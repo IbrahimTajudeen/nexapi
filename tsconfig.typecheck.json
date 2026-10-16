@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "baseUrl": ".",
+    "paths": {
+      "@nexapi/core": ["packages/core/src/index.ts"],
+      "@nexapi/codegen": ["packages/codegen/src/index.ts"],
+      "@nexapi/react": ["packages/react/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/*/src",
+    "packages/*/test",
+    "tests",
+    "examples/*/src",
+    "examples/*/generated",
+    "vitest.config.ts"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@nexapi/benchmarks",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "bench": "node --expose-gc run.mjs"
+  },
+  "dependencies": {
+    "@nexapi/core": "workspace:*",
+    "@tanstack/query-core": "5.104.2"
+  }
+}

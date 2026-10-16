@@ -1,0 +1,23 @@
+{
+  "name": "@nexapi/core",
+  "version": "0.0.1",
+  "description": "Framework-independent query cache, mutation engine and Fetch runtime for NexAPI",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  }
+}
