@@ -18,13 +18,22 @@ NodeNext consumer plus a React component against the generated client, and runs 
 npm registry for `react`, `typescript` and `@types/*`, so it needs network access. It has been
 mutation-checked: breaking the consumer's runtime or type expectations makes it fail.
 
-## Publishing (manual, when you decide to)
+## Publishing
 
 1. Pick the version (SemVer; `0.x` allows breaking changes in minors) and set it in every publishable
    `packages/*/package.json` (`core`, `codegen`, `cli`, `react`). `devtools` stays private.
 2. Add a CHANGELOG entry at the repository root (not created yet).
-3. `pnpm smoke:pack`, then `pnpm -r publish --access public` from a clean checkout of the tagged commit.
-   Publishing order is handled by pnpm's topological sort.
+3. Commit and push the version changes, then create and publish a GitHub release whose tag is `v<version>`
+   (for example, `v0.0.1`). The `Publish to npm` workflow runs `pnpm check` and `pnpm smoke:pack`,
+   verifies all four package versions match the tag, and publishes the workspace packages in dependency
+   order.
+
+Before the first release, add an `NPM_TOKEN` Actions secret with publish access to the `@nexapi` npm
+scope. Scoped packages need `--access public` on their first public publish. The private `devtools`
+and `benchmarks` workspace packages are not published.
+
+To publish manually instead, run `pnpm smoke:pack` and then `pnpm -r publish --access public` from a
+clean checkout of the tagged commit. Publishing order is handled by pnpm's topological sort.
 
 Not set up: automated versioning (changesets), provenance attestations, a `repository` field in the
 manifests (it needs the real repository URL), and CHANGELOG generation.
