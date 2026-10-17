@@ -1,6 +1,7 @@
 import { resolveConfig, type NexApiConfig } from "./config.js";
 import type {
   ApiModel,
+  BodyKind,
   Diagnostic,
   HttpMethod,
   OperationModel,
@@ -248,6 +249,58 @@ export function buildApiModel(
   // ---- operations ---------------------------------------------------------------------------
   const operations: OperationModel[] = [];
   const paths = isObj(document["paths"]) ? document["paths"] : {};
+  const textContent = (content: unknown): Obj | undefined => {
+    if (!isObj(content)) return undefined;
+    const key = Object.keys(content).find((k) => /^text\//i.test(k));
+    return key === undefined ? undefined : (content[key] as Obj | undefined);
+  };
+
+  /** Preferred request body encoding among the declared media types. */
+  const pickBody = (content: unknown): { kind: BodyKind; schema: Obj } | undefined => {
+    if (!isObj(content)) return undefined;
+    const json = jsonContent(content);
+    if (json) return { kind: "json", schema: json };
+    const find = (re: RegExp): Obj | undefined => {
+      const key = Object.keys(content).find((k) => re.test(k));
+      return key === undefined ? undefined : (content[key] as Obj | undefined);
+    };
+    const multipart = find(/^multipart\/form-data/i);
+    if (multipart) return { kind: "form-data", schema: multipart };
+    const urlencoded = find(/^application\/x-www-form-urlencoded/i);
+    if (urlencoded) return { kind: "urlencoded", schema: urlencoded };
+    const text = find(/^text\/plain/i);
+    if (text) return { kind: "text", schema: text };
+    for (const key of Object.keys(content)) {
+      const entry = content[key];
+      const schema = isObj(entry) ? entry["schema"] : undefined;
+      if (
+        /^application\/octet-stream/i.test(key) ||
+        (isObj(schema) && schema["type"] === "string" && schema["format"] === "binary")
+      )
+        return { kind: "binary", schema: entry as Obj };
+    }
+    return undefined;
+  };
+
+  /** Why `type` cannot be sent as `kind` (the runtime would refuse it), or `undefined`. */
+  const bodyProblem = (kind: BodyKind, type: TypeNode): string | undefined => {
+    if (kind === "binary")
+      return type.kind === "primitive" && type.type === "Blob"
+        ? undefined
+        : 'a binary request body must be a string with format "binary"';
+    if (kind !== "form-data" && kind !== "urlencoded") return undefined;
+    if (type.kind !== "object" || type.additional !== null)
+      return `a ${kind} body must be an object with declared properties`;
+    const field = (t: TypeNode): boolean =>
+      isScalarLike(t) || (kind === "form-data" && t.kind === "primitive" && t.type === "Blob");
+    const bad = type.properties.find(
+      (p) => !(field(p.type) || (p.type.kind === "array" && field(p.type.item))),
+    );
+    return bad
+      ? `${kind} body property "${bad.name}" must be a scalar${kind === "form-data" ? ", file" : ""} or an array of them`
+      : undefined;
+  };
+
   const jsonContent = (content: unknown): Obj | undefined => {
     if (!isObj(content)) return undefined;
     const key = Object.keys(content).find((k) => /^application\/(.+\+)?json(\s*;.*)?$/i.test(k));
@@ -309,21 +362,20 @@ export function buildApiModel(
         };
         const description = str(param["description"]);
         if (description) model.description = description;
-        if (type.kind === "object" || (type.kind === "array" && type.item.kind === "object"))
+        const queryStyle = where === "query" ? queryStyleOf(param, type) : undefined;
+        if (queryStyle) model.style = queryStyle;
+        else if (where === "query" && type.kind === "array" && hasUnhandledArrayStyle(param))
+          warn(
+            "UNSUPPORTED_STYLE",
+            `${label}: query parameter "${name}" uses an array style that is not supported; it will be sent exploded (a=1&a=2)`,
+          );
+        else if (type.kind === "object" || (type.kind === "array" && type.item.kind === "object"))
           error(
             "UNSUPPORTED_PARAMETER",
             `${label}: ${where} parameter "${name}" has an object schema (deepObject/JSON serialization is not supported)`,
           );
         if (where === "path") declaredPath.set(name, model);
         else if (where === "query") {
-          if (
-            type.kind === "array" &&
-            (param["explode"] === false || (str(param["style"]) ?? "form") !== "form")
-          )
-            warn(
-              "UNSUPPORTED_STYLE",
-              `${label}: query parameter "${name}" uses a non-default array style; it will be sent exploded (a=1&a=2)`,
-            );
           queryParams.push(model);
         } else if (where === "header") {
           if (!SKIPPED_HEADERS.has(name.toLowerCase())) headerParams.push(model);
@@ -349,23 +401,31 @@ export function buildApiModel(
       if (op["requestBody"] !== undefined) {
         const rb = deref(op["requestBody"], `${label} requestBody`);
         if (rb) {
-          const json = jsonContent(rb["content"]);
-          if (!json) {
+          const picked = pickBody(rb["content"]);
+          if (!picked) {
             const types = isObj(rb["content"]) ? Object.keys(rb["content"]).join(", ") : "none";
             error(
               "UNSUPPORTED_CONTENT_TYPE",
-              `${label}: request body content types [${types}] are not supported yet (JSON only). Add "${id}" to "exclude" to skip it.`,
+              `${label}: request body content types [${types}] are not supported (JSON, multipart/form-data, application/x-www-form-urlencoded, text/plain and binary are). Add "${id}" to "exclude" to skip it.`,
             );
           } else if (method === "get" || method === "head")
             error(
               "BODY_NOT_ALLOWED",
               `${label}: ${method.toUpperCase()} operations cannot have a request body`,
             );
-          else
-            body = {
-              type: convert(json["schema"], `${label} requestBody`),
-              required: rb["required"] === true,
-            };
+          else {
+            const type =
+              picked.kind === "text"
+                ? ({ kind: "primitive", type: "string" } as TypeNode)
+                : convert(picked.schema["schema"], `${label} requestBody`);
+            const problem = bodyProblem(picked.kind, type);
+            if (problem)
+              error(
+                "UNSUPPORTED_BODY_SCHEMA",
+                `${label}: ${problem}. Add "${id}" to "exclude" to skip it.`,
+              );
+            else body = { type, required: rb["required"] === true, kind: picked.kind };
+          }
         }
       }
 
@@ -374,7 +434,7 @@ export function buildApiModel(
       const success: TypeNode[] = [];
       const errors: { status: string; type: TypeNode }[] = [];
       let sawSuccess = false;
-      let sawUnsupportedSuccess = false;
+      const successKinds = new Set<"json" | "text" | "blob">();
       for (const status of Object.keys(responses).sort()) {
         const res = deref(responses[status], `${label} response ${status}`);
         if (!res) continue;
@@ -383,29 +443,37 @@ export function buildApiModel(
         if (!isSuccess && !isError) continue;
         const content = isObj(res["content"]) ? res["content"] : undefined;
         const json = jsonContent(content);
+        const text = json ? undefined : textContent(content);
         const noContent =
           content === undefined ||
           Object.keys(content).length === 0 ||
           status === "204" ||
           status === "205";
         let node: TypeNode | undefined;
-        if (json) node = convert(json["schema"], `${label} response ${status}`);
-        else if (noContent) node = isSuccess ? VOID : { kind: "primitive", type: "undefined" };
-        else if (isSuccess) {
-          sawUnsupportedSuccess = true;
-          error(
-            "UNSUPPORTED_CONTENT_TYPE",
-            `${label}: response ${status} content types [${Object.keys(content ?? {}).join(", ")}] are not supported yet (JSON only). Add "${id}" to "exclude" to skip it.`,
-          );
+        if (json) {
+          node = convert(json["schema"], `${label} response ${status}`);
+          if (isSuccess) successKinds.add("json");
+        } else if (noContent) node = isSuccess ? VOID : { kind: "primitive", type: "undefined" };
+        else if (text) {
+          node = { kind: "primitive", type: "string" };
+          if (isSuccess) successKinds.add("text");
+        } else if (isSuccess) {
+          node = { kind: "primitive", type: "Blob" };
+          successKinds.add("blob");
         }
         if (isSuccess) {
           sawSuccess = true;
           if (node) success.push(node);
         } else if (node) errors.push({ status: status.toUpperCase(), type: node });
       }
-      if (!sawSuccess && !sawUnsupportedSuccess)
-        error("NO_SUCCESS_RESPONSE", `${label}: no 2xx response is declared`);
+      if (!sawSuccess) error("NO_SUCCESS_RESPONSE", `${label}: no 2xx response is declared`);
 
+      if (successKinds.size > 1) {
+        error(
+          "UNSUPPORTED_CONTENT_TYPE",
+          `${label}: success responses mix payload kinds [${[...successKinds].join(", ")}]; one operation can return only one kind. Add "${id}" to "exclude" to skip it.`,
+        );
+      }
       const successNode = success.length === 0 ? VOID : union(success);
       const op_: OperationModel = {
         id,
@@ -419,7 +487,9 @@ export function buildApiModel(
         success: successNode,
         errors,
         responseKind:
-          successNode.kind === "primitive" && successNode.type === "void" ? "none" : "json",
+          successNode.kind === "primitive" && successNode.type === "void"
+            ? "none"
+            : (successKinds.values().next().value ?? "json"),
       };
       const summary = str(op["summary"]);
       const description = str(op["description"]);
@@ -451,4 +521,49 @@ export function buildApiModel(
     },
     diagnostics,
   };
+}
+
+/**
+ * Query serialization other than the exploded default, or `undefined` for the default.
+ * Unsupported combinations are errors, never silently sent in a different form.
+ */
+function queryStyleOf(param: Record<string, unknown>, type: TypeNode): ParameterModel["style"] {
+  const style = typeof param["style"] === "string" ? param["style"] : "form";
+  const explode = param["explode"];
+  if (style === "deepObject") {
+    if (type.kind !== "object" || type.additional !== null || explode === false) return undefined;
+    return type.properties.every((p) => isScalarLike(p.type)) ? "deepObject" : undefined;
+  }
+  if (type.kind !== "array" || !isScalarLike(type.item)) return undefined;
+  if (style === "form") return explode === false ? "csv" : undefined;
+  if (explode === true) return undefined; // delimited styles with explode=true are sent exploded
+  if (style === "spaceDelimited") return "space";
+  if (style === "pipeDelimited") return "pipe";
+  return undefined;
+}
+
+function isScalarLike(type: TypeNode): boolean {
+  switch (type.kind) {
+    case "primitive":
+      return type.type === "string" || type.type === "number" || type.type === "boolean";
+    case "literal":
+      return true;
+    case "ref":
+      return true; // enums/aliases; the runtime still rejects anything that is not a primitive
+    case "union":
+      return type.members.every(
+        (m) => isScalarLike(m) || (m.kind === "primitive" && m.type === "null"),
+      );
+    default:
+      return false;
+  }
+}
+
+/** Array style/explode settings that are neither the default nor one of the implemented forms. */
+function hasUnhandledArrayStyle(param: Record<string, unknown>): boolean {
+  const style = typeof param["style"] === "string" ? param["style"] : "form";
+  const explode = param["explode"];
+  if (style === "form") return explode === false; // csv was not applicable (non-scalar items)
+  if ((style === "spaceDelimited" || style === "pipeDelimited") && explode === true) return false;
+  return true;
 }

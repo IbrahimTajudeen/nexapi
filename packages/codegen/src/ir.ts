@@ -40,6 +40,8 @@ export interface ParameterModel {
   type: TypeNode;
   required: boolean;
   description?: string;
+  /** Query parameters only: non-default serialization (default is exploded `a=1&a=2`). */
+  style?: "csv" | "space" | "pipe" | "deepObject";
 }
 
 export interface OperationModel {
@@ -56,14 +58,17 @@ export interface OperationModel {
   pathParams: ParameterModel[];
   queryParams: ParameterModel[];
   headerParams: ParameterModel[];
-  body?: { type: TypeNode; required: boolean };
+  body?: { type: TypeNode; required: boolean; kind: BodyKind };
   /** Union of 2xx payloads; `void` when there is no content. */
   success: TypeNode;
   /** Documented error responses; `status` is `"404"`, `"4XX"` or `"default"`. */
   errors: { status: string; type: TypeNode }[];
   /** `none` when every success response is empty. */
-  responseKind: "json" | "none";
+  responseKind: "json" | "none" | "text" | "blob";
 }
+
+/** How the request body is sent (matches `@nexapi/core`'s `BodyKind`). */
+export type BodyKind = "json" | "form-data" | "urlencoded" | "binary" | "text";
 
 export interface ApiModel {
   title: string;

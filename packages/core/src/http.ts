@@ -49,10 +49,14 @@ export interface RequestSpec {
   path: string;
   params?: Readonly<Record<string, PathParamValue>>;
   query?: Readonly<Record<string, unknown>> | undefined;
+  /** Per-parameter query serialization; parameters not listed use the exploded default. */
+  queryStyles?: Readonly<Record<string, QueryStyle>> | undefined;
   headers?: Readonly<Record<string, HeaderValue>> | undefined;
   body?: unknown;
+  /** Encoding of `body`. Default `json`. */
+  bodyKind?: BodyKind;
   /** `json` (default) requires a JSON body; `none` ignores any body (e.g. 204 endpoints). */
-  response?: "json" | "none";
+  response?: ResponseKind;
   signal?: AbortSignal | undefined;
   timeoutMs?: number | undefined;
 }
@@ -75,41 +79,171 @@ export function expandPath(
   });
 }
 
-function appendQuery(search: URLSearchParams, name: string, value: unknown): void {
-  if (value === undefined || value === null) return;
-  if (Array.isArray(value)) {
-    for (const item of value as unknown[]) appendQuery(search, name, item);
-    return;
-  }
-  if (value instanceof Date) return void search.append(name, value.toISOString());
+/** Serialization of one query parameter, beyond the default exploded form (`a=1&a=2`). */
+export type QueryStyle = "csv" | "space" | "pipe" | "deepObject";
+
+const DELIMITERS = { csv: ",", space: " ", pipe: "|" } as const;
+
+/** A primitive's string form, or `undefined` when there is none to send (`undefined`/`null`). */
+function scalar(name: string, value: unknown, what = "Query parameter"): string | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (value instanceof Date) return value.toISOString();
   switch (typeof value) {
     case "string":
-      return void search.append(name, value);
+      return value;
     case "number":
-      if (!Number.isFinite(value))
-        throw new RequestError(`Query parameter "${name}" is not finite`);
-      return void search.append(name, String(value));
+      if (!Number.isFinite(value)) throw new RequestError(`${what} "${name}" is not finite`);
+      return String(value);
     case "boolean":
-      return void search.append(name, value ? "true" : "false");
+      return value ? "true" : "false";
     default:
-      throw new RequestError(
-        `Query parameter "${name}" must be a primitive, Date or array of primitives`,
-      );
+      throw new RequestError(`${what} "${name}" must be a primitive, Date or array of primitives`);
   }
 }
 
-/** `a=1&a=2` style (exploded arrays); `undefined`/`null` are skipped; nested objects are rejected. */
-export function serializeQuery(query: Readonly<Record<string, unknown>> | undefined): string {
+function appendQuery(
+  search: URLSearchParams,
+  name: string,
+  value: unknown,
+  what = "Query parameter",
+): void {
+  if (Array.isArray(value)) {
+    for (const item of value as unknown[]) appendQuery(search, name, item, what);
+    return;
+  }
+  const text = scalar(name, value, what);
+  if (text !== undefined) search.append(name, text);
+}
+
+/** How a request body is encoded. `json` is the default. */
+export type BodyKind = "json" | "form-data" | "urlencoded" | "binary" | "text";
+/** How a successful response body is decoded. `none` ignores it. */
+export type ResponseKind = "json" | "none" | "text" | "blob";
+
+function plainRecord(body: unknown, what: string): Record<string, unknown> {
+  if (typeof body !== "object" || body === null || Array.isArray(body) || body instanceof Blob)
+    throw new RequestError(`${what} body must be a plain object`);
+  return body as Record<string, unknown>;
+}
+
+function toFormData(body: unknown): FormData {
+  if (body instanceof FormData) return body;
+  const record = plainRecord(body, "multipart/form-data");
+  const form = new FormData();
+  const add = (name: string, value: unknown): void => {
+    if (value === undefined || value === null) return;
+    if (value instanceof Blob) return void form.append(name, value);
+    if (Array.isArray(value)) {
+      for (const item of value as unknown[]) add(name, item);
+      return;
+    }
+    const text = scalar(name, value, "Form field");
+    if (text !== undefined) form.append(name, text);
+  };
+  for (const name of Object.keys(record)) add(name, record[name]);
+  return form;
+}
+
+function toUrlEncoded(body: unknown): string {
+  const record = plainRecord(body, "application/x-www-form-urlencoded");
+  const search = new URLSearchParams();
+  for (const name of Object.keys(record)) appendQuery(search, name, record[name], "Form field");
+  return search.toString();
+}
+
+function encodeBody(kind: BodyKind, body: unknown, headers: Headers): BodyInit {
+  switch (kind) {
+    case "json": {
+      let text: string;
+      try {
+        text = JSON.stringify(body);
+      } catch (cause) {
+        throw new RequestError(`Request body is not JSON-serializable: ${String(cause)}`);
+      }
+      if (!headers.has("content-type")) headers.set("content-type", "application/json");
+      return text;
+    }
+    case "text":
+      if (typeof body !== "string") throw new RequestError("A text body must be a string");
+      if (!headers.has("content-type")) headers.set("content-type", "text/plain; charset=utf-8");
+      return body;
+    case "binary":
+      if (!(body instanceof Blob) && !(body instanceof ArrayBuffer) && !ArrayBuffer.isView(body))
+        throw new RequestError("A binary body must be a Blob, ArrayBuffer or typed array");
+      if (!headers.has("content-type"))
+        headers.set(
+          "content-type",
+          body instanceof Blob && body.type !== "" ? body.type : "application/octet-stream",
+        );
+      return body as BodyInit;
+    case "urlencoded":
+      if (!headers.has("content-type"))
+        headers.set("content-type", "application/x-www-form-urlencoded");
+      return toUrlEncoded(body);
+    case "form-data":
+      // no content-type: `fetch` adds `multipart/form-data; boundary=...` itself
+      headers.delete("content-type");
+      return toFormData(body);
+  }
+}
+
+function appendStyled(
+  search: URLSearchParams,
+  name: string,
+  value: unknown,
+  style: QueryStyle,
+): void {
+  if (value === undefined || value === null) return;
+  if (style === "deepObject") {
+    if (typeof value !== "object" || Array.isArray(value) || value instanceof Date)
+      throw new RequestError(`Query parameter "${name}" must be an object of primitives`);
+    for (const key of Object.keys(value)) {
+      if (/[[\]]/.test(key))
+        throw new RequestError(`Query parameter "${name}" has a key containing "[" or "]"`);
+      const text = scalar(`${name}[${key}]`, (value as Record<string, unknown>)[key]);
+      if (text !== undefined) search.append(`${name}[${key}]`, text);
+    }
+    return;
+  }
+  if (!Array.isArray(value))
+    throw new RequestError(`Query parameter "${name}" must be an array (${style}-delimited)`);
+  const delimiter = DELIMITERS[style];
+  const parts: string[] = [];
+  for (const item of value as unknown[]) {
+    const text = scalar(name, item);
+    if (text === undefined) continue;
+    if (text.includes(delimiter))
+      throw new RequestError(
+        `Query parameter "${name}" has a value containing its "${delimiter}" delimiter, which would be ambiguous`,
+      );
+    parts.push(text);
+  }
+  if (parts.length > 0) search.append(name, parts.join(delimiter));
+}
+
+/**
+ * Default is `a=1&a=2` (exploded arrays). `styles` selects another form per parameter:
+ * comma/space/pipe-delimited arrays and `deepObject` (`filter[a]=1`). `undefined`/`null` are
+ * skipped; nested structures and values containing their own delimiter are rejected.
+ */
+export function serializeQuery(
+  query: Readonly<Record<string, unknown>> | undefined,
+  styles?: Readonly<Record<string, QueryStyle>>,
+): string {
   if (!query) return "";
   const search = new URLSearchParams();
-  for (const name of Object.keys(query)) appendQuery(search, name, query[name]);
+  for (const name of Object.keys(query)) {
+    const style = styles?.[name];
+    if (style) appendStyled(search, name, query[name], style);
+    else appendQuery(search, name, query[name]);
+  }
   return search.toString();
 }
 
 /** Resolve a request URL, guaranteeing it stays on the configured origin. */
 export function buildUrl(
   base: URL,
-  spec: Pick<RequestSpec, "path" | "params" | "query">,
+  spec: Pick<RequestSpec, "path" | "params" | "query" | "queryStyles">,
   allowAbsoluteUrls: boolean,
 ): URL {
   const expanded = expandPath(spec.path, spec.params);
@@ -129,7 +263,7 @@ export function buildUrl(
     url.pathname = base.pathname.replace(/\/+$/, "") + expanded;
     if (url.origin !== base.origin) throw new RequestError("Request URL escaped the base origin");
   }
-  const qs = serializeQuery(spec.query);
+  const qs = serializeQuery(spec.query, spec.queryStyles);
   if (qs) url.search = qs;
   return url;
 }
@@ -188,17 +322,14 @@ export class HttpClient {
     if (spec.headers)
       for (const [name, value] of Object.entries(spec.headers))
         if (value !== undefined) headers.set(name, String(value));
-    if (!headers.has("accept")) headers.set("accept", "application/json");
+    if (!headers.has("accept"))
+      headers.set(
+        "accept",
+        spec.response === "text" ? "text/*" : spec.response === "blob" ? "*/*" : "application/json",
+      );
 
-    let body: string | undefined;
-    if (spec.body !== undefined) {
-      try {
-        body = JSON.stringify(spec.body);
-      } catch (cause) {
-        throw new RequestError(`Request body is not JSON-serializable: ${String(cause)}`);
-      }
-      if (!headers.has("content-type")) headers.set("content-type", "application/json");
-    }
+    let body: BodyInit | undefined;
+    if (spec.body !== undefined) body = encodeBody(spec.bodyKind ?? "json", spec.body, headers);
 
     // Link caller abort + timeout into one controller so we can tell them apart.
     const controller = new AbortController();
@@ -248,6 +379,10 @@ export class HttpClient {
           await response.body?.cancel().catch(() => undefined);
           return undefined as TData;
         }
+        if (spec.response === "text")
+          return (await raceAbort(response.text(), controller.signal)) as TData;
+        if (spec.response === "blob")
+          return (await raceAbort(response.blob(), controller.signal)) as TData;
         const text = await raceAbort(response.text(), controller.signal);
         if (text === "")
           throw new ParseError(

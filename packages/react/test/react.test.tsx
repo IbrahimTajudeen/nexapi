@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { StrictMode, act, type ReactElement } from "react";
+import { Component, StrictMode, Suspense, act, type ReactElement, type ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { renderToString } from "react-dom/server";
+import { renderToPipeableStream, renderToString } from "react-dom/server";
+import { Writable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   createNexClient,
@@ -13,7 +14,13 @@ import {
   type Transport,
 } from "@nexapi/core";
 import { createApi } from "../../../examples/basic/generated/index.js";
-import { NexProvider, useInfiniteQuery, useMutation, useQuery } from "../src/index.js";
+import {
+  NexProvider,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useSuspenseQuery,
+} from "../src/index.js";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -401,12 +408,169 @@ describe("useInfiniteQuery", () => {
     await settle();
     expect(host.querySelector("#items")?.textContent).toBe("0");
     const button = host.querySelector("button");
-    await act(async () => button?.click());
+    await act(async () => {
+      void rig.api.users.byId("9").get.invalidate(); // what a boundary's reset handler does
+      button?.click();
+    });
     await settle();
     await act(async () => button?.click());
     await settle();
     expect(host.querySelector("#items")?.textContent).toBe("0,1,2");
     expect(button?.disabled).toBe(true); // no next page
     expect(fns.size).toBe(1);
+  });
+});
+
+class Boundary extends Component<
+  { children: ReactNode; onError?: (e: unknown) => void },
+  { error: unknown; failed: boolean }
+> {
+  override state = { error: undefined as unknown, failed: false };
+  static getDerivedStateFromError(error: unknown): { error: unknown; failed: boolean } {
+    return { error, failed: true };
+  }
+  override componentDidCatch(error: unknown): void {
+    this.props.onError?.(error);
+  }
+  reset = (): void => this.setState({ error: undefined, failed: false });
+  override render(): ReactNode {
+    return this.state.failed ? (
+      <button onClick={this.reset}>failed: {(this.state.error as Error).name}</button>
+    ) : (
+      this.props.children
+    );
+  }
+}
+
+describe("useSuspenseQuery", () => {
+  it("shows the fallback until the first data arrives, then renders defined data with one request", async () => {
+    const rig = makeRig();
+    rig.delay = 20;
+    function User({ id }: { id: string }): ReactElement {
+      const q = useSuspenseQuery(rig.api.users.byId(id).get.options());
+      return <p>{q.data.name.toUpperCase()}</p>;
+    }
+    await render(
+      <Suspense fallback={<i>loading</i>}>
+        <User id="1" />
+        <User id="1" />
+      </Suspense>,
+    );
+    expect(host.textContent).toBe("loading");
+    await settle(80);
+    expect(host.textContent).toBe("ADAADA");
+    expect(rig.requests).toHaveLength(1); // both components shared one run
+  });
+
+  it("does not suspend on cached data, even stale; refetches in the background", async () => {
+    const rig = makeRig();
+    rig.nex.queryClient.buildQuery({
+      queryKey: rig.api.users.byId("1").get.key(),
+      initialData: { id: "1", name: "Cached", role: "admin" },
+      initialDataUpdatedAt: 1, // long ago, so stale
+    });
+    rig.users["1"] = { id: "1", name: "Fresh", role: "admin" };
+    rig.delay = 20;
+    function User(): ReactElement {
+      const q = useSuspenseQuery(rig.api.users.byId("1").get.options());
+      return <p>{q.data.name}</p>;
+    }
+    await render(
+      <Suspense fallback={<i>loading</i>}>
+        <User />
+      </Suspense>,
+    );
+    expect(host.textContent).toBe("Cached");
+    await settle(80);
+    expect(host.textContent).toBe("Fresh");
+  });
+
+  it("throws a failed first load to the error boundary; invalidating then resetting retries once", async () => {
+    const rig = makeRig();
+    const caught: unknown[] = [];
+    function User({ id }: { id: string }): ReactElement {
+      const q = useSuspenseQuery(rig.api.users.byId(id).get.options());
+      return <p>{q.data.name}</p>;
+    }
+    await render(
+      <Boundary onError={(e) => caught.push(e)}>
+        <Suspense fallback={<i>loading</i>}>
+          <User id="9" />
+        </Suspense>
+      </Boundary>,
+    );
+    await settle(30);
+    expect(host.textContent).toBe("failed: HttpError");
+    expect(caught).toHaveLength(1);
+    const before = rig.requests.length;
+
+    rig.users["9"] = { id: "9", name: "Now exists", role: "member" };
+    const button = host.querySelector("button");
+    await act(async () => {
+      void rig.api.users.byId("9").get.invalidate(); // what a boundary's reset handler does
+      button?.click();
+    });
+    await settle(30);
+    expect(host.textContent).toBe("Now exists");
+    expect(rig.requests.length).toBe(before + 1); // exactly one retry
+  });
+
+  it("a failed background refetch keeps rendering the data and does not throw", async () => {
+    const rig = makeRig();
+    function User(): ReactElement {
+      const q = useSuspenseQuery({
+        ...rig.api.users.byId("1").get.options(undefined, { staleTime: 0 }),
+      });
+      return <p>{q.data.name}</p>;
+    }
+    await render(
+      <Boundary>
+        <Suspense fallback={<i>loading</i>}>
+          <User />
+        </Suspense>
+      </Boundary>,
+    );
+    await settle(30);
+    expect(host.textContent).toBe("Ada");
+    delete rig.users["1"]; // the next refetch 404s
+    await act(
+      async () =>
+        void (await rig.nex.queryClient.refetchQueries({ queryKey: [] }).catch(() => undefined)),
+    );
+    await settle(30);
+    expect(host.textContent).toBe("Ada");
+  });
+
+  it("streaming SSR waits for the data on the server, in the request's own client", async () => {
+    const rig = makeRig();
+    rig.delay = 10;
+    function User(): ReactElement {
+      const q = useSuspenseQuery(rig.api.users.byId("1").get.options());
+      return <p>{q.data.name}</p>;
+    }
+    const html = await new Promise<string>((resolve, reject) => {
+      let out = "";
+      const sink = new Writable({
+        write(chunk: Buffer, _enc, done) {
+          out += chunk.toString("utf8");
+          done();
+        },
+        final(done) {
+          resolve(out);
+          done();
+        },
+      });
+      const stream = renderToPipeableStream(
+        <NexProvider client={rig.nex.queryClient}>
+          <Suspense fallback={<i>loading</i>}>
+            <User />
+          </Suspense>
+        </NexProvider>,
+        { onAllReady: () => stream.pipe(sink), onError: reject },
+      );
+    });
+    expect(html).toContain("<p>Ada</p>");
+    expect(html).not.toContain("loading");
+    expect(rig.requests).toHaveLength(1);
   });
 });

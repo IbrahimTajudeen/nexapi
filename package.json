@@ -19,7 +19,8 @@
     "generate:example": "pnpm build && node packages/cli/dist/cli.js generate --config examples/basic/nexapi.config.json",
     "generate:check": "pnpm build && node packages/cli/dist/cli.js generate --config examples/basic/nexapi.config.json --check",
     "bench": "pnpm --filter @nexapi/benchmarks bench",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm generate:check"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm generate:check",
+    "smoke:pack": "pnpm build && node scripts/smoke-pack.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",

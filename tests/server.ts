@@ -27,10 +27,14 @@ function send(res: ServerResponse, status: number, body?: unknown): void {
   res.writeHead(status, { "content-type": "application/json" }).end(JSON.stringify(body));
 }
 
-async function readJson(req: IncomingMessage): Promise<unknown> {
+async function readRaw(req: IncomingMessage): Promise<Buffer> {
   const chunks: Buffer[] = [];
   for await (const c of req) chunks.push(c as Buffer);
-  const text = Buffer.concat(chunks).toString("utf8");
+  return Buffer.concat(chunks);
+}
+
+function parseJson(raw: Buffer): unknown {
+  const text = raw.toString("utf8");
   return text ? (JSON.parse(text) as unknown) : undefined;
 }
 
@@ -54,7 +58,17 @@ export async function startServer(): Promise<TestServer> {
   const server: Server = createServer((req, res) => {
     void (async () => {
       const url = new URL(req.url ?? "/", "http://x");
-      const body = await readJson(req).catch(() => undefined);
+      const raw = await readRaw(req);
+      const contentType = req.headers["content-type"] ?? "";
+      const body = contentType.includes("json")
+        ? (() => {
+            try {
+              return parseJson(raw);
+            } catch {
+              return undefined;
+            }
+          })()
+        : undefined;
       state.requests.push({
         method: req.method ?? "",
         url: req.url ?? "",
@@ -65,6 +79,26 @@ export async function startServer(): Promise<TestServer> {
       const path = url.pathname;
       const m = /^\/v1\/users\/(.+)$/.exec(path);
 
+      const avatar = /^\/v1\/users\/([^/]+)\/avatar$/.exec(path);
+      if (avatar && req.method === "POST") {
+        const form = await new Response(new Uint8Array(raw), {
+          headers: { "content-type": contentType },
+        }).formData();
+        const file = form.get("file");
+        return send(res, 200, {
+          bytes: file instanceof Blob ? file.size : 0,
+          caption: form.get("caption") ?? undefined,
+          tags: form.getAll("tags"),
+        });
+      }
+      if (avatar && req.method === "GET") {
+        res.writeHead(200, { "content-type": "image/png" }).end(Buffer.from([137, 80, 78, 71]));
+        return;
+      }
+      if (req.method === "GET" && path === "/v1/exports/users") {
+        res.writeHead(200, { "content-type": "text/csv" }).end("id,name\n1,Ada\n");
+        return;
+      }
       if (req.method === "POST" && path === "/v1/auth/login") {
         const b = body as { email?: string; password?: string } | undefined;
         if (b?.password !== "secret")

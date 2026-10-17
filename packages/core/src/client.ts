@@ -58,6 +58,13 @@ export class QueryClient implements QueryHost {
   readonly defaultGcTime: number;
 
   readonly #queries = new Map<string, Query>();
+  /**
+   * Entries bucketed by the primitive first element of their key (`["users", ...]` → `"users"`).
+   * A prefix filter that starts with a primitive only has to look at its own bucket, so
+   * `invalidate(["users"])` no longer scans every entry. Buckets are a superset filter: every
+   * candidate is still checked with the real prefix match, and everything else falls back to a scan.
+   */
+  readonly #byRoot = new Map<string, Set<Query>>();
   readonly #observers = new Set<ObserverHandle>();
   readonly #defaults: QueryDefaults | undefined;
   readonly #focus: FocusManager;
@@ -90,7 +97,11 @@ export class QueryClient implements QueryHost {
     return ++this.#clock;
   }
   removeQuery(query: { readonly hash: string; destroy(): void }): void {
-    if ((this.#queries.get(query.hash) as unknown) === query) this.#queries.delete(query.hash);
+    const stored = this.#queries.get(query.hash);
+    if ((stored as unknown) === query) {
+      this.#queries.delete(query.hash);
+      if (stored) this.#unindex(stored);
+    }
     query.destroy();
   }
   reportUpdaterError(error: unknown): void {
@@ -117,6 +128,7 @@ export class QueryClient implements QueryHost {
     if (!query) {
       query = new Query(this, options.queryKey, hash);
       this.#queries.set(hash, query);
+      this.#index(query);
       const seed = options.initialData;
       if (seed !== undefined) {
         const value = typeof seed === "function" ? (seed as () => unknown)() : seed;
@@ -143,13 +155,33 @@ export class QueryClient implements QueryHost {
       if (q && this.#matches(q, filter)) out.push(q);
       return out;
     }
-    for (const q of this.#queries.values()) {
+    const root = queryKey ? rootOf(queryKey) : undefined;
+    const candidates: Iterable<Query> =
+      root === undefined ? this.#queries.values() : (this.#byRoot.get(root) ?? []);
+    for (const q of candidates) {
       if (queryKey && !keyMatchesPrefix(q.key, queryKey)) continue;
       if (active !== undefined && active !== q.observerCount > 0) continue;
       if (predicate && !predicate(q)) continue;
       out.push(q);
     }
     return out;
+  }
+
+  #index(query: Query): void {
+    const root = rootOf(query.key);
+    if (root === undefined) return;
+    let bucket = this.#byRoot.get(root);
+    if (!bucket) this.#byRoot.set(root, (bucket = new Set()));
+    bucket.add(query);
+  }
+
+  #unindex(query: Query): void {
+    const root = rootOf(query.key);
+    if (root === undefined) return;
+    const bucket = this.#byRoot.get(root);
+    if (!bucket) return;
+    bucket.delete(query);
+    if (bucket.size === 0) this.#byRoot.delete(root);
   }
 
   #matches(q: Query, f: QueryFilter): boolean {
@@ -312,4 +344,13 @@ export class QueryClient implements QueryHost {
     for (const off of this.#unsubscribeEnv) off();
     this.#unsubscribeEnv = [];
   }
+}
+
+/** Bucket token for a key whose first element is a primitive; `undefined` ⇒ not indexable. */
+function rootOf(key: QueryKey): string | undefined {
+  const first = key[0];
+  if (key.length === 0) return undefined;
+  if (first === null || ["string", "number", "boolean"].includes(typeof first))
+    return hashKey([first]);
+  return undefined;
 }

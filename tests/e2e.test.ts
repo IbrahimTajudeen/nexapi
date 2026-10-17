@@ -1,7 +1,13 @@
 import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { generate } from "@nexapi/codegen";
-import { HttpError, QueryObserver, createNexClient, type NexClient } from "@nexapi/core";
+import {
+  HttpError,
+  QueryObserver,
+  ResponseValidationError,
+  createNexClient,
+  type NexClient,
+} from "@nexapi/core";
 import { createApi } from "../examples/basic/generated/index.js";
 import type { User } from "../examples/basic/generated/index.js";
 import { startServer, type TestServer } from "./server.js";
@@ -109,6 +115,71 @@ describe("generated client: direct HTTP", () => {
     await expect(createApi(down).users.byId("1").get()).rejects.toMatchObject({
       name: "NetworkError",
     });
+  });
+});
+
+describe("generated client: bodies and non-JSON payloads", () => {
+  it("uploadAvatar sends multipart (file, scalar, repeated array) and returns the typed reply", async () => {
+    const file = new Blob([new Uint8Array([1, 2, 3, 4, 5])], { type: "image/png" });
+    const reply = await api.users.byId("1").avatar.post({ file, caption: "me", tags: ["a", "b"] });
+    expect(reply).toEqual({ bytes: 5, caption: "me", tags: ["a", "b"] });
+  });
+
+  it("getAvatar returns a Blob; exportUsers returns text and applies csv/deepObject query styles", async () => {
+    const blob = await api.users.byId("1").avatar.get();
+    expect(blob).toBeInstanceOf(Blob);
+    expect(blob.type).toBe("image/png");
+    expect(blob.size).toBe(4);
+    const csv = await api.exports.users.get({
+      query: { columns: ["id", "name"], filter: { role: "admin" } },
+    });
+    expect(csv).toBe("id,name\n1,Ada\n");
+    const url = new URL(server.requests.at(-1)?.url ?? "", "http://x");
+    expect(url.searchParams.get("columns")).toBe("id,name");
+    expect(url.searchParams.get("filter[role]")).toBe("admin");
+  });
+});
+
+describe("generated client: response validation", () => {
+  const corrupt = (): void => {
+    server.users.set("bad", { id: 5, name: "Eve", role: "root" } as never);
+  };
+
+  it("rejects a response that does not match the schema, reporting positions but not values", async () => {
+    corrupt();
+    const error = await api.users
+      .byId("bad")
+      .get()
+      .catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ResponseValidationError);
+    const e = error as ResponseValidationError;
+    expect(e.issues.map((i) => i.path)).toEqual(["$.id", "$.role"]);
+    expect(e.message).toContain("GET /users/{id}");
+    expect(JSON.stringify([e.message, e.issues])).not.toMatch(/Eve|root/);
+  });
+
+  it("is not retried and lands in query state like any other error", async () => {
+    corrupt();
+    const retrying = createNexClient({
+      baseUrl: server.url,
+      queryClient: { defaultOptions: { queries: { retryDelay: 1 } } },
+    });
+    const observer = new QueryObserver(
+      retrying.queryClient,
+      createApi(retrying).users.byId("bad").get.options(),
+    );
+    const stop = observer.subscribe(() => undefined);
+    await new Promise((r) => setTimeout(r, 40));
+    expect(observer.getResult().error).toBeInstanceOf(ResponseValidationError);
+    expect(server.hits("GET", "/v1/users/bad")).toBe(1);
+    stop();
+  });
+
+  it("can be switched off per client, and valid responses are unaffected", async () => {
+    corrupt();
+    const lax = createApi(createNexClient({ baseUrl: server.url, validateResponses: false }));
+    expect((await lax.users.byId("bad").get()).name).toBe("Eve");
+    expect((await api.users.byId("1").get()).name).toBe("Ada");
   });
 });
 

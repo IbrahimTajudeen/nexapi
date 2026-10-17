@@ -66,6 +66,26 @@ export class ParseError extends NexError {
   }
 }
 
+/** A 2xx response parsed fine but does not have the documented shape (opt-in validation). */
+export class ResponseValidationError extends NexError {
+  /** Positions and expectations only; the response data itself is never included. */
+  readonly issues: readonly { path: string; expected: string; received: string }[];
+  constructor(
+    operation: string,
+    issues: readonly { path: string; expected: string; received: string }[],
+  ) {
+    const first = issues[0];
+    super(
+      `Response of ${operation} does not match its schema: ${String(issues.length)} issue(s)` +
+        (first
+          ? `, first at ${first.path} (expected ${first.expected}, got ${first.received})`
+          : ""),
+    );
+    this.name = "ResponseValidationError";
+    this.issues = issues;
+  }
+}
+
 /** The request could not be built from the supplied input (bad path param, bad query value...). */
 export class RequestError extends NexError {
   constructor(message: string) {
@@ -96,4 +116,9 @@ export type HttpErrorOf<T> = T extends ErrorCase<infer S, infer B> ? HttpError<B
 
 /** Everything an endpoint call can reject with. `TBody` is a body type or a union of `ErrorCase`s. */
 export type EndpointError<TBody = unknown> =
-  HttpErrorOf<TBody> | NetworkError | TimeoutError | ParseError | RequestError;
+  | HttpErrorOf<TBody>
+  | NetworkError
+  | TimeoutError
+  | ParseError
+  | ResponseValidationError
+  | RequestError;

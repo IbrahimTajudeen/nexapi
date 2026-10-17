@@ -60,6 +60,20 @@ describe("buildUrl (origin safety)", () => {
       buildUrl(base, { path: "/users/{id}", params: { id: "7" }, query: { a: 1 } }, false).href,
     ).toBe("https://api.test/v1/users/7?a=1");
   });
+  it("applies per-parameter query styles", () => {
+    const url = buildUrl(
+      base,
+      {
+        path: "/items",
+        query: { ids: [1, 2], filter: { a: "x" }, tag: ["p", "q"] },
+        queryStyles: { ids: "csv", filter: "deepObject" },
+      },
+      false,
+    );
+    expect(url.searchParams.get("ids")).toBe("1,2");
+    expect(url.searchParams.get("filter[a]")).toBe("x");
+    expect(url.searchParams.getAll("tag")).toEqual(["p", "q"]);
+  });
   it("cannot be redirected to another origin via protocol-relative or absolute paths", () => {
     expect(() => buildUrl(base, { path: "//evil.test/x" }, false)).toThrow(RequestError);
     expect(() => buildUrl(base, { path: "https://evil.test/x" }, false)).toThrow(RequestError);
@@ -241,5 +255,45 @@ describe("HttpClient.request", () => {
   it("validates baseUrl", () => {
     expect(() => new HttpClient({ baseUrl: "/relative" })).toThrow(RequestError);
     expect(() => new HttpClient({ baseUrl: "ftp://x.test" })).toThrow(RequestError);
+  });
+});
+
+describe("serializeQuery styles", () => {
+  const decoded = (q: string): string => decodeURIComponent(q.replace(/\+/g, " "));
+
+  it("joins arrays as csv / space / pipe into one parameter", () => {
+    expect(decoded(serializeQuery({ ids: [1, 2, 3] }, { ids: "csv" }))).toBe("ids=1,2,3");
+    expect(decoded(serializeQuery({ t: ["a", "b"] }, { t: "space" }))).toBe("t=a b");
+    expect(decoded(serializeQuery({ t: ["a", "b"] }, { t: "pipe" }))).toBe("t=a|b");
+    expect(serializeQuery({ ids: [] }, { ids: "csv" })).toBe(""); // empty arrays are omitted
+    expect(decoded(serializeQuery({ ids: [1, null, undefined, 2] }, { ids: "csv" }))).toBe(
+      "ids=1,2",
+    );
+  });
+
+  it("refuses values that would be ambiguous or malformed for their style", () => {
+    expect(() => serializeQuery({ ids: ["a,b"] }, { ids: "csv" })).toThrow(/delimiter/);
+    expect(() => serializeQuery({ t: ["a|b"] }, { t: "pipe" })).toThrow(/delimiter/);
+    expect(() => serializeQuery({ ids: "x" }, { ids: "csv" })).toThrow(/array/);
+    expect(() => serializeQuery({ ids: [{ a: 1 }] }, { ids: "csv" })).toThrow(/primitive/);
+  });
+
+  it("serializes deepObject as name[key]=value and rejects anything nested", () => {
+    expect(
+      decoded(
+        serializeQuery(
+          { filter: { a: "x", n: 2, skip: undefined, nil: null } },
+          { filter: "deepObject" },
+        ),
+      ),
+    ).toBe("filter[a]=x&filter[n]=2");
+    expect(() => serializeQuery({ f: { a: { b: 1 } } }, { f: "deepObject" })).toThrow(/primitive/);
+    expect(() => serializeQuery({ f: { a: [1] } }, { f: "deepObject" })).toThrow(/primitive/);
+    expect(() => serializeQuery({ f: { "a]b": 1 } }, { f: "deepObject" })).toThrow(/"\["/);
+    expect(() => serializeQuery({ f: [1] }, { f: "deepObject" })).toThrow(/object/);
+  });
+
+  it("leaves parameters without a style on the exploded default", () => {
+    expect(serializeQuery({ a: [1, 2], b: "x" }, { other: "csv" })).toBe("a=1&a=2&b=x");
   });
 });

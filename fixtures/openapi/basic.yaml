@@ -82,6 +82,64 @@ paths:
       responses:
         "204":
           description: Deleted
+  /users/{id}/avatar:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getAvatar
+      summary: Download the user's avatar
+      responses:
+        "200":
+          description: The image
+          content:
+            image/png:
+              schema: { type: string, format: binary }
+    post:
+      operationId: uploadAvatar
+      summary: Upload an avatar
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+                caption: { type: string }
+                tags: { type: array, items: { type: string } }
+      responses:
+        "200":
+          description: Stored
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [bytes]
+                properties:
+                  bytes: { type: integer }
+                  caption: { type: string }
+                  tags: { type: array, items: { type: string } }
+  /exports/users:
+    get:
+      operationId: exportUsers
+      summary: Users as CSV
+      parameters:
+        - { name: columns, in: query, explode: false, schema: { type: array, items: { type: string } } }
+        - name: filter
+          in: query
+          style: deepObject
+          explode: true
+          schema:
+            type: object
+            properties:
+              role: { type: string }
+      responses:
+        "200":
+          description: CSV text
+          content:
+            text/csv:
+              schema: { type: string }
 components:
   schemas:
     Role:

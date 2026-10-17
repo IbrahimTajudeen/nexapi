@@ -13,16 +13,16 @@
 ## Milestone 2: cache completeness
 
 - ✅ `paused` fetch status when offline (`networkMode`). (`initialData` ✅, `placeholderData`/`keepPreviousData` ✅, `refetchInterval` ✅)
-- Dehydrate/hydrate ✅ (`dehydrate`, `hydrate`, `initialData`); streaming/suspense integration still open.
-- Key-prefix index (first element) so filtered operations stop scanning every entry.
-- Infinite queries in core + `useInfiniteQuery` ✅ (refetch re-requests all loaded pages; `maxPages` and bidirectional paging still open).
+- Dehydrate/hydrate ✅ (`dehydrate`, `hydrate`, `initialData`); `useSuspenseQuery` + streaming SSR (`renderToPipeableStream`) ✅; a suspense variant of `useInfiniteQuery` and Next.js/RSC integration still open.
+- ✅ Key-prefix index (first element): prefix filters that start with a primitive look only at their bucket; object-rooted or empty prefixes still scan.
+- Infinite queries in core + `useInfiniteQuery` ✅ (refetch re-requests all loaded pages; `getPreviousPageParam`/`fetchPreviousPage` and `maxPages` ✅).
 - `useIsFetching`, `useQueries`.
 
 ## Milestone 3: codegen breadth
 
-- Multipart, binary and text responses; `deepObject`/CSV query styles; cookies.
+- ✅ Multipart/urlencoded/binary/text request bodies and text/binary responses. Cookies still open. (`deepObject`, comma/space/pipe-delimited query styles ✅)
 - ✅ Response status discrimination (`HttpError<X, 401> | HttpError<Y, 404>` via `ErrorCase`).
-- Optional runtime validation (opt-in, schema-derived) for responses.
+- ✅ Optional runtime response validation (`"validation": true` in the codegen config). Error bodies and request bodies are not validated.
 - Remote-schema caching, watch mode, split output per tag.
 - Additional sources producing `ApiModel`: NestJS (decorators/Swagger), ASP.NET Core (ApiExplorer / OpenAPI document).
 
@@ -37,4 +37,5 @@
 
 ## Milestone 6: release
 
-- Changesets, npm provenance, docs site, browser matrix tests, size-limit budgets.
+- ✅ LICENSE, package READMEs, `pnpm smoke:pack` (pack → empty-project install → CLI generate → strict type-check → run), CI step, `docs/RELEASING.md`.
+- Open: changesets, npm provenance, `repository` manifest field (needs the real URL), CHANGELOG, docs site, browser matrix tests, size-limit budgets.

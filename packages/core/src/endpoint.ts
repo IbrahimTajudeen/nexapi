@@ -1,7 +1,16 @@
 import type { QueryClient } from "./client.js";
 import { keyMatchesPrefix, type QueryKey, type TypedKey } from "./key.js";
-import type { EndpointError } from "./errors.js";
-import type { HeaderValue, HttpClient, HttpMethod, PathParamValue } from "./http.js";
+import { ResponseValidationError, type EndpointError } from "./errors.js";
+import { checkShape, type Shape, type Shapes } from "./shape.js";
+import type {
+  BodyKind,
+  HeaderValue,
+  HttpClient,
+  HttpMethod,
+  PathParamValue,
+  QueryStyle,
+  ResponseKind,
+} from "./http.js";
 import type { MutationConfig, MutationOptions } from "./mutation.js";
 import type { QueryConfig, QueryOptions } from "./types.js";
 
@@ -92,11 +101,22 @@ export interface EndpointDef {
   params?: Readonly<Record<string, PathParamValue>>;
   /** Whether the operation takes a JSON body as first argument. */
   hasBody?: boolean;
-  /** `none` for operations that return no content. */
-  response?: "json" | "none";
+  /**
+   * Response shape emitted when the generator runs with `"validation": true`. Checked on every
+   * successful response unless the client was created with `validateResponses: false`.
+   */
+  validate?: { readonly shape: Shape; readonly shapes: Shapes };
+  /** How the request body is encoded (default `json`). */
+  bodyKind?: BodyKind;
+  /** `none` for operations that return no content; `text`/`blob` for non-JSON payloads. */
+  response?: ResponseKind;
+  /** Query parameters that are not sent as plain exploded `a=1&a=2`. */
+  queryStyles?: Readonly<Record<string, QueryStyle>>;
 }
 
 export interface EndpointRuntime {
+  /** `false` skips shape checks even for endpoints that carry a shape. Default `true`. */
+  readonly validateResponses?: boolean;
   readonly http: HttpClient;
   readonly queryClient: QueryClient;
 }
@@ -138,15 +158,25 @@ function execute<TData>(
   body: unknown,
   signal?: AbortSignal,
 ): Promise<TData> {
-  return rt.http.request<TData>({
+  const validate = def.validate && rt.validateResponses !== false ? def.validate : undefined;
+  const pending = rt.http.request<TData>({
     method: def.method,
     path: def.path,
     ...(def.params ? { params: def.params } : {}),
     query: request?.query,
+    ...(def.queryStyles ? { queryStyles: def.queryStyles } : {}),
     headers: request?.headers,
     body,
+    ...(def.bodyKind ? { bodyKind: def.bodyKind } : {}),
     response: def.response ?? "json",
     signal: signal ?? request?.signal,
+  });
+  if (!validate) return pending;
+  return pending.then((data) => {
+    const issues = checkShape(data, validate.shape, validate.shapes);
+    if (issues.length > 0)
+      throw new ResponseValidationError(`${def.method.toUpperCase()} ${def.path}`, issues);
+    return data;
   });
 }
 

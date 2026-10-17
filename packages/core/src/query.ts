@@ -353,6 +353,8 @@ export class Query<TData = unknown, TError = unknown> {
         error: error as TError,
         status: "error", // previously successful data is deliberately kept
         fetchStatus: "idle",
+        // "may be outdated" means nothing without data; a first load that failed is simply failed
+        isInvalidated: this.state.data === undefined ? false : this.state.isInvalidated,
         errorUpdatedAt: Date.now(),
         failureCount: this.state.failureCount + 1,
       });

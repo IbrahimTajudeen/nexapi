@@ -223,24 +223,57 @@ describe("generate: invalid input is reported, never silently skipped", () => {
   });
 
   it("refuses unsupported content types unless the operation is excluded", () => {
-    const multipart = doc(
-      `  /up:\n    post:\n      operationId: upload\n      requestBody:\n        content:\n          multipart/form-data:\n            schema: { type: object }\n${op()}`,
+    const xml = doc(
+      `  /up:\n    post:\n      operationId: upload\n      requestBody:\n        content:\n          application/xml:\n            schema: { type: object }\n${op()}`,
     );
-    expect(errorsOf(multipart)).toContain("UNSUPPORTED_CONTENT_TYPE");
-    expect(errorsOf(multipart, { exclude: ["upload"] })).toEqual([]);
+    expect(errorsOf(xml)).toContain("UNSUPPORTED_CONTENT_TYPE");
+    expect(errorsOf(xml, { exclude: ["upload"] })).toEqual([]);
   });
 
-  it("rejects object-valued query parameters and warns about unsupported array styles", () => {
+  it("rejects object-valued query parameters unless they are a supported deepObject", () => {
     const obj = doc(
       `  /a:\n    get:\n      operationId: a\n      parameters: [{ name: f, in: query, schema: { type: object } }]\n${op()}`,
     );
     expect(errorsOf(obj)).toContain("UNSUPPORTED_PARAMETER");
-    const csv = doc(
-      `  /a:\n    get:\n      operationId: a\n      parameters: [{ name: f, in: query, explode: false, schema: { type: array, items: { type: string } } }]\n${op()}`,
+    const nested = doc(
+      `  /a:\n    get:\n      operationId: a\n      parameters: [{ name: f, in: query, style: deepObject, explode: true, schema: { type: object, properties: { x: { type: object } } } }]\n${op()}`,
     );
-    expect(validateSchema(csv).diagnostics.map((d) => d.code)).toEqual(["UNSUPPORTED_STYLE"]);
+    expect(errorsOf(nested)).toContain("UNSUPPORTED_PARAMETER");
   });
 
+  it("warns about array styles it cannot honour instead of silently changing them", () => {
+    const matrix = doc(
+      `  /a:\n    get:\n      operationId: a\n      parameters: [{ name: f, in: query, style: matrix, schema: { type: array, items: { type: string } } }]\n${op()}`,
+    );
+    expect(validateSchema(matrix).diagnostics.map((d) => d.code)).toEqual(["UNSUPPORTED_STYLE"]);
+  });
+});
+
+describe("generate: query parameter styles", () => {
+  const client = (params: string): string =>
+    generate(doc(`  /a:\n    get:\n      operationId: a\n      parameters: ${params}\n${op()}`))
+      .files[1]?.content as string;
+  const arr = "schema: { type: array, items: { type: string } }";
+
+  it("emits queryStyles for csv, space, pipe and deepObject, and nothing for the default", () => {
+    const text = client(
+      `[{ name: ids, in: query, explode: false, ${arr} }, { name: sp, in: query, style: spaceDelimited, ${arr} }, { name: pi, in: query, style: pipeDelimited, ${arr} }, { name: filter, in: query, style: deepObject, explode: true, schema: { type: object, properties: { a: { type: string }, n: { type: integer } } } }, { name: plain, in: query, ${arr} }]`,
+    );
+    expect(text).toContain(
+      'queryStyles: { ids: "csv", sp: "space", pi: "pipe", filter: "deepObject" }',
+    );
+    expect(text).not.toContain("plain:");
+  });
+
+  it("sends delimited styles with explode=true exploded, with no warning", () => {
+    const text = `[{ name: sp, in: query, style: spaceDelimited, explode: true, ${arr} }]`;
+    const source = doc(`  /a:\n    get:\n      operationId: a\n      parameters: ${text}\n${op()}`);
+    expect(validateSchema(source).diagnostics).toEqual([]);
+    expect(client(text)).not.toContain("queryStyles");
+  });
+});
+
+describe("generate: validation", () => {
   it("reports every error, not just the first", () => {
     const text = doc(
       `  /u/{id}:\n    get:\n      operationId: a\n      responses:\n        "404": { description: nope }`,
@@ -338,5 +371,155 @@ describe("generate: status-discriminated errors", () => {
     const types = typesOf("");
     expect(types).toContain("export type AErrorBody = unknown;");
     expect(types).not.toContain("ErrorCase");
+  });
+});
+
+describe("generate: request body kinds and text/binary responses", () => {
+  const built = (path: string): { client: string; types: string } => {
+    const text = doc(path);
+    const out = generate(text);
+    return {
+      client: out.files[1]?.content as string,
+      types: out.files[0]?.content as string,
+    };
+  };
+  const post = (content: string, responses = `        "204": { description: ok }`): string =>
+    `  /x:\n    post:\n      operationId: x\n      requestBody:\n        required: true\n        content:\n${content}\n      responses:\n${responses}`;
+
+  it("multipart/form-data: object with scalar and file fields", () => {
+    const { client, types } = built(
+      post(
+        `          multipart/form-data:\n            schema:\n              type: object\n              required: [file]\n              properties:\n                file: { type: string, format: binary }\n                title: { type: string }\n                tags: { type: array, items: { type: string } }`,
+      ),
+    );
+    expect(client).toContain('hasBody: true, bodyKind: "form-data"');
+    expect(types).toMatch(/file: Blob;/);
+    expect(types).toMatch(/tags\?: string\[\]/);
+  });
+
+  it("urlencoded and text/plain bodies; JSON wins when several are declared", () => {
+    expect(
+      built(
+        post(
+          `          application/x-www-form-urlencoded:\n            schema: { type: object, properties: { a: { type: string } } }`,
+        ),
+      ).client,
+    ).toContain('bodyKind: "urlencoded"');
+    const text = built(post(`          text/plain:\n            schema: { type: string }`));
+    expect(text.client).toContain('bodyKind: "text"');
+    expect(text.types).toContain("export type XBody = string;");
+    const both = built(
+      post(
+        `          multipart/form-data:\n            schema: { type: object, properties: { a: { type: string } } }\n          application/json:\n            schema: { type: object, properties: { a: { type: string } } }`,
+      ),
+    ).client;
+    expect(both).not.toContain("bodyKind");
+  });
+
+  it("binary bodies must be a binary-format string", () => {
+    const ok = built(
+      post(
+        `          application/octet-stream:\n            schema: { type: string, format: binary }`,
+      ),
+    );
+    expect(ok.client).toContain('bodyKind: "binary"');
+    expect(ok.types).toContain("export type XBody = Blob;");
+    expect(
+      errorsOf(
+        doc(post(`          application/octet-stream:\n            schema: { type: object }`)),
+      ),
+    ).toContain("UNSUPPORTED_BODY_SCHEMA");
+  });
+
+  it("rejects form bodies the runtime could not send (nested objects, free-form)", () => {
+    const nested = doc(
+      post(
+        `          multipart/form-data:\n            schema: { type: object, properties: { a: { type: object, properties: { b: { type: string } } } } }`,
+      ),
+    );
+    expect(errorsOf(nested)).toContain("UNSUPPORTED_BODY_SCHEMA");
+    const free = doc(
+      post(`          application/x-www-form-urlencoded:\n            schema: { type: object }`),
+    );
+    expect(errorsOf(free)).toContain("UNSUPPORTED_BODY_SCHEMA");
+    const blobInUrlencoded = doc(
+      post(
+        `          application/x-www-form-urlencoded:\n            schema: { type: object, properties: { f: { type: string, format: binary } } }`,
+      ),
+    );
+    expect(errorsOf(blobInUrlencoded)).toContain("UNSUPPORTED_BODY_SCHEMA");
+  });
+
+  const get = (responses: string): string =>
+    `  /r:\n    get:\n      operationId: r\n      responses:\n${responses}`;
+
+  it("text/* and binary success responses become string and Blob", () => {
+    const t = built(
+      get(
+        `        "200": { description: ok, content: { text/csv: { schema: { type: string } } } }`,
+      ),
+    );
+    expect(t.client).toContain('response: "text"');
+    expect(t.types).toContain("export type RData = string;");
+    const b = built(
+      get(
+        `        "200": { description: ok, content: { image/png: { schema: { type: string, format: binary } } } }`,
+      ),
+    );
+    expect(b.client).toContain('response: "blob"');
+    expect(b.types).toContain("export type RData = Blob;");
+  });
+
+  it("an empty 204 alongside a binary 200 is fine, but mixed payload kinds are an error", () => {
+    const ok = built(
+      get(
+        `        "200": { description: ok, content: { application/pdf: { schema: { type: string, format: binary } } } }\n        "204": { description: none }`,
+      ),
+    );
+    expect(ok.client).toContain('response: "blob"');
+    const mixed = doc(
+      get(
+        `        "200": { description: ok, content: { application/json: { schema: { type: string } } } }\n        "202": { description: ok, content: { text/plain: { schema: { type: string } } } }`,
+      ),
+    );
+    expect(errorsOf(mixed)).toContain("UNSUPPORTED_CONTENT_TYPE");
+  });
+});
+
+describe("generate: response shapes", () => {
+  it("emits nothing extra unless validation is enabled", () => {
+    const out = generate(fixture, config);
+    expect(out.files.map((f) => f.path)).toEqual(["types.ts", "client.ts", "index.ts"]);
+    expect(out.files[1]?.content).not.toContain("validate:");
+  });
+
+  it("emits shapes.ts and attaches a shape to every JSON endpoint", () => {
+    const out = generate(fixture, { ...config, validation: true });
+    expect(out.files.map((f) => f.path)).toEqual([
+      "types.ts",
+      "client.ts",
+      "index.ts",
+      "shapes.ts",
+    ]);
+    const client = out.files[1]?.content as string;
+    expect(client).toContain("import { shapes, ");
+    expect(client).toContain("validate: { shape: GetUserResponse, shapes }");
+    const shapes = out.files[3]?.content as string;
+    expect(shapes).toContain('"User": {');
+    expect(shapes).toContain('export const GetUserResponse: Shape = { k: "ref", name: "User" };');
+    // deterministic
+    expect(generate(fixture, { ...config, validation: true }).files[3]?.content).toBe(shapes);
+  });
+
+  it("skips shapes for endpoints without a JSON payload", () => {
+    const text = doc(
+      `  /t:\n    get:\n      operationId: t\n      responses:\n        "200": { description: ok, content: { text/plain: { schema: { type: string } } } }\n  /n:\n    delete:\n      operationId: n\n      responses:\n        "204": { description: ok }`,
+    );
+    const out = generate(text, { validation: true });
+    expect(out.files[1]?.content).not.toContain("validate:");
+  });
+
+  it("rejects a non-boolean validation setting", () => {
+    expect(() => generate(fixture, { validation: "yes" as never })).toThrow();
   });
 });

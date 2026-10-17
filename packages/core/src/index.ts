@@ -22,6 +22,7 @@ export {
   NexError,
   ParseError,
   RequestError,
+  ResponseValidationError,
   TimeoutError,
   type EndpointError,
 } from "./errors.js";
@@ -37,14 +38,18 @@ export {
   buildUrl,
   expandPath,
   serializeQuery,
+  type BodyKind,
   type HeaderValue,
   type HttpClientOptions,
   type HttpMethod,
   type Middleware,
   type PathParamValue,
+  type QueryStyle,
   type RequestSpec,
+  type ResponseKind,
   type Transport,
 } from "./http.js";
+export { checkShape, type Shape, type ShapeIssue, type Shapes } from "./shape.js";
 export { hashKey, keyMatchesPrefix, type QueryKey, type TypedKey } from "./key.js";
 export {
   Mutation,

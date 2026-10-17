@@ -3,9 +3,15 @@
 /* eslint-disable */
 
 import type { NexClient, NoRequest } from "@nexapi/core";
+import { shapes, GetUserResponse, ListUsersResponse, LoginResponse, UpdateUserResponse, UploadAvatarResponse } from "./shapes.js";
 import type {
   DeleteUserData,
   DeleteUserErrorBody,
+  ExportUsersData,
+  ExportUsersErrorBody,
+  ExportUsersRequest,
+  GetAvatarData,
+  GetAvatarErrorBody,
   GetUserData,
   GetUserErrorBody,
   ListUsersData,
@@ -17,6 +23,9 @@ import type {
   UpdateUserBody,
   UpdateUserData,
   UpdateUserErrorBody,
+  UploadAvatarBody,
+  UploadAvatarData,
+  UploadAvatarErrorBody,
 } from "./types.js";
 
 /**
@@ -30,7 +39,16 @@ export function createApi(client: NexClient) {
          * Exchange credentials for a session token
          * `POST /auth/login`
          */
-        post: client.mutation<NoRequest, LoginBody, LoginData, LoginErrorBody>({ operationId: "login", method: "post", path: "/auth/login", hasBody: true }),
+        post: client.mutation<NoRequest, LoginBody, LoginData, LoginErrorBody>({ operationId: "login", method: "post", path: "/auth/login", validate: { shape: LoginResponse, shapes }, hasBody: true }),
+      },
+    },
+    exports: {
+      users: {
+        /**
+         * Users as CSV
+         * `GET /exports/users`
+         */
+        get: client.query<ExportUsersRequest, ExportUsersData, ExportUsersErrorBody>({ operationId: "exportUsers", method: "get", path: "/exports/users", queryStyles: { columns: "csv", filter: "deepObject" }, response: "text" }),
       },
     },
     users: {
@@ -39,25 +57,37 @@ export function createApi(client: NexClient) {
          * Fetch one user
          * `GET /users/{id}`
          */
-        get: client.query<NoRequest, GetUserData, GetUserErrorBody>({ operationId: "getUser", method: "get", path: "/users/{id}", params: { id: id } }),
+        get: client.query<NoRequest, GetUserData, GetUserErrorBody>({ operationId: "getUser", method: "get", path: "/users/{id}", params: { id: id }, validate: { shape: GetUserResponse, shapes } }),
         /**
          * Update a user
          * `PATCH /users/{id}`
          */
-        patch: client.mutation<NoRequest, UpdateUserBody, UpdateUserData, UpdateUserErrorBody>({ operationId: "updateUser", method: "patch", path: "/users/{id}", params: { id: id }, hasBody: true }),
+        patch: client.mutation<NoRequest, UpdateUserBody, UpdateUserData, UpdateUserErrorBody>({ operationId: "updateUser", method: "patch", path: "/users/{id}", params: { id: id }, validate: { shape: UpdateUserResponse, shapes }, hasBody: true }),
         /**
          * Delete a user
          * `DELETE /users/{id}`
          * @deprecated
          */
         delete: client.mutation<NoRequest, void, DeleteUserData, DeleteUserErrorBody>({ operationId: "deleteUser", method: "delete", path: "/users/{id}", params: { id: id }, response: "none" }),
+        avatar: {
+          /**
+           * Download the user's avatar
+           * `GET /users/{id}/avatar`
+           */
+          get: client.query<NoRequest, GetAvatarData, GetAvatarErrorBody>({ operationId: "getAvatar", method: "get", path: "/users/{id}/avatar", params: { id: id }, response: "blob" }),
+          /**
+           * Upload an avatar
+           * `POST /users/{id}/avatar`
+           */
+          post: client.mutation<NoRequest, UploadAvatarBody, UploadAvatarData, UploadAvatarErrorBody>({ operationId: "uploadAvatar", method: "post", path: "/users/{id}/avatar", params: { id: id }, validate: { shape: UploadAvatarResponse, shapes }, hasBody: true, bodyKind: "form-data" }),
+        },
       }),
       list: {
         /**
          * List users
          * `GET /users`
          */
-        get: client.query<ListUsersRequest, ListUsersData, ListUsersErrorBody>({ operationId: "listUsers", method: "get", path: "/users" }),
+        get: client.query<ListUsersRequest, ListUsersData, ListUsersErrorBody>({ operationId: "listUsers", method: "get", path: "/users", validate: { shape: ListUsersResponse, shapes } }),
       },
     },
   };

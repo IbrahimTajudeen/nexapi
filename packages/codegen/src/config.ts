@@ -11,8 +11,13 @@ export interface NexApiConfig {
    * @example { "listUsers": { "path": ["users", "list"] } }  →  api.users.list.get(...)
    */
   overrides?: { operations?: Record<string, { path: string[] }> };
-  /** operationIds to leave out (e.g. multipart operations until they are supported). */
+  /** operationIds to leave out of the generated client (e.g. operations you want to hand-write). */
   exclude?: string[];
+  /**
+   * Also emit `shapes.ts` and attach each JSON response's runtime shape to its endpoint, so the
+   * client can verify responses (`validateResponses`, on by default). Default `false`.
+   */
+  validation?: boolean;
   naming?: {
     /** Prefix for path-parameter segments. Default `by` (`/users/{id}` → `users.byId(id)`). */
     paramPrefix?: string;
@@ -23,6 +28,7 @@ export interface ResolvedConfig {
   overrides: Record<string, { path: string[] }>;
   exclude: ReadonlySet<string>;
   paramPrefix: string;
+  validation: boolean;
 }
 
 export function validateConfig(raw: unknown): { config: NexApiConfig; problems: string[] } {
@@ -30,13 +36,23 @@ export function validateConfig(raw: unknown): { config: NexApiConfig; problems: 
   if (typeof raw !== "object" || raw === null || Array.isArray(raw))
     return { config: {}, problems: ["config must be a JSON object"] };
   const c = raw as Record<string, unknown>;
-  const known = new Set(["$schema", "input", "output", "overrides", "exclude", "naming"]);
+  const known = new Set([
+    "$schema",
+    "input",
+    "output",
+    "overrides",
+    "exclude",
+    "naming",
+    "validation",
+  ]);
   for (const key of Object.keys(c))
     if (!known.has(key)) problems.push(`unknown config key "${key}"`);
   if (c["input"] !== undefined && typeof c["input"] !== "string")
     problems.push('"input" must be a string');
   if (c["output"] !== undefined && typeof c["output"] !== "string")
     problems.push('"output" must be a string');
+  if (c["validation"] !== undefined && typeof c["validation"] !== "boolean")
+    problems.push('"validation" must be true or false');
   if (
     c["exclude"] !== undefined &&
     !(Array.isArray(c["exclude"]) && c["exclude"].every((x) => typeof x === "string"))
@@ -77,5 +93,6 @@ export function resolveConfig(config: NexApiConfig): ResolvedConfig {
     overrides: config.overrides?.operations ?? {},
     exclude: new Set(config.exclude ?? []),
     paramPrefix: config.naming?.paramPrefix ?? "by",
+    validation: config.validation === true,
   };
 }

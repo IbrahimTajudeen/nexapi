@@ -12,6 +12,12 @@ import { HttpClient, type HttpClientOptions } from "./http.js";
 export interface NexClientOptions extends HttpClientOptions {
   /** Reuse an existing cache, or configure a fresh one. A new `QueryClient` is created by default. */
   queryClient?: QueryClient | QueryClientOptions;
+  /**
+   * Check responses against the shapes generated with `"validation": true`. Default `true`; it
+   * only does anything for endpoints that carry a shape. A mismatch rejects with
+   * `ResponseValidationError` (never retried).
+   */
+  validateResponses?: boolean;
 }
 
 /**
@@ -21,9 +27,11 @@ export interface NexClientOptions extends HttpClientOptions {
 export class NexClient {
   readonly http: HttpClient;
   readonly queryClient: QueryClient;
+  readonly validateResponses: boolean;
 
   constructor(options: NexClientOptions) {
-    const { queryClient, ...http } = options;
+    const { queryClient, validateResponses, ...http } = options;
+    this.validateResponses = validateResponses !== false;
     this.http = new HttpClient(http);
     this.queryClient =
       queryClient instanceof QueryClient ? queryClient : new QueryClient(queryClient);

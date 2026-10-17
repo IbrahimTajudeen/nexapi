@@ -3,7 +3,10 @@
   "output": "generated",
   "overrides": {
     "operations": {
-      "listUsers": { "path": ["users", "list"] }
+      "listUsers": {
+        "path": ["users", "list"]
+      }
     }
-  }
+  },
+  "validation": true
 }

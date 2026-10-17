@@ -74,3 +74,7 @@ Visible data = `patches.reduce(apply, base)`. Each optimistic update is a pure f
 | Unsafe mutation retries                              | opt-in `{ idempotent: true }`, type + runtime enforced | `mutation.test.ts › retry safety`                           |
 | SSR data leaks                                       | no globals; client per request                         | `e2e.test.ts`, `react.test.tsx › server rendering`          |
 | URL/origin safety                                    | pathname assignment + checks                           | `http.test.ts › buildUrl`                                   |
+
+## Prefix lookup index
+
+`QueryClient` keeps entries in a hash map and, additionally, in buckets keyed by the primitive first element of the key. `findAll`/`invalidate`/`cancel` with a prefix whose first element is a string, number, boolean or null only inspect that bucket; each candidate is still verified with the real prefix match, so the index can only narrow, never change, results. Prefixes that are empty or start with an object/array, and entries with such keys, use the full scan. Indexing follows entry creation, removal, `clear()` and GC. A one-off local measurement with 50,000 entries gave roughly 0.006 ms per indexed lookup versus 2.4 ms for a full scan (single machine, not a benchmark claim).

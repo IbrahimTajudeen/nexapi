@@ -1,4 +1,10 @@
-import { HttpError, NexError, ParseError, RequestError } from "./errors.js";
+import {
+  HttpError,
+  NexError,
+  ParseError,
+  RequestError,
+  ResponseValidationError,
+} from "./errors.js";
 
 export function noop(): void {
   /* intentionally empty */
@@ -8,7 +14,12 @@ export function noop(): void {
 export function isTransientError(error: unknown): boolean {
   if (error instanceof HttpError)
     return error.status >= 500 || error.status === 408 || error.status === 429;
-  if (error instanceof ParseError || error instanceof RequestError) return false;
+  if (
+    error instanceof ParseError ||
+    error instanceof ResponseValidationError ||
+    error instanceof RequestError
+  )
+    return false;
   return error instanceof NexError; // NetworkError, TimeoutError
 }
 
@@ -16,7 +27,12 @@ export function isTransientError(error: unknown): boolean {
 export function defaultQueryRetry(failureCount: number, error: unknown): boolean {
   if (failureCount >= 3) return false;
   if (error instanceof HttpError) return isTransientError(error);
-  if (error instanceof ParseError || error instanceof RequestError) return false;
+  if (
+    error instanceof ParseError ||
+    error instanceof ResponseValidationError ||
+    error instanceof RequestError
+  )
+    return false;
   return true;
 }
 

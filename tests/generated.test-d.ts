@@ -51,3 +51,11 @@ if (loginFailure instanceof HttpError) expectTypeOf(loginFailure.status).toEqual
 // a request-less 204 endpoint documents no errors: any HttpError, body unknown
 declare const deleteFailure: EndpointError<DeleteUserErrorBody>;
 if (deleteFailure instanceof HttpError) expectTypeOf(deleteFailure.body).toBeUnknown();
+
+// non-JSON payloads: binary → Blob, text → string, multipart body takes a Blob for `file`
+expectTypeOf(api.users.byId("1").avatar.get()).toEqualTypeOf<Promise<Blob>>();
+expectTypeOf(api.exports.users.get()).toEqualTypeOf<Promise<string>>();
+expectTypeOf(api.users.byId("1").avatar.post).parameter(0).toHaveProperty("file");
+expectTypeOf(api.users.byId("1").avatar.post).parameter(0).not.toBeAny();
+// @ts-expect-error `file` is required and must be a Blob
+void api.users.byId("1").avatar.post({ file: "not a blob" });

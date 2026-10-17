@@ -45,6 +45,28 @@ export type DeleteUserData = void;
 /** Documented error responses of `DELETE /users/{id}`. Narrow on `error.status`. */
 export type DeleteUserErrorBody = unknown;
 
+/** Success payload of `GET /exports/users`. */
+export type ExportUsersData = string;
+
+/** Documented error responses of `GET /exports/users`. Narrow on `error.status`. */
+export type ExportUsersErrorBody = unknown;
+
+/** Request options for `GET /exports/users`. */
+export interface ExportUsersRequest {
+  query?: {
+    columns?: string[];
+    filter?: {
+      role?: string;
+    };
+  };
+}
+
+/** Success payload of `GET /users/{id}/avatar`. */
+export type GetAvatarData = Blob;
+
+/** Documented error responses of `GET /users/{id}/avatar`. Narrow on `error.status`. */
+export type GetAvatarErrorBody = unknown;
+
 /** Success payload of `GET /users/{id}`. */
 export type GetUserData = User;
 
@@ -83,3 +105,20 @@ export type UpdateUserData = User;
 
 /** Documented error responses of `PATCH /users/{id}`. Narrow on `error.status`. */
 export type UpdateUserErrorBody = ErrorCase<422, ApiError>;
+
+/** Request body of `POST /users/{id}/avatar`. */
+export type UploadAvatarBody = {
+  file: Blob;
+  caption?: string;
+  tags?: string[];
+};
+
+/** Success payload of `POST /users/{id}/avatar`. */
+export type UploadAvatarData = {
+  bytes: number;
+  caption?: string;
+  tags?: string[];
+};
+
+/** Documented error responses of `POST /users/{id}/avatar`. Narrow on `error.status`. */
+export type UploadAvatarErrorBody = unknown;

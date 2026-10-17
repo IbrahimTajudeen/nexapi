@@ -30,14 +30,34 @@ export interface InfiniteQueryOptions<
     lastPageParam: TParam,
     allPageParams: readonly TParam[],
   ) => TParam | undefined | null;
+  /**
+   * Parameter of the page *before* the first loaded one, or `undefined`/`null` when there is none.
+   * Enables `fetchPreviousPage` / `hasPreviousPage`.
+   */
+  getPreviousPageParam?: (
+    firstPage: TPage,
+    allPages: readonly TPage[],
+    firstPageParam: TParam,
+    allPageParams: readonly TParam[],
+  ) => TParam | undefined | null;
+  /**
+   * Keep at most this many pages (integer ≥ 1). Loading a page at one end drops the page at the
+   * other end; a refetch re-requests only the pages still held, starting from the first one held.
+   */
+  maxPages?: number;
   queryClient?: QueryClient;
 }
 
 export interface InfiniteQueryResult<TData, TError> extends QueryResult<TData, TError> {
   readonly hasNextPage: boolean;
   readonly isFetchingNextPage: boolean;
+  /** Always `false` unless `getPreviousPageParam` is given. */
+  readonly hasPreviousPage: boolean;
+  readonly isFetchingPreviousPage: boolean;
   /** Loads the next page and appends it. No-op when there is none. Joins a fetch already in flight. */
   fetchNextPage: () => Promise<void>;
+  /** Loads the page before the first one and prepends it. No-op when there is none. */
+  fetchPreviousPage: () => Promise<void>;
 }
 
 /**
@@ -55,16 +75,20 @@ export class InfiniteQueryObserver<
   #options: InfiniteQueryOptions<TPage, TError, TParam, TSelected>;
   #inner: QueryObserver<InfiniteData<TPage, TParam>, TError, TSelected>;
   #fetchingNext = false;
+  #fetchingPrevious = false;
+  #inFlightPage: Promise<void> | undefined;
   readonly #listeners = new Set<() => void>();
   #unsubscribeInner: (() => void) | undefined;
   #result: InfiniteQueryResult<TSelected, TError>;
   #lastInner: QueryResult<TSelected, TError> | undefined;
   readonly #fetchNextPage = (): Promise<void> => this.fetchNextPage();
+  readonly #fetchPreviousPage = (): Promise<void> => this.fetchPreviousPage();
 
   constructor(
     client: QueryClient,
     options: InfiniteQueryOptions<TPage, TError, TParam, TSelected>,
   ) {
+    validateMaxPages(options.maxPages);
     this.#client = client;
     this.#options = options;
     this.#inner = new QueryObserver(client, this.#toQueryOptions(options));
@@ -94,19 +118,43 @@ export class InfiniteQueryObserver<
   }
 
   setOptions(options: InfiniteQueryOptions<TPage, TError, TParam, TSelected>): void {
+    validateMaxPages(options.maxPages);
     this.#options = options;
     this.#inner.setOptions(this.#toQueryOptions(options));
     this.#refresh();
   }
 
-  async fetchNextPage(): Promise<void> {
+  fetchNextPage(): Promise<void> {
+    return this.#fetchPage("next");
+  }
+
+  fetchPreviousPage(): Promise<void> {
+    return this.#fetchPage("previous");
+  }
+
+  /**
+   * One directional page load. While one is in flight, a second call (either direction) joins it
+   * instead of racing it: both would write the same entry from the same snapshot.
+   */
+  #fetchPage(direction: "next" | "previous"): Promise<void> {
+    if (this.#inFlightPage) return this.#inFlightPage;
+    const run = this.#loadPage(direction).finally(() => {
+      this.#inFlightPage = undefined;
+    });
+    this.#inFlightPage = run;
+    return run;
+  }
+
+  async #loadPage(direction: "next" | "previous"): Promise<void> {
     const o = this.#options;
     const query = this.#inner.query;
     const data = query.state.data;
     if (!data) return void (await this.#inner.refetch()); // nothing loaded yet: load the first page
-    const next = this.#nextParam(data, o);
-    if (next === undefined) return;
-    this.#fetchingNext = true;
+    const target = direction === "next" ? this.#nextParam(data, o) : this.#previousParam(data, o);
+    if (target === undefined) return;
+    const param = target.param;
+    if (direction === "next") this.#fetchingNext = true;
+    else this.#fetchingPrevious = true;
     this.#refresh();
     try {
       await query
@@ -116,16 +164,40 @@ export class InfiniteQueryObserver<
             const page = await o.queryFn({
               queryKey: ctx.queryKey,
               signal: ctx.signal,
-              pageParam: next.param,
+              pageParam: param,
             });
-            return { pages: [...data.pages, page], pageParams: [...data.pageParams, next.param] };
+            return direction === "next"
+              ? trim(
+                  { pages: [...data.pages, page], pageParams: [...data.pageParams, param] },
+                  o.maxPages,
+                  "start",
+                )
+              : trim(
+                  { pages: [page, ...data.pages], pageParams: [param, ...data.pageParams] },
+                  o.maxPages,
+                  "end",
+                );
           },
         })
         .catch(noop);
     } finally {
       this.#fetchingNext = false;
+      this.#fetchingPrevious = false;
       this.#refresh();
     }
+  }
+
+  #previousParam(
+    data: InfiniteData<TPage, TParam>,
+    o: InfiniteQueryOptions<TPage, TError, TParam, TSelected>,
+  ): { param: TParam } | undefined {
+    if (!o.getPreviousPageParam) return undefined;
+    const firstPage = data.pages[0];
+    const firstParam = data.pageParams[0];
+    if (data.pages.length === 0 || firstPage === undefined || firstParam === undefined)
+      return undefined;
+    const previous = o.getPreviousPageParam(firstPage, data.pages, firstParam, data.pageParams);
+    return previous === undefined || previous === null ? undefined : { param: previous };
   }
 
   #nextParam(
@@ -153,39 +225,54 @@ export class InfiniteQueryObserver<
   ): InfiniteQueryResult<TSelected, TError> {
     const data = this.#inner.query.state.data;
     const hasNextPage = data !== undefined && this.#nextParam(data, options) !== undefined;
+    const hasPreviousPage = data !== undefined && this.#previousParam(data, options) !== undefined;
     const prev = this.#result as InfiniteQueryResult<TSelected, TError> | undefined;
     if (
       prev &&
       this.#lastInner === inner &&
       prev.hasNextPage === hasNextPage &&
-      prev.isFetchingNextPage === this.#fetchingNext
+      prev.hasPreviousPage === hasPreviousPage &&
+      prev.isFetchingNextPage === this.#fetchingNext &&
+      prev.isFetchingPreviousPage === this.#fetchingPrevious
     )
       return prev;
     this.#lastInner = inner;
     return {
       ...inner,
       hasNextPage,
+      hasPreviousPage,
       isFetchingNextPage: this.#fetchingNext,
+      isFetchingPreviousPage: this.#fetchingPrevious,
       fetchNextPage: this.#fetchNextPage,
+      fetchPreviousPage: this.#fetchPreviousPage,
     };
   }
 
   #toQueryOptions(
     o: InfiniteQueryOptions<TPage, TError, TParam, TSelected>,
   ): QueryOptions<InfiniteData<TPage, TParam>, TError, TSelected> {
-    const { queryFn: _q, getNextPageParam: _g, initialPageParam: _i, ...config } = o;
+    const {
+      queryFn: _q,
+      getNextPageParam: _g,
+      getPreviousPageParam: _p,
+      initialPageParam: _i,
+      maxPages: _m,
+      ...config
+    } = o;
     return {
       ...config,
       queryKey: o.queryKey,
       queryClient: o.queryClient ?? this.#client,
       // Used for the first load and every refetch: re-request all loaded pages, in order.
       queryFn: async (ctx) => {
-        const loaded =
-          this.#client.getData<InfiniteData<TPage, TParam>>(o.queryKey)?.pages.length ?? 1;
+        // Re-request exactly the pages held, from the first one held (which is not the initial
+        // page after `fetchPreviousPage` or `maxPages` trimming). Confirmed data, not the optimistic view.
+        const held = this.#client.getQuery<InfiniteData<TPage, TParam>>(o.queryKey)?.confirmedData;
+        const loaded = Math.max(held?.pages.length ?? 1, 1);
         const pages: TPage[] = [];
         const pageParams: TParam[] = [];
-        let param: TParam = o.initialPageParam;
-        for (let i = 0; i < Math.max(loaded, 1); i++) {
+        let param: TParam = held?.pageParams[0] ?? o.initialPageParam;
+        for (let i = 0; i < loaded; i++) {
           const page = await o.queryFn({
             queryKey: ctx.queryKey,
             signal: ctx.signal,
@@ -202,4 +289,21 @@ export class InfiniteQueryObserver<
       },
     };
   }
+}
+
+function validateMaxPages(maxPages: number | undefined): void {
+  if (maxPages !== undefined && (!Number.isInteger(maxPages) || maxPages < 1))
+    throw new RangeError("maxPages must be an integer >= 1");
+}
+
+/** Drop pages from the `start` (after appending) or the `end` (after prepending) beyond `max`. */
+function trim<TPage, TParam>(
+  data: InfiniteData<TPage, TParam>,
+  max: number | undefined,
+  from: "start" | "end",
+): InfiniteData<TPage, TParam> {
+  if (max === undefined || data.pages.length <= max) return data;
+  return from === "start"
+    ? { pages: data.pages.slice(-max), pageParams: data.pageParams.slice(-max) }
+    : { pages: data.pages.slice(0, max), pageParams: data.pageParams.slice(0, max) };
 }

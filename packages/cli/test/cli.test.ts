@@ -98,7 +98,7 @@ describe("nexapi generate", () => {
 describe("nexapi validate", () => {
   it("accepts a good schema and rejects a bad one", async () => {
     expect(await run(["validate"], io())).toBe(0);
-    expect(out).toContain("OK: 5 operation(s), 7 schema(s)");
+    expect(out).toContain("OK: 8 operation(s), 7 schema(s)");
     await writeFile(join(dir, "bad.yaml"), "swagger: '2.0'\n");
     expect(await run(["validate", "bad.yaml"], io())).toBe(1);
     expect(err).toContain("UNSUPPORTED_VERSION");

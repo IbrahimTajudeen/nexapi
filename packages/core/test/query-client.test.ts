@@ -573,3 +573,40 @@ describe("observers: switching keys, enabled, select and notifications", () => {
     expect(w.observer.getResult().error?.message).toBe("bad select");
   });
 });
+
+describe("invalidation of failed entries", () => {
+  it("a failed first load clears isInvalidated, but an entry that has data stays invalidated", async () => {
+    const { client } = makeClient();
+    const failing = client.buildQuery({ queryKey: ["first"] });
+    await client
+      .fetchQuery({
+        queryKey: ["first"],
+        queryFn: () => Promise.reject(new Error("x")),
+        retry: false,
+      })
+      .catch(() => undefined);
+    failing.invalidate();
+    expect(failing.state.isInvalidated).toBe(true);
+    await client
+      .fetchQuery({
+        queryKey: ["first"],
+        queryFn: () => Promise.reject(new Error("x")),
+        retry: false,
+      })
+      .catch(() => undefined);
+    expect(failing.state.isInvalidated).toBe(false);
+
+    client.setData(["has"], 1);
+    const withData = client.buildQuery({ queryKey: ["has"] });
+    withData.invalidate();
+    await client
+      .fetchQuery({
+        queryKey: ["has"],
+        queryFn: () => Promise.reject(new Error("x")),
+        retry: false,
+        staleTime: 0,
+      })
+      .catch(() => undefined);
+    expect(withData.state).toMatchObject({ isInvalidated: true, data: 1, status: "error" });
+  });
+});
