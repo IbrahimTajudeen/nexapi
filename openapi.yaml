@@ -1,0 +1,254 @@
+openapi: 3.0.3
+info:
+  title: Notes API
+  version: 1.0.0
+  description: A small sample API for trying NexAPI (users, auth, notes with pagination).
+servers:
+  - url: http://localhost:3000
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Log in and receive a token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "401":
+          description: Wrong email or password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: The signed-in user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /users/{userId}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get a user by id
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: The user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: No such user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /notes:
+    get:
+      operationId: listNotes
+      tags: [notes]
+      summary: List notes, newest first
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - name: tag
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/NoteStatus" }
+      responses:
+        "200":
+          description: A page of notes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotePage"
+    post:
+      operationId: createNote
+      tags: [notes]
+      summary: Create a note
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewNote"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        "422":
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /notes/{noteId}:
+    parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getNote
+      tags: [notes]
+      summary: Get a note
+      responses:
+        "200":
+          description: The note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        "404":
+          description: No such note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    patch:
+      operationId: updateNote
+      tags: [notes]
+      summary: Change a note
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotePatch"
+      responses:
+        "200":
+          description: The updated note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+    delete:
+      operationId: deleteNote
+      tags: [notes]
+      summary: Delete a note
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    NoteStatus:
+      type: string
+      enum: [draft, published, archived]
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+    Session:
+      type: object
+      required: [token, user]
+      properties:
+        token: { type: string }
+        user: { $ref: "#/components/schemas/User" }
+    User:
+      type: object
+      required: [id, name, email]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string, format: email }
+        avatarUrl: { type: string, nullable: true }
+    Note:
+      type: object
+      required: [id, title, body, status, tags, authorId, createdAt]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        body: { type: string }
+        status: { $ref: "#/components/schemas/NoteStatus" }
+        tags:
+          type: array
+          items: { type: string }
+        authorId: { type: string }
+        createdAt: { type: string, format: date-time }
+    NewNote:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        body: { type: string }
+        status: { $ref: "#/components/schemas/NoteStatus" }
+        tags:
+          type: array
+          items: { type: string }
+    NotePatch:
+      type: object
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        body: { type: string }
+        status: { $ref: "#/components/schemas/NoteStatus" }
+        tags:
+          type: array
+          items: { type: string }
+    NotePage:
+      type: object
+      required: [items, page, limit, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Note" }
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+    Problem:
+      type: object
+      required: [title, status]
+      properties:
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
