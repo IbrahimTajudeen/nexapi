@@ -8,7 +8,7 @@ import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const packages = ["core", "codegen", "cli", "react"];
-const work = mkdtempSync(join(tmpdir(), "nexapi-smoke-"));
+const work = mkdtempSync(join(tmpdir(), "syncapi-smoke-"));
 const run = (cmd, args, cwd) =>
   execFileSync(cmd, args, { cwd, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" });
 const step = (name) => console.log(`- ${name}`);
@@ -26,7 +26,7 @@ try {
     run("pnpm", ["pack", "--pack-destination", packDir], join(root, "packages", name));
   }
   for (const file of readdirSync(packDir)) {
-    const name = /^nexapi-(\w+)-/.exec(file)?.[1];
+    const name = /^syncapi-(\w+)-/.exec(file)?.[1];
     if (name) tarballs[name] = join(packDir, file);
   }
   for (const name of packages) if (!tarballs[name]) throw new Error(`no tarball for ${name}`);
@@ -55,7 +55,7 @@ try {
   const app = join(work, "app");
   mkdirSync(app);
   const overrides = Object.fromEntries(
-    packages.map((n) => [`@nexapi/${n}`, `file:${tarballs[n]}`]),
+    packages.map((n) => [`@syncapi/${n}`, `file:${tarballs[n]}`]),
   );
   writeFileSync(
     join(app, "package.json"),
@@ -82,17 +82,17 @@ try {
   step("generate a client with the installed CLI");
   cpSync(join(root, "fixtures/openapi/basic.yaml"), join(app, "openapi.yaml"));
   writeFileSync(
-    join(app, "nexapi.config.json"),
+    join(app, "syncapi.config.json"),
     JSON.stringify({ input: "openapi.yaml", output: "src/api", validation: true }),
   );
-  run("npx", ["nexapi", "generate"], app);
-  run("npx", ["nexapi", "generate", "--check"], app);
+  run("npx", ["syncapi", "generate"], app);
+  run("npx", ["syncapi", "generate", "--check"], app);
 
   step("type-check and run a consumer (strict, NodeNext)");
   mkdirSync(join(app, "src"), { recursive: true });
   writeFileSync(
     join(app, "src/main.ts"),
-    `import { createNexClient, HttpError } from "@nexapi/core";
+    `import { createNexClient, HttpError } from "@syncapi/core";
 import { createApi } from "./api/index.js";
 
 const nex = createNexClient({
@@ -114,7 +114,7 @@ console.log("consumer ok");
   );
   writeFileSync(
     join(app, "src/hooks.tsx"),
-    `import { useQuery, useSuspenseQuery } from "@nexapi/react";
+    `import { useQuery, useSuspenseQuery } from "@syncapi/react";
 import type { Api } from "./api/index.js";
 export function Name({ api }: { api: Api }) {
   const q = useQuery(api.users.byId("1").get.options());

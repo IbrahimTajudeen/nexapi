@@ -2,14 +2,14 @@
 
 ```
 OpenAPI 3.x (JSON/YAML)
-   │  @nexapi/codegen  parse ──▶ normalized ApiModel (IR) ──▶ validate + name ──▶ emit
+   │  @syncapi/codegen  parse ──▶ normalized ApiModel (IR) ──▶ validate + name ──▶ emit
    ▼
 generated/{types,client,index}.ts      ← committed, readable, deterministic
    │  createApi(nexClient)  → plain objects + real functions (no Proxy)
    ▼
-@nexapi/core
+@syncapi/core
    NexClient ── HttpClient (Fetch transport, middleware, auth, timeouts, URL safety)
-        └────── QueryClient ── Query entries ── QueryObserver(s) ◀── @nexapi/react (useSyncExternalStore)
+        └────── QueryClient ── Query entries ── QueryObserver(s) ◀── @syncapi/react (useSyncExternalStore)
                     └───────── MutationCache / Mutation / MutationObserver
 ```
 
@@ -17,11 +17,11 @@ generated/{types,client,index}.ts      ← committed, readable, deterministic
 
 | Package            | Responsibility                                                                                   | Depends on                             |
 | ------------------ | ------------------------------------------------------------------------------------------------ | -------------------------------------- |
-| `@nexapi/core`     | HTTP runtime, query cache, mutations, endpoint contracts. **No React, no runtime dependencies.** | –                                      |
-| `@nexapi/codegen`  | OpenAPI → IR → TypeScript. Pure functions (`generate(text, config)`), no file I/O.               | `yaml`                                 |
-| `@nexapi/cli`      | `nexapi generate                                                                                 | validate`, file I/O, `--check` for CI. | codegen |
-| `@nexapi/react`    | `useQuery`, `useMutation`, `NexProvider`. Thin: one observer per hook, no second cache.          | core, react (peer)                     |
-| `@nexapi/devtools` | Reserved, not implemented.                                                                       | –                                      |
+| `@syncapi/core`     | HTTP runtime, query cache, mutations, endpoint contracts. **No React, no runtime dependencies.** | –                                      |
+| `@syncapi/codegen`  | OpenAPI → IR → TypeScript. Pure functions (`generate(text, config)`), no file I/O.               | `yaml`                                 |
+| `@syncapi/cli`      | `syncapi generate                                                                                 | validate`, file I/O, `--check` for CI. | codegen |
+| `@syncapi/react`    | `useQuery`, `useMutation`, `NexProvider`. Thin: one observer per hook, no second cache.          | core, react (peer)                     |
+| `@syncapi/devtools` | Reserved, not implemented.                                                                       | –                                      |
 
 ## Core design
 

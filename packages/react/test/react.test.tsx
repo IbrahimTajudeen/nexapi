@@ -12,7 +12,7 @@ import {
   type NexClient,
   type QueryOptions,
   type Transport,
-} from "@nexapi/core";
+} from "@syncapi/core";
 import { createApi } from "../../../examples/basic/generated/index.js";
 import {
   NexProvider,

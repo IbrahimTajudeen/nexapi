@@ -1,8 +1,8 @@
 {
-  "name": "@nexapi/devtools",
+  "name": "@syncapi/devtools",
   "private": true,
   "version": "0.0.1",
-  "description": "Cache inspection and request diagnostics for NexAPI (not implemented yet)",
+  "description": "Cache inspection and request diagnostics for syncapi (not implemented yet)",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,

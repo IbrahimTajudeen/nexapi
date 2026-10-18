@@ -28,7 +28,7 @@
 
 ## Milestone 4: devtools & diagnostics
 
-- `@nexapi/devtools`: cache inspector, request timeline, redacted by default.
+- `@syncapi/devtools`: cache inspector, request timeline, redacted by default.
 
 ## Milestone 5: performance evidence
 

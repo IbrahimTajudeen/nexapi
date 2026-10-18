@@ -1,4 +1,4 @@
-import { QueryObserver, type QueryClient, type QueryOptions, type QueryResult } from "@nexapi/core";
+import { QueryObserver, type QueryClient, type QueryOptions, type QueryResult } from "@syncapi/core";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { useQueryClient } from "./context.js";
 

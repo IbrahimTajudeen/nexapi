@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: NexAPI Example API
+  title: syncapi Example API
   version: 1.0.0
 paths:
   /auth/login:

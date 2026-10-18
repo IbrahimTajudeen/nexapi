@@ -1,4 +1,4 @@
-import type { QueryOptions, QueryResult } from "@nexapi/core";
+import type { QueryOptions, QueryResult } from "@syncapi/core";
 import { useQuery } from "./useQuery.js";
 import { useQueryClient } from "./context.js";
 

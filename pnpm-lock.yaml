@@ -47,7 +47,7 @@ importers:
 
   benchmarks:
     dependencies:
-      '@nexapi/core':
+      '@syncapi/core':
         specifier: workspace:*
         version: link:../packages/core
       '@tanstack/query-core':
@@ -56,7 +56,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@nexapi/codegen':
+      '@syncapi/codegen':
         specifier: workspace:*
         version: link:../codegen
 
@@ -72,7 +72,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@nexapi/core':
+      '@syncapi/core':
         specifier: workspace:*
         version: link:../core
       react:

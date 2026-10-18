@@ -1,7 +1,7 @@
 {
-  "name": "@nexapi/codegen",
+  "name": "@syncapi/codegen",
   "version": "0.0.1",
-  "description": "OpenAPI parser, normalized API model and TypeScript generator for NexAPI",
+  "description": "OpenAPI parser, normalized API model and TypeScript generator for syncapi",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,

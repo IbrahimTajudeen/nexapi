@@ -7,8 +7,8 @@ import {
   validateConfig,
   validateSchema,
   type Diagnostic,
-  type NexApiConfig,
-} from "@nexapi/codegen";
+  type syncapiConfig,
+} from "@syncapi/codegen";
 
 export interface CliIo {
   cwd: string;
@@ -20,14 +20,14 @@ export interface CliIo {
 
 const MAX_REMOTE_BYTES = 10 * 1024 * 1024;
 
-const HELP = `nexapi: generate typed clients from OpenAPI 3.x
+const HELP = `syncapi: generate typed clients from OpenAPI 3.x
 
 Usage:
-  nexapi generate [--config <file>] [--input <path|url>] [--output <dir>] [--check]
-  nexapi validate [<path|url>] [--config <file>]
+  syncapi generate [--config <file>] [--input <path|url>] [--output <dir>] [--check]
+  syncapi validate [<path|url>] [--config <file>]
 
 Options:
-  --config   JSON config file (default: ./nexapi.config.json when present)
+  --config   JSON config file (default: ./syncapi.config.json when present)
   --input    OpenAPI file (JSON/YAML) or an explicit http(s) URL
   --output   Output directory (default: ./generated)
   --check    Do not write; exit 1 if generated files would change (for CI)
@@ -80,11 +80,11 @@ export async function run(argv: readonly string[], io: CliIo): Promise<number> {
 
   try {
     // ---- config -----------------------------------------------------------------------
-    let config: NexApiConfig = {};
+    let config: syncapiConfig = {};
     let configDir = io.cwd;
     let configPath = values.config
       ? resolve(io.cwd, values.config)
-      : resolve(io.cwd, "nexapi.config.json");
+      : resolve(io.cwd, "syncapi.config.json");
     try {
       const raw: unknown = JSON.parse(await readFile(configPath, "utf8"));
       const { config: c, problems } = validateConfig(raw);
@@ -163,7 +163,7 @@ export async function run(argv: readonly string[], io: CliIo): Promise<number> {
     }
     if (values.check) {
       if (stale.length > 0) {
-        io.stderr(`Generated files are out of date: ${stale.join(", ")}. Run "nexapi generate".\n`);
+        io.stderr(`Generated files are out of date: ${stale.join(", ")}. Run "syncapi generate".\n`);
         return 1;
       }
       io.stdout("Generated files are up to date\n");

@@ -28,7 +28,7 @@ mutation-checked: breaking the consumer's runtime or type expectations makes it 
    verifies all four package versions match the tag, and publishes the workspace packages in dependency
    order.
 
-Before the first release, add an `NPM_TOKEN` Actions secret with publish access to the `@nexapi` npm
+Before the first release, add an `NPM_TOKEN` Actions secret with publish access to the `@syncapi` npm
 scope. Scoped packages need `--access public` on their first public publish. The private `devtools`
 and `benchmarks` workspace packages are not published.
 

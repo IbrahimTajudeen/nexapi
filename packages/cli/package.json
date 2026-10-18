@@ -1,7 +1,7 @@
 {
-  "name": "@nexapi/cli",
+  "name": "@syncapi/cli",
   "version": "0.0.1",
-  "description": "Schema validation and client generation commands for NexAPI",
+  "description": "Schema validation and client generation commands for syncapi",
   "type": "module",
   "license": "MIT",
   "publishConfig": {
@@ -11,7 +11,7 @@
     "node": ">=22.12"
   },
   "bin": {
-    "nexapi": "./dist/cli.js"
+    "syncapi": "./dist/cli.js"
   },
   "files": [
     "dist"
@@ -25,6 +25,6 @@
     }
   },
   "dependencies": {
-    "@nexapi/codegen": "workspace:*"
+    "@syncapi/codegen": "workspace:*"
   }
 }

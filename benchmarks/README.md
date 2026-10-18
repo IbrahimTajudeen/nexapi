@@ -9,7 +9,7 @@ Each result file records Node/V8 version, OS, CPU, library versions, cache polic
 
 ## Method
 
-- Headless: `@nexapi/core` vs `@tanstack/query-core` (pinned in `package.json`). No React, no network, no timers in `queryFn`s (they resolve immediately).
+- Headless: `@syncapi/core` vs `@tanstack/query-core` (pinned in `package.json`). No React, no network, no timers in `queryFn`s (they resolve immediately).
 - Identical policy on both sides: `retry: false`, `gcTime: Infinity`, inert focus/online managers; `staleTime` as stated per scenario.
 - Each _sample_ is a batch of operations timed with `performance.now()`; we report per-operation **median, p95, p99** across samples after warm-up. GC is forced between samples (`--expose-gc`).
 - The dedup scenarios assert that the `queryFn` ran exactly once per sample and abort the run otherwise: a benchmark that doesn't deduplicate would measure the wrong thing.
@@ -33,6 +33,6 @@ Each result file records Node/V8 version, OS, CPU, library versions, cache polic
 
 ## Reading the results honestly
 
-- NexAPI does **less** per operation than TanStack Query by design and by current maturity: no `notifyManager` batching, no tracked-property result proxies, structural sharing is opt-in, no persisters/devtools hooks. A faster number can simply mean fewer features. In particular, in the observer scenario NexAPI notifies synchronously whereas TanStack batches through its scheduler, so the two measure different notification semantics.
+- syncapi does **less** per operation than TanStack Query by design and by current maturity: no `notifyManager` batching, no tracked-property result proxies, structural sharing is opt-in, no persisters/devtools hooks. A faster number can simply mean fewer features. In particular, in the observer scenario syncapi notifies synchronously whereas TanStack batches through its scheduler, so the two measure different notification semantics.
 - Samples come from a small shared VM (see the recorded environment); absolute numbers will differ elsewhere. Compare ratios across several runs on your own hardware before drawing conclusions.
 - No performance-superiority claim is made anywhere in this repository. If a claim is ever added, it must cite a specific scenario in a committed result file.

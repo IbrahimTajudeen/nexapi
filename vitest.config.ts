@@ -7,9 +7,9 @@ const src = (p: string): string =>
 export default defineConfig({
   resolve: {
     alias: {
-      "@nexapi/core": src("core"),
-      "@nexapi/codegen": src("codegen"),
-      "@nexapi/react": src("react"),
+      "@syncapi/core": src("core"),
+      "@syncapi/codegen": src("codegen"),
+      "@syncapi/react": src("react"),
     },
   },
   test: {

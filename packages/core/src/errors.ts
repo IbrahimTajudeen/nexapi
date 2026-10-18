@@ -1,5 +1,5 @@
 /**
- * Error taxonomy. Every error NexAPI raises itself extends `NexError`.
+ * Error taxonomy. Every error syncapi raises itself extends `NexError`.
  *
  * Security note: errors intentionally carry the request *method* and a sanitized URL
  * (origin + path, no query string) but never request headers or bodies, so that logging an

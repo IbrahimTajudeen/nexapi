@@ -40,7 +40,7 @@ Types: `QueryEndpoint<TReq, TData, TErrBody>`, `MutationEndpoint<TReq, TBody, TD
 
 ### Optional response validation
 
-With `"validation": true` in `nexapi.config.json`, codegen also emits `shapes.ts` (plain data, no code, no dependency) and attaches the shape of every JSON success response to its endpoint. The runtime then checks each response and rejects with `ResponseValidationError` (`issues: { path, expected, received }[]`, at most 10) when it differs; turn it off per client with `createNexClient({ validateResponses: false })`. Reports contain positions and types, never values, because responses may carry personal data. A mismatch is deterministic, so it is never retried, and it lands in query state like any error.
+With `"validation": true` in `syncapi.config.json`, codegen also emits `shapes.ts` (plain data, no code, no dependency) and attaches the shape of every JSON success response to its endpoint. The runtime then checks each response and rejects with `ResponseValidationError` (`issues: { path, expected, received }[]`, at most 10) when it differs; turn it off per client with `createNexClient({ validateResponses: false })`. Reports contain positions and types, never values, because responses may carry personal data. A mismatch is deterministic, so it is never retried, and it lands in query state like any error.
 
 What is checked: types, required properties, literals/enums, arrays, unions (one member must match), intersections, declared `additionalProperties` types. What is not: undeclared extra properties are accepted (servers add fields without breaking clients), and `integer`, `format`, length, pattern and range constraints are not represented, so they are not enforced. Validation runs once per fetch on the parsed body (cost is linear in its size; benchmark before enabling on very large payloads). Turning the option off later leaves `shapes.ts` on disk, unreferenced; delete it.
 
@@ -82,4 +82,4 @@ No logging anywhere. Errors never include headers, bodies or query strings. Base
 
 ## Breaking-change policy (from 0.1)
 
-Public = everything exported from package entry points plus the _shape_ of generated code. Generated-code shape changes require a major version of `@nexapi/codegen` and a note in the changelog; `nexapi generate --check` in CI makes drift visible.
+Public = everything exported from package entry points plus the _shape_ of generated code. Generated-code shape changes require a major version of `@syncapi/codegen` and a note in the changelog; `syncapi generate --check` in CI makes drift visible.

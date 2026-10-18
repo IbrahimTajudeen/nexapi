@@ -7,9 +7,9 @@
     "sourceMap": false,
     "baseUrl": ".",
     "paths": {
-      "@nexapi/core": ["packages/core/src/index.ts"],
-      "@nexapi/codegen": ["packages/codegen/src/index.ts"],
-      "@nexapi/react": ["packages/react/src/index.ts"]
+      "@syncapi/core": ["packages/core/src/index.ts"],
+      "@syncapi/codegen": ["packages/codegen/src/index.ts"],
+      "@syncapi/react": ["packages/react/src/index.ts"]
     }
   },
   "include": [

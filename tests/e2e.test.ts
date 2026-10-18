@@ -1,13 +1,13 @@
 import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { generate } from "@nexapi/codegen";
+import { generate } from "@syncapi/codegen";
 import {
   HttpError,
   QueryObserver,
   ResponseValidationError,
   createNexClient,
   type NexClient,
-} from "@nexapi/core";
+} from "@syncapi/core";
 import { createApi } from "../examples/basic/generated/index.js";
 import type { User } from "../examples/basic/generated/index.js";
 import { startServer, type TestServer } from "./server.js";
@@ -301,7 +301,7 @@ describe("generated output", () => {
   it("is exactly what the generator produces today (no drift, no irrelevant diffs)", () => {
     const text = readFileSync(new URL("../fixtures/openapi/basic.yaml", import.meta.url), "utf8");
     const config = JSON.parse(
-      readFileSync(new URL("../examples/basic/nexapi.config.json", import.meta.url), "utf8"),
+      readFileSync(new URL("../examples/basic/syncapi.config.json", import.meta.url), "utf8"),
     ) as Parameters<typeof generate>[1];
     for (const file of generate(text, config).files)
       expect(
