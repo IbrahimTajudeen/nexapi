@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const AREAS: [string, string][] = [
   [
     "Try it on your schema",
-    "Run nyxapi validate on a real OpenAPI document and report anything that is rejected or generated wrongly. Large and unusual schemas are the most valuable.",
+    "Run nyx validate on a real OpenAPI document and report anything that is rejected or generated wrongly. Large and unusual schemas are the most valuable.",
   ],
   [
     "Framework guides",

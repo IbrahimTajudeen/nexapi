@@ -15,13 +15,21 @@ generated/{types,client,index}.ts      ← committed, readable, deterministic
 
 ## Packages
 
-| Package            | Responsibility                                                                                      | Depends on                             |
-| ------------------ | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `@nyxapi/core`     | HTTP runtime, query cache, mutations, endpoint contracts. **No React, no runtime dependencies.**    | –                                      |
-| `@nyxapi/codegen`  | OpenAPI → IR → TypeScript. Pure functions (`generate(text, config)`), no file I/O.                  | `yaml`                                 |
-| `@nyxapi/cli`      | `nyxapi generate                                                                                    | validate`, file I/O, `--check` for CI. | codegen |
-| `@nyxapi/react`    | `useQuery`, `useMutation`, `NyxProvider`. Thin: one observer per hook, no second cache.             | core, react (peer)                     |
-| `@nyxapi/devtools` | Cache inspector (`createInspector`) and minimal React panel, built on `QueryClient.subscribeCache`. | –                                      |
+| Package            | Responsibility                                                                                                                       | Depends on               |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| `@nyxapi/core`     | HTTP runtime, query cache, mutations, endpoint contracts. **No React, no runtime dependencies.**                                     | –                        |
+| `@nyxapi/codegen`  | OpenAPI, Swagger 2.0 and GraphQL → IR → TypeScript. Pure functions (`generate`, async `generateFrom`), no file I/O.                  | `yaml`, `graphql` (lazy) |
+| `@nyxapi/cli`      | The `nyx` command: `init`, `generate [--watch]`, `validate`; file I/O, `--check` for CI.                                             | codegen                  |
+| `@nyxapi/react`    | `useQuery`, `useMutation`, `NyxProvider`. Thin: one observer per hook, no second cache.                                              | core, react (peer)       |
+| `@nyxapi/devtools` | Cache inspector (`createInspector`) and minimal React panel, built on `QueryClient.subscribeCache`.                                  | –                        |
+| `@nyxapi/graphql`  | `GraphQLClient`: POST through the origin-pinned `HttpClient`, `GraphQLError`, error policy. Generated GraphQL clients build on it.   | core                     |
+| `@nyxapi/trpc`     | `createNyxTrpc(client)`: wraps a tRPC v11 client so each procedure is a core operation. Types are read structurally; no tRPC import. | core                     |
+
+## Protocols
+
+REST endpoints are HTTP-specific (`endpoint.ts`). Everything else is built on the protocol-neutral **operation** layer in core (`operation.ts`): an operation is `run(input, signal)` plus a key prefix, and `createQueryOperation` / `createMutationOperation` give it `options`, `key`, `prefetch` and `invalidate` on the one cache. GraphQL and tRPC are thin adapters over it, so single-flight, retries (honouring `NyxError.retryable`), cancellation and optimistic updates are implemented once.
+
+The generator has two front ends. OpenAPI (and Swagger 2.0, converted to OpenAPI 3 in `swagger2.ts`) builds the `ApiModel` and emits the resource tree. GraphQL (`graphql.ts`) uses `graphql-js` to read the schema and documents, derives each result type from the exact selection set it sends, and emits `api.query.*` / `api.mutation.*`. tRPC has no generator.
 
 ## Core design
 

@@ -59,6 +59,12 @@ const extra = [
     href: "/contribute/",
     text: "open source contributors issues pull requests development setup",
   },
+  {
+    title: "Releases",
+    page: "Project",
+    href: "/releases/",
+    text: "versions changelog what is new 0.1.0 0.0.1 release notes graphql trpc swagger nyx npm published",
+  },
 ];
 entries.push(...extra);
 mkdirSync(join(root, "src/generated"), { recursive: true });

@@ -27,6 +27,8 @@ export {
   NyxError,
   ParseError,
   RequestError,
+  OperationError,
+  ResponseTooLargeError,
   ResponseValidationError,
   TimeoutError,
   type EndpointError,
@@ -54,6 +56,16 @@ export {
   type ResponseKind,
   type Transport,
 } from "./http.js";
+export {
+  createMutationOperation,
+  createQueryOperation,
+  type MutationOperation,
+  type OperationArgs,
+  type OperationCallExtras,
+  type OperationDef,
+  type OperationRuntime,
+  type QueryOperation,
+} from "./operation.js";
 export { checkShape, type Shape, type ShapeIssue, type Shapes } from "./shape.js";
 export { hashKey, keyMatchesPrefix, type QueryKey, type TypedKey } from "./key.js";
 export {

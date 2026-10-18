@@ -168,7 +168,7 @@ describe("generate: schema features", () => {
 
 describe("generate: invalid input is reported, never silently skipped", () => {
   it("rejects non-OpenAPI-3 documents and malformed YAML", () => {
-    expect(errorsOf("swagger: '2.0'\npaths: {}")).toEqual(["UNSUPPORTED_VERSION"]);
+    expect(errorsOf("info: {}\npaths: {}")).toEqual(["UNSUPPORTED_VERSION"]);
     expect(errorsOf("- just\n- a list")).toEqual(["INVALID_DOCUMENT"]);
     expect(errorsOf("openapi: [unclosed")).toEqual(["PARSE_ERROR"]);
     expect(errorsOf("a: 1\na: 2")).toEqual(["PARSE_ERROR"]); // duplicate keys
@@ -605,5 +605,48 @@ describe("generate: naming.stripPathPrefix", () => {
       `  /x/a:\n    get:\n      operationId: one\n${op()}  /a:\n    get:\n      operationId: two\n${op()}`,
     );
     expect(() => generate(clash, { naming: { stripPathPrefix: "/x" } })).toThrow();
+  });
+});
+
+describe("Swagger 2.0 input", () => {
+  const swagger = readFileSync(
+    new URL("../../../fixtures/swagger/petstore2.yaml", import.meta.url),
+    "utf8",
+  );
+  it("converts and generates a typed client", () => {
+    const { files, model } = generate(swagger);
+    expect(model.operations.map((o) => o.id).sort()).toEqual([
+      "createPet",
+      "getPet",
+      "listPets",
+      "uploadPhoto",
+    ]);
+    const client = files.find((f) => f.path.endsWith("client.ts"))?.content ?? "";
+    expect(client).toContain("/pets/{id}");
+    const types = files.find((f) => f.path.endsWith("types.ts"))?.content ?? "";
+    expect(types).toContain("Blob");
+    expect(types).toContain("null");
+  });
+  it("is deterministic", () => {
+    expect(generate(swagger).files).toEqual(generate(swagger).files);
+  });
+});
+
+describe("edge cases", () => {
+  it("rejects alias cycles", () => {
+    const text = doc(
+      `  /a:\n    get:\n${op()}`,
+      "    A: { $ref: '#/components/schemas/B' }\n    B: { $ref: '#/components/schemas/A' }",
+    );
+    expect(errorsOf(text)).toContain("REF_CYCLE");
+  });
+  it("emits __proto__ shape keys as own properties", () => {
+    const text = doc(
+      `  /a:\n    get:\n      responses:\n        "200":\n          description: ok\n          content:\n            application/json:\n              schema:\n                type: object\n                properties:\n                  __proto__: { type: string }`,
+    );
+    const out = generate(text, { validation: true })
+      .files.map((f) => f.content)
+      .join("\n");
+    expect(out).toContain('["__proto__"]');
   });
 });

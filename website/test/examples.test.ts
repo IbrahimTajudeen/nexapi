@@ -22,8 +22,8 @@ describe("site examples run against the real engine and say what the docs say", 
 });
 
 import { readFileSync } from "node:fs";
-import { generate } from "@nyxapi/codegen";
-import { SAMPLE_SCHEMA } from "../src/lib/sample-schema";
+import { generate, generateFrom } from "@nyxapi/codegen";
+import { GRAPHQL_SAMPLE, SAMPLE_SCHEMA } from "../src/lib/sample-schema";
 
 describe("playground sample schema", () => {
   it("is identical to the fixture and generates a client", () => {
@@ -39,5 +39,17 @@ describe("playground sample schema", () => {
       "shapes.ts",
       "types.ts",
     ]);
+  });
+});
+
+describe("playground GraphQL sample", () => {
+  it("is identical to the fixture and generates a client", async () => {
+    const fixture = readFileSync(
+      new URL("../../fixtures/graphql/blog.graphql", import.meta.url),
+      "utf8",
+    );
+    expect(GRAPHQL_SAMPLE).toBe(fixture);
+    const { files } = await generateFrom(GRAPHQL_SAMPLE, { scalars: { DateTime: "string" } });
+    expect(files.map((f) => f.path).sort()).toEqual(["client.ts", "index.ts", "types.ts"]);
   });
 });

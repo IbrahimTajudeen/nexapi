@@ -10,6 +10,8 @@ export default defineConfig({
       "@nyxapi/core": src("core"),
       "@nyxapi/codegen": src("codegen"),
       "@nyxapi/react": src("react"),
+      "@nyxapi/graphql": src("graphql"),
+      "@nyxapi/trpc": src("trpc"),
       "@nyxapi/devtools/react": fileURLToPath(
         new URL("./packages/devtools/src/react.tsx", import.meta.url),
       ),

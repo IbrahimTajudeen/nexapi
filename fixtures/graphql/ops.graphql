@@ -1,0 +1,7 @@
+fragment UserBits on User { id name role }
+
+query GetUser($id: ID!) { user(id: $id) { ...UserBits posts(first: 3) { id title } } }
+
+query Find($text: String!) { search(text: $text) { __typename ... on User { name } ... on Post { title } } }
+
+mutation AddPost($input: NewPost!) { createPost(input: $input) { id title } }

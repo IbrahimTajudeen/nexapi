@@ -27,7 +27,7 @@ await app.close();
 ```
 
 ```bash
-npx nyxapi generate --input openapi.json --output src/api
+npx nyx generate --input openapi.json --output src/api
 ```
 
 Verified against real output: `fixtures/openapi/nestjs-swagger.json` was produced by `@nestjs/swagger` 11 from
@@ -52,7 +52,7 @@ Things to know:
 
 ```bash
 dotnet swagger tofile --output openapi.json ./bin/Release/net9.0/Api.dll v1     # Swashbuckle CLI
-npx nyxapi generate --input openapi.json --output src/api --config nyxapi.config.json
+npx nyx generate --input openapi.json --output src/api --config nyx.config.json
 ```
 
 ```json

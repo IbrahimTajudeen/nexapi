@@ -1,6 +1,23 @@
+type InputKind = "auto" | "openapi" | "swagger" | "graphql";
+
 export interface NyxApiConfig {
-  /** Local OpenAPI file (JSON or YAML), relative to the config file. Remote URLs go through `--input`. */
+  /**
+   * Local schema file, relative to the config file: OpenAPI 3.x or Swagger 2.0 (JSON/YAML), or a
+   * GraphQL schema (`.graphql` SDL or introspection JSON). Remote URLs go through `--input`.
+   */
   input?: string;
+  /** What `input` is. Default `auto`: detected from the file name and contents. */
+  kind?: InputKind;
+  /**
+   * GraphQL only: operation documents (`.graphql` files or globs-free directory paths, relative to
+   * the config file). When set, exactly these operations are generated; otherwise one operation
+   * per root field of the schema.
+   */
+  documents?: string[];
+  /** GraphQL only: TypeScript type per custom scalar, e.g. `{ "DateTime": "string" }`. Default `unknown`. */
+  scalars?: Record<string, string>;
+  /** GraphQL only: how deep the generated default selection sets go. Default 2, range 1–6. */
+  selectionDepth?: number;
   /** Output directory, relative to the config file. */
   output?: string;
   /**
@@ -47,6 +64,10 @@ export function validateConfig(raw: unknown): { config: NyxApiConfig; problems: 
   const known = new Set([
     "$schema",
     "input",
+    "kind",
+    "documents",
+    "scalars",
+    "selectionDepth",
     "output",
     "overrides",
     "exclude",
@@ -59,6 +80,38 @@ export function validateConfig(raw: unknown): { config: NyxApiConfig; problems: 
     problems.push('"input" must be a string');
   if (c["output"] !== undefined && typeof c["output"] !== "string")
     problems.push('"output" must be a string');
+  if (
+    c["kind"] !== undefined &&
+    !(
+      typeof c["kind"] === "string" && ["auto", "openapi", "swagger", "graphql"].includes(c["kind"])
+    )
+  )
+    problems.push('"kind" must be "auto", "openapi", "swagger" or "graphql"');
+  if (
+    c["documents"] !== undefined &&
+    !(Array.isArray(c["documents"]) && c["documents"].every((x) => typeof x === "string"))
+  )
+    problems.push('"documents" must be an array of file or directory paths');
+  const scalars = c["scalars"];
+  if (
+    scalars !== undefined &&
+    !(
+      typeof scalars === "object" &&
+      scalars !== null &&
+      !Array.isArray(scalars) &&
+      Object.values(scalars).every((x) => typeof x === "string")
+    )
+  )
+    problems.push('"scalars" must map scalar names to TypeScript types (strings)');
+  if (
+    c["selectionDepth"] !== undefined &&
+    !(
+      Number.isInteger(c["selectionDepth"]) &&
+      (c["selectionDepth"] as number) >= 1 &&
+      (c["selectionDepth"] as number) <= 6
+    )
+  )
+    problems.push('"selectionDepth" must be an integer from 1 to 6');
   if (c["validation"] !== undefined && typeof c["validation"] !== "boolean")
     problems.push('"validation" must be true or false');
   if (

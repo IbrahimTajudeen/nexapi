@@ -7,7 +7,7 @@
 #   curl -fsSL https://YOUR-SITE/install.sh | sh -s -- https://YOUR-SITE
 #
 # Environment:
-#   NYXAPI_PACKAGES  space-separated list (default: "core cli codegen"; also: react devtools)
+#   NYXAPI_PACKAGES  space-separated list (default: "core cli codegen"; also: react devtools graphql trpc)
 #   NYXAPI_PM        npm | pnpm | yarn | bun (default: detected from your lockfile, else npm)
 #
 # Read it first if you like: it only downloads from the site you give it, writes to ./.nyxapi/
@@ -102,4 +102,4 @@ fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + "\n");
 
 echo
 echo "NyxAPI $VERSION installed with $PM. Next:"
-echo "  npx nyxapi generate --input ./openapi.yaml --output ./src/api"
+echo "  npx nyx generate --input ./openapi.yaml --output ./src/api"

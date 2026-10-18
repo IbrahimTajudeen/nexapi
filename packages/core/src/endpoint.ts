@@ -1,5 +1,5 @@
 import type { QueryClient } from "./client.js";
-import { keyMatchesPrefix, type QueryKey, type TypedKey } from "./key.js";
+import type { QueryKey, TypedKey } from "./key.js";
 import { ResponseValidationError, type EndpointError } from "./errors.js";
 import { checkShape, type Shape, type Shapes } from "./shape.js";
 import type {
@@ -247,9 +247,4 @@ export function createMutationEndpoint<TReq extends RequestShape, TBody, TData, 
     key: () => prefix,
   };
   return Object.assign(call, methods) as unknown as MutationEndpoint<TReq, TBody, TData, TErrBody>;
-}
-
-/** Re-export for tests/devtools: does `key` belong to this endpoint's route (any variant)? */
-export function isEndpointKey(key: QueryKey, endpointPrefix: QueryKey): boolean {
-  return keyMatchesPrefix(key, endpointPrefix);
 }

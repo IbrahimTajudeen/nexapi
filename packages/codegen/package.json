@@ -1,7 +1,7 @@
 {
   "name": "@nyxapi/codegen",
-  "version": "0.0.1",
-  "description": "OpenAPI parser, normalized API model and TypeScript generator for NyxAPI",
+  "version": "0.1.0",
+  "description": "OpenAPI, Swagger 2.0 and GraphQL to typed TypeScript client generator for NyxAPI",
   "keywords": [
     "nyxapi",
     "openapi",
@@ -9,7 +9,8 @@
     "typescript",
     "api-client",
     "code-generator",
-    "swagger"
+    "swagger",
+    "graphql"
   ],
   "license": "MIT",
   "type": "module",
@@ -19,6 +20,7 @@
   },
   "files": [
     "dist",
+    "config.schema.json",
     "README.md",
     "LICENSE"
   ],
@@ -28,13 +30,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./config.schema.json": "./config.schema.json"
   },
   "dependencies": {
+    "graphql": "^16.14.2",
     "yaml": "^2.9.1"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }

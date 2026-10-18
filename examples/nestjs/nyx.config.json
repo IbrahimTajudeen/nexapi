@@ -1,0 +1,5 @@
+{
+  "input": "../../fixtures/openapi/nestjs-swagger.json",
+  "output": "generated",
+  "validation": true
+}

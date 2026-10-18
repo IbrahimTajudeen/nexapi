@@ -3,7 +3,15 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [
-    ["@nyxapi/core", "@nyxapi/codegen", "@nyxapi/cli", "@nyxapi/react", "@nyxapi/devtools"]
+    [
+      "@nyxapi/core",
+      "@nyxapi/codegen",
+      "@nyxapi/cli",
+      "@nyxapi/react",
+      "@nyxapi/devtools",
+      "@nyxapi/graphql",
+      "@nyxapi/trpc"
+    ]
   ],
   "linked": [],
   "access": "public",

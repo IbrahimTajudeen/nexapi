@@ -1,0 +1,38 @@
+{
+  "name": "@nyxapi/graphql",
+  "version": "0.1.0",
+  "description": "GraphQL runtime for NyxAPI: typed queries and mutations on the same cache, retries and optimistic updates as REST",
+  "keywords": [
+    "nyxapi",
+    "graphql",
+    "graphql-client",
+    "query-cache",
+    "typescript",
+    "api-client"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@nyxapi/core": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

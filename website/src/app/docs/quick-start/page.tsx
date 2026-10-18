@@ -89,7 +89,7 @@ npm pkg set type=module`}</Code>
         </li>
         <li>
           <strong>Install NyxAPI.</strong> See <Link href="/docs/installation/">Installation</Link>{" "}
-          if the packages are not on the registry yet.
+          for tarballs and other ways to install.
           <PackageInstall packages="@nyxapi/core" />
           <PackageInstall packages="@nyxapi/cli tsx typescript" dev />
         </li>
@@ -105,7 +105,7 @@ npm pkg set type=module`}</Code>
           <Code
             lang="bash"
             title="terminal"
-          >{`npx nyxapi generate --input openapi.yaml --output src/api`}</Code>
+          >{`npx nyx generate --input openapi.yaml --output src/api`}</Code>
           You now have <code>src/api/index.ts</code>, <code>client.ts</code> and{" "}
           <code>types.ts</code>. Open <code>types.ts</code>: you will find a <code>Pet</code> type
           that matches your schema.
@@ -156,7 +156,7 @@ No such pet`}</Code>
       <Code
         lang="bash"
         title="terminal"
-      >{`npx nyxapi generate --input openapi.yaml --output src/api --check`}</Code>
+      >{`npx nyx generate --input openapi.yaml --output src/api --check`}</Code>
     </Doc>
   );
 }

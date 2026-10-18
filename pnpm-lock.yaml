@@ -26,6 +26,9 @@ importers:
       eslint:
         specifier: ^10.12.0
         version: 10.12.0
+      graphql:
+        specifier: ^16.14.2
+        version: 16.14.2
       jsdom:
         specifier: ^30.1.2
         version: 30.1.2
@@ -89,6 +92,9 @@ importers:
 
   packages/codegen:
     dependencies:
+      graphql:
+        specifier: ^16.14.2
+        version: 16.14.2
       yaml:
         specifier: ^2.9.1
         version: 2.9.1
@@ -107,6 +113,12 @@ importers:
         specifier: ^18.0.0 || ^19.0.0
         version: 19.3.1
 
+  packages/graphql:
+    dependencies:
+      '@nyxapi/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/react:
     dependencies:
       '@nyxapi/core':
@@ -115,6 +127,19 @@ importers:
       react:
         specifier: ^18.0.0 || ^19.0.0
         version: 19.3.1
+
+  packages/trpc:
+    dependencies:
+      '@nyxapi/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@trpc/client':
+        specifier: ^11.19.0
+        version: 11.19.0(@trpc/server@11.19.0(typescript@5.9.3))(typescript@5.9.3)
+      '@trpc/server':
+        specifier: ^11.19.0
+        version: 11.19.0(typescript@5.9.3)
 
   website:
     dependencies:
@@ -873,6 +898,19 @@ packages:
     peerDependencies:
       react: ^18 || ^19
 
+  '@trpc/client@11.19.0':
+    resolution: {integrity: sha512-0MKkPq6MejsKB5Opca1Rl22KVIaqo2+A1EiXyZ8EGUsl9TLrPdpGn+Usux20TZKFwnSC2+wI/WilqNJaP4ODfw==}
+    hasBin: true
+    peerDependencies:
+      '@trpc/server': 11.19.0
+      typescript: '>=5.7.2'
+
+  '@trpc/server@11.19.0':
+    resolution: {integrity: sha512-7C1goiDurz82yFKtZUbEzjXd0Rg/jyisaIZQhdvus+1l7E6mwcEYZXjZ1US/HF8kOyz1LERL8UN3bcboJtjcyQ==}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=5.7.2'
+
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
 
@@ -1172,6 +1210,10 @@ packages:
   glob-parent@6.0.2:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
+
+  graphql@16.14.2:
+    resolution: {integrity: sha512-Chq1s4CY7jmh8gO2qvLIJyfCDIN+EHLFW/9iShnp1z8FjBQMoodWP1kDC36VAMXXIvAjj4ARa7ntfAV2BrjsbA==}
+    engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
 
   hashery@1.5.1:
     resolution: {integrity: sha512-iZyKG96/JwPz1N55vj2Ie2vXbhu440zfUfJvSwEqEbeLluk7NnapfGqa7LH0mOsnDxTF85Mx8/dyR6HfqcbmbQ==}
@@ -2285,6 +2327,15 @@ snapshots:
       '@tanstack/query-core': 5.104.2
       react: 19.3.1
 
+  '@trpc/client@11.19.0(@trpc/server@11.19.0(typescript@5.9.3))(typescript@5.9.3)':
+    dependencies:
+      '@trpc/server': 11.19.0(typescript@5.9.3)
+      typescript: 5.9.3
+
+  '@trpc/server@11.19.0(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
+
   '@types/chai@5.2.3':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -2635,6 +2686,8 @@ snapshots:
   glob-parent@6.0.2:
     dependencies:
       is-glob: 4.0.3
+
+  graphql@16.14.2: {}
 
   hashery@1.5.1:
     dependencies:

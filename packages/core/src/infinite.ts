@@ -270,7 +270,7 @@ function trim<TPage, TParam>(
 }
 
 /** Plain query options for an infinite query: first load and refetch re-request every page held. */
-export function toQueryOptions<TPage, TError, TParam, TSelected>(
+function toQueryOptions<TPage, TError, TParam, TSelected>(
   client: QueryClient,
   o: InfiniteQueryOptions<TPage, TError, TParam, TSelected>,
 ): QueryOptions<InfiniteData<TPage, TParam>, TError, TSelected> {

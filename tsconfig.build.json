@@ -11,6 +11,12 @@
       "path": "packages/cli"
     },
     {
+      "path": "packages/graphql"
+    },
+    {
+      "path": "packages/trpc"
+    },
+    {
       "path": "packages/react"
     },
     {

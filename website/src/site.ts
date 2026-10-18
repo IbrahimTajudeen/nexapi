@@ -1,7 +1,9 @@
+import downloads from "@/generated/downloads.json";
+
 /** Deployment settings. Set these as environment variables at build time (see README). */
 export const REPO_URL: string | undefined = process.env.NEXT_PUBLIC_REPO_URL || undefined;
 export const SITE_URL: string | undefined = process.env.NEXT_PUBLIC_SITE_URL || undefined;
-export const VERSION = "0.0.1";
+export const VERSION: string = downloads.version;
 export const NODE_MIN = "22.12";
 
 export interface NavItem {
@@ -64,6 +66,21 @@ export const DOCS_NAV: NavSection[] = [
         href: "/docs/pagination/",
         summary: "Infinite queries in both directions.",
       },
+      {
+        title: "Schema formats",
+        href: "/docs/schemas/",
+        summary: "OpenAPI, Swagger 2.0, GraphQL and tRPC: what works and how it is detected.",
+      },
+      {
+        title: "GraphQL",
+        href: "/docs/graphql/",
+        summary: "Typed queries and mutations from a schema, on the same cache.",
+      },
+      {
+        title: "tRPC",
+        href: "/docs/trpc/",
+        summary: "Typed keys, prefetch and invalidation for every procedure.",
+      },
       { title: "React", href: "/docs/react/", summary: "Hooks, Suspense and server rendering." },
       {
         title: "Security",
@@ -82,7 +99,7 @@ export const DOCS_NAV: NavSection[] = [
     title: "Reference",
     items: [
       { title: "CLI", href: "/docs/cli/", summary: "Every command and flag." },
-      { title: "Configuration", href: "/docs/config/", summary: "nyxapi.config.json options." },
+      { title: "Configuration", href: "/docs/config/", summary: "nyx.config.json options." },
       {
         title: "Client options",
         href: "/docs/client-options/",

@@ -4,6 +4,7 @@ import {
   NyxError,
   ParseError,
   RequestError,
+  ResponseTooLargeError,
   TimeoutError,
 } from "./errors.js";
 import { raceAbort } from "./util.js";
@@ -50,6 +51,11 @@ export interface HttpClientOptions {
    * Default: the runtime's (`"same-origin"` in browsers; Node's fetch has no cookie jar).
    */
   credentials?: RequestCredentials;
+  /**
+   * Largest response body (in bytes) that will be read. A larger one is cancelled and rejects with
+   * `ResponseTooLargeError`, so a misbehaving server cannot exhaust memory. Unlimited by default.
+   */
+  maxResponseBytes?: number;
 }
 
 export interface RequestSpec {
@@ -281,10 +287,49 @@ function isJsonContentType(value: string | null): boolean {
   return value !== null && /(^|[/+])json(\s*;|$)/i.test(value.trim());
 }
 
-async function readErrorBody(response: Response, signal: AbortSignal): Promise<unknown> {
+/** Read a body as bytes, giving up (and cancelling the stream) once it passes `limit`. */
+async function readBytes(response: Response, limit: number): Promise<Uint8Array> {
+  const declared = Number(response.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > limit) {
+    await response.body?.cancel().catch(() => undefined);
+    throw new ResponseTooLargeError(limit);
+  }
+  const reader = response.body?.getReader();
+  if (!reader) return new Uint8Array(0);
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > limit) {
+      await reader.cancel().catch(() => undefined);
+      throw new ResponseTooLargeError(limit);
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out;
+}
+
+function readText(response: Response, limit: number | undefined): Promise<string> {
+  if (limit === undefined) return response.text();
+  return readBytes(response, limit).then((bytes) => new TextDecoder().decode(bytes));
+}
+
+async function readErrorBody(
+  response: Response,
+  signal: AbortSignal,
+  limit: number | undefined,
+): Promise<unknown> {
   let text: string;
   try {
-    text = await raceAbort(response.text(), signal);
+    text = await raceAbort(readText(response, limit), signal);
   } catch {
     return undefined;
   }
@@ -322,6 +367,7 @@ export class HttpClient {
     const url = buildUrl(this.#base, spec, this.#options.allowAbsoluteUrls === true);
     const safeUrl = url.origin + url.pathname;
     const method = spec.method.toUpperCase();
+    const maxBytes = this.#options.maxResponseBytes;
 
     const headers = new Headers(this.#options.headers);
     if (this.#options.getToken) {
@@ -377,7 +423,7 @@ export class HttpClient {
 
       try {
         if (!response.ok) {
-          const errorBody = await readErrorBody(response, controller.signal);
+          const errorBody = await readErrorBody(response, controller.signal, maxBytes);
           throw new HttpError({
             status: response.status,
             statusText: response.statusText,
@@ -391,10 +437,16 @@ export class HttpClient {
           return undefined as TData;
         }
         if (spec.response === "text")
-          return (await raceAbort(response.text(), controller.signal)) as TData;
-        if (spec.response === "blob")
-          return (await raceAbort(response.blob(), controller.signal)) as TData;
-        const text = await raceAbort(response.text(), controller.signal);
+          return (await raceAbort(readText(response, maxBytes), controller.signal)) as TData;
+        if (spec.response === "blob") {
+          if (maxBytes === undefined)
+            return (await raceAbort(response.blob(), controller.signal)) as TData;
+          const bytes = await raceAbort(readBytes(response, maxBytes), controller.signal);
+          return new Blob([bytes as BlobPart], {
+            type: response.headers.get("content-type") ?? "",
+          }) as TData;
+        }
+        const text = await raceAbort(readText(response, maxBytes), controller.signal);
         if (text === "")
           throw new ParseError(
             `Expected a JSON body from ${method} ${safeUrl} but it was empty`,

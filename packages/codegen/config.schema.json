@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unpkg.com/@nyxapi/codegen/config.schema.json",
+  "title": "NyxAPI config (nyx.config.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "input": {
+      "type": "string",
+      "description": "Local schema file, relative to this config: OpenAPI 3.x or Swagger 2.0 (JSON/YAML), or GraphQL SDL / introspection JSON."
+    },
+    "kind": {
+      "enum": ["auto", "openapi", "swagger", "graphql"],
+      "description": "What input is. Default auto: detected from the file name and contents."
+    },
+    "output": {
+      "type": "string",
+      "description": "Output directory, relative to this config. Default ./generated."
+    },
+    "documents": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "GraphQL only: .graphql operation files or directories. When set, exactly these operations are generated."
+    },
+    "scalars": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "GraphQL only: TypeScript type per custom scalar, e.g. { \"DateTime\": \"string\" }."
+    },
+    "selectionDepth": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 6,
+      "description": "GraphQL only: depth of generated default selection sets. Default 2."
+    },
+    "overrides": {
+      "type": "object",
+      "properties": {
+        "operations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+              "path": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "exclude": { "type": "array", "items": { "type": "string" } },
+    "validation": { "type": "boolean" },
+    "naming": {
+      "type": "object",
+      "properties": {
+        "paramPrefix": { "type": "string" },
+        "stripPathPrefix": { "type": "string" }
+      }
+    }
+  }
+}

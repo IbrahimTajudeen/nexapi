@@ -10,10 +10,11 @@ export default function Page() {
     <Doc
       href="/docs/config/"
       title="Configuration"
-      lede="Everything the generator can be told, in nyxapi.config.json. Unknown keys are rejected so a typo never silently does nothing."
+      lede="Everything the generator can be told, in nyx.config.json (nyx.config.json is still read). Unknown keys are rejected so a typo never silently does nothing."
     >
-      <Code lang="json" title="nyxapi.config.json">{`{
+      <Code lang="json" title="nyx.config.json">{`{
   "input": "./openapi.yaml",
+  "kind": "auto",
   "output": "./src/api",
   "validation": false,
   "exclude": [],
@@ -26,7 +27,30 @@ export default function Page() {
           [
             <code key="a">input</code>,
             "string",
-            "Local OpenAPI file, JSON or YAML, relative to the config file. URLs go through --input.",
+            "Local schema file relative to the config file: OpenAPI 3.x or Swagger 2.0 (JSON/YAML), or GraphQL SDL / introspection JSON. URLs go through --input.",
+          ],
+          [
+            <code key="k1">kind</code>,
+            '"auto" | "openapi" | "swagger" | "graphql"',
+            "What input is. Default auto: detected from the file name and contents.",
+          ],
+          [
+            <code key="k2">documents</code>,
+            "string[]",
+            "GraphQL only: .graphql operation files or directories. When set, exactly these operations are generated.",
+          ],
+          [
+            <code key="k3">scalars</code>,
+            "object",
+            <>
+              GraphQL only: a TypeScript type per custom scalar, such as{" "}
+              <code>{`{ "DateTime": "string" }`}</code>.
+            </>,
+          ],
+          [
+            <code key="k4">selectionDepth</code>,
+            "1 to 6",
+            "GraphQL only: depth of generated default selection sets. Default 2.",
           ],
           [<code key="b">output</code>, "string", "Output directory, relative to the config file."],
           [
@@ -71,7 +95,9 @@ export default function Page() {
         </p>
       </Callout>
       <p>
-        A <code>$schema</code> key is allowed for editors. Any other unknown key is an error.
+        A <code>$schema</code> key is allowed for editors;{" "}
+        <code>@nyxapi/codegen/config.schema.json</code> describes every key, so an editor can
+        autocomplete and flag typos. Any other unknown key is an error.
       </p>
     </Doc>
   );

@@ -132,8 +132,8 @@ cd nyxapi-starter`}</SiteCommand>
         <li>
           In <code>server.mjs</code> change the first pet to <code>name: 42</code> and run{" "}
           <code>npm start</code>. The schema says a name is text, and validation is on in{" "}
-          <code>nyxapi.config.json</code>, so you get a response validation error instead of bad
-          data reaching your code.
+          <code>nyx.config.json</code>, so you get a response validation error instead of bad data
+          reaching your code.
         </li>
       </ul>
 

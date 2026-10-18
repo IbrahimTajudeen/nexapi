@@ -1,7 +1,7 @@
 "use client";
-import { useMemo, useState } from "react";
-import { GenerationError, generate, type Diagnostic } from "@nyxapi/codegen";
-import { SAMPLE_SCHEMA } from "@/lib/sample-schema";
+import { useEffect, useState } from "react";
+import { GenerationError, generateFrom, type Diagnostic } from "@nyxapi/codegen";
+import { GRAPHQL_SAMPLE, SAMPLE_SCHEMA } from "@/lib/sample-schema";
 import { highlight } from "@/lib/highlight";
 import { CopyButton } from "./CopyButton";
 
@@ -11,10 +11,14 @@ interface Output {
   failed: boolean;
 }
 
-function run(text: string, validation: boolean, strip: string): Output {
+async function run(text: string, validation: boolean, strip: string): Promise<Output> {
   try {
-    const config = { validation, ...(strip ? { naming: { stripPathPrefix: strip } } : {}) };
-    const result = generate(text, config, "schema");
+    const config = {
+      validation,
+      scalars: { DateTime: "string" },
+      ...(strip ? { naming: { stripPathPrefix: strip } } : {}),
+    };
+    const result = await generateFrom(text, config, { sourceName: "schema" });
     return { files: result.files, diagnostics: result.diagnostics, failed: false };
   } catch (error) {
     if (error instanceof GenerationError)
@@ -39,17 +43,27 @@ export function GeneratePlayground() {
   const [validation, setValidation] = useState(true);
   const [strip, setStrip] = useState("");
   const [file, setFile] = useState("client.ts");
-  const out = useMemo(() => run(text, validation, strip), [text, validation, strip]);
+  const [out, setOut] = useState<Output>({ files: [], diagnostics: [], failed: false });
+  useEffect(() => {
+    let live = true;
+    void run(text, validation, strip).then((o) => live && setOut(o));
+    return () => {
+      live = false;
+    };
+  }, [text, validation, strip]);
   const current = out.files.find((f) => f.path === file) ?? out.files[0];
   return (
     <div>
       <p className="hint" style={{ marginTop: 0 }}>
-        Paste any OpenAPI 3.0 or 3.1 document (JSON or YAML). The generator runs in this page, so
-        your schema is not uploaded.
+        Paste an OpenAPI 3.x or Swagger 2.0 document (JSON or YAML) or a GraphQL schema (SDL). The
+        kind is detected. The generator runs in this page, so your schema is not uploaded.
       </p>
       <div className="cta-row" style={{ alignItems: "center", marginBottom: 12 }}>
         <button type="button" className="btn small" onClick={() => setText(SAMPLE_SCHEMA)}>
-          Load the sample schema
+          Load the OpenAPI sample
+        </button>
+        <button type="button" className="btn small" onClick={() => setText(GRAPHQL_SAMPLE)}>
+          Load the GraphQL sample
         </button>
         <label className="check" style={{ color: "var(--muted)" }}>
           <input
@@ -81,7 +95,7 @@ export function GeneratePlayground() {
       <div className="gen-grid">
         <div>
           <label className="sr-only" htmlFor="schema-input">
-            OpenAPI schema
+            Schema
           </label>
           <textarea
             id="schema-input"

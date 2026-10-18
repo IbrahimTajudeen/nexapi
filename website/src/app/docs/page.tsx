@@ -5,6 +5,7 @@ import { Code } from "@/components/Code";
 import { Doc, H2 } from "@/components/Doc";
 import { Runnable } from "@/components/Runnable";
 import { Table } from "@/components/Doc";
+import { VERSION } from "@/site";
 
 export const metadata: Metadata = { title: "Introduction" };
 
@@ -13,12 +14,12 @@ export default function Page() {
     <Doc
       href="/docs/"
       title="Introduction"
-      lede="NyxAPI turns an OpenAPI schema into a typed TypeScript client, and gives that client a cache, retries and optimistic updates. Here is what each piece does and how they fit."
+      lede="NyxAPI turns an OpenAPI, Swagger or GraphQL schema into a typed TypeScript client (or wraps your tRPC client), and gives it a cache, retries and optimistic updates. Here is what each piece does and how they fit."
     >
       <Callout kind="warn" title="Early development">
-        NyxAPI is at version 0.0.1. The API can change before 0.1, and the packages are not on the
-        npm registry yet. See <Link href="/docs/installation/">Installation</Link> for what works
-        today.
+        NyxAPI is at version {VERSION}. It is pre-1.0, so the API can still change between minor
+        versions. See <Link href="/releases/">Releases</Link> for what each version contains and
+        which are on npm, and <Link href="/docs/installation/">Installation</Link> to get started.
       </Callout>
 
       <H2>What you get</H2>
@@ -31,13 +32,22 @@ export default function Page() {
           ],
           [
             <code key="b">@nyxapi/codegen</code>,
-            "Reads an OpenAPI 3.x document and produces TypeScript. Pure functions: text in, files out.",
+            "Reads OpenAPI 3.x, Swagger 2.0 or GraphQL and produces TypeScript. Pure functions: text in, files out.",
           ],
           [
             <code key="c">@nyxapi/cli</code>,
             <>
-              The <code>nyxapi</code> command: <code>generate</code> and <code>validate</code>.
+              The <code>nyx</code> command: <code>init</code>, <code>generate</code> (with{" "}
+              <code>--watch</code>) and <code>validate</code>.
             </>,
+          ],
+          [
+            <code key="g">@nyxapi/graphql</code>,
+            "Runtime for generated GraphQL clients: same cache, retries and optimistic updates as REST.",
+          ],
+          [
+            <code key="t">@nyxapi/trpc</code>,
+            "Wraps a tRPC client so every procedure gets typed keys, prefetch and invalidation.",
           ],
           [
             <code key="d">@nyxapi/react</code>,
@@ -52,13 +62,13 @@ export default function Page() {
 
       <H2>How the pieces fit</H2>
       <p>
-        You write your API once, as an OpenAPI file. The CLI generates a client from it. That client
-        talks to your server through the core package, which keeps a cache of everything it has
-        fetched. React hooks, if you use them, read from that same cache instead of keeping their
-        own copy.
+        You describe your API once: an OpenAPI or Swagger file, a GraphQL schema, or a tRPC router.
+        The CLI generates a client from it. That client talks to your server through the core
+        package, which keeps a cache of everything it has fetched. React hooks, if you use them,
+        read from that same cache instead of keeping their own copy.
       </p>
       <Code lang="text" copy={false} title="data flow">{`openapi.yaml
-   │  nyxapi generate
+   │  nyx generate
    ▼
 src/api/*.ts           readable, deterministic, safe to commit
    │  createApi(nyx)

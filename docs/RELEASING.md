@@ -1,7 +1,7 @@
 # Releasing to npm
 
-Five packages are published together under the `@nyxapi` scope, always at the same version:
-`@nyxapi/core`, `codegen`, `cli`, `react` and `devtools`. The website and benchmarks are private.
+Seven packages are published together under the `@nyxapi` scope, always at the same version:
+`@nyxapi/core`, `codegen`, `cli`, `react`, `devtools`, `graphql` and `trpc`. The website and benchmarks are private.
 
 ## One-time setup
 
@@ -25,9 +25,20 @@ Five packages are published together under the `@nyxapi` scope, always at the sa
 3. Merge that pull request. The workflow builds, checks, and runs `changeset publish`, which
    publishes every package whose version is not on npm yet, with provenance.
 
-The first publish needs no changeset: the packages are at `0.0.1`, which is not on npm, so the
-first run of `pnpm release` publishes it. To start at `0.1.0` instead, run `pnpm changeset`, pick
-_minor_ for any package (they move together), merge, then merge the version pull request.
+### Publishing 0.1.0
+
+The repository is already at `0.1.0` (the changeset was applied and the changelogs written), and the
+two new packages, `@nyxapi/graphql` and `@nyxapi/trpc`, are in the fixed group. `0.1.0` is not on npm,
+so pushing to `main` (or running `pnpm release`) publishes it: `changeset publish` publishes every
+package whose version is not on the registry yet. No new changeset is needed. After that, the
+website's Releases page shows "latest on npm" for 0.1.0 by itself, because it reads the registry.
+
+Install a specific version with `npm install @nyxapi/core@0.1.0`. If an old broken `0.0.0-stage`
+version is on the registry, an unpinned install can pick it up; unpublish or deprecate it
+(`npm deprecate @nyxapi/core@0.0.0-stage "not a release"`) and install by exact version.
+
+Add an entry for every later release to `website/src/releases.ts` (the test fails if the newest
+entry does not match `packages/core/package.json`).
 
 ## Check before you publish
 
@@ -50,10 +61,24 @@ pnpm --filter @nyxapi/website prepare:site     # builds packages
 pnpm -r --filter './packages/*' publish --access public --no-git-checks
 ```
 
-Manual publishes have no provenance badge. Prefer the workflow once it is set up.
+Manual publishes have no provenance badge (the release workflow turns provenance on with
+`NPM_CONFIG_PROVENANCE=true`, so it is not set in the package files, which would break local
+publishing). Prefer the workflow once it is set up.
+
+### Publishing 0.1.0 from your computer, step by step
+
+```bash
+npm login                      # with two-factor auth; you will be asked for a one-time code
+pnpm install
+pnpm publish:local             # prepare, check, smoke test, then publish all seven packages
+# if npm asks for a one-time code on every package, pass it through:
+#   pnpm -r --filter './packages/*' publish --access public --no-git-checks --otp 123456
+npm view @nyxapi/core version  # should print 0.1.0
+```
+
+`pnpm` replaces the `workspace:*` dependency specs with the real version while packing, and
+publishes dependencies before the packages that need them.
 
 ## After the first release
 
-- Remove the "not on the npm registry yet" notes from the website (`website/src/site.ts` and the
-  docs pages that mention it) and from the package READMEs.
 - Update `website/src/app/install/page.tsx` so the npm commands are the primary path.

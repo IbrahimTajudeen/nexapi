@@ -20,7 +20,7 @@ import { zipDirectory } from "./zip.mjs";
 const site = fileURLToPath(new URL("..", import.meta.url));
 const repo = join(site, "..");
 const out = join(site, "public/downloads");
-const PACKAGES = ["core", "codegen", "cli", "react", "devtools"];
+const PACKAGES = ["core", "codegen", "cli", "react", "devtools", "graphql", "trpc"];
 
 const run = (cmd, args, cwd) =>
   execFileSync(cmd, args, {
@@ -100,8 +100,8 @@ files.push({ file: zip, kind: "source" });
         type: "module",
         scripts: {
           api: "node server.mjs",
-          generate: "nyxapi generate",
-          "generate:check": "nyxapi generate --check",
+          generate: "nyx generate",
+          "generate:check": "nyx generate --check",
           start: "tsx src/main.ts",
           check: "tsc --noEmit",
         },

@@ -1,6 +1,6 @@
 const WORD = /[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g;
 
-export function words(input: string): string[] {
+function words(input: string): string[] {
   return input.match(WORD) ?? [];
 }
 
@@ -78,7 +78,7 @@ export function variableName(paramName: string): string {
 }
 
 /** Global type names the generated code relies on, or that would shadow lib types. */
-export const RESERVED_TYPE_NAMES = new Set([
+const RESERVED_TYPE_NAMES = new Set([
   "Record",
   "Blob",
   "Array",

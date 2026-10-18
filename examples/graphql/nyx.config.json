@@ -1,0 +1,5 @@
+{
+  "input": "../../fixtures/graphql/blog.graphql",
+  "output": "generated",
+  "scalars": { "DateTime": "string" }
+}

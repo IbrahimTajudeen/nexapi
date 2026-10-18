@@ -22,17 +22,17 @@ export default function Home() {
                 <b>Open source</b> MIT
               </span>
               <span className="pill">
-                <b>v{VERSION}</b> early development
+                <b>v{VERSION}</b> pre-1.0
               </span>
               <span className="pill">
                 <b>TypeScript</b> first
               </span>
             </div>
-            <h1>Your OpenAPI schema, as a typed client that caches for you.</h1>
+            <h1>Your API schema, as a typed client that caches for you.</h1>
             <p className="lead">
-              NyxAPI generates a fluent TypeScript client from your schema, then handles caching,
-              retries and optimistic updates. It works without React, and comes with a React adapter
-              when you want one.
+              NyxAPI generates a fluent TypeScript client from OpenAPI, Swagger or GraphQL (and
+              adapts tRPC), then handles caching, retries and optimistic updates. It works without
+              React, and comes with a React adapter when you want one.
             </p>
             <div className="cta-row">
               <Link className="btn primary" href="/docs/quick-start/">
@@ -75,7 +75,7 @@ export default function Home() {
               </li>
               <li>
                 <strong>Generate the client.</strong> The output is plain TypeScript with a stable,
-                reviewable shape. Run <code>nyxapi generate --check</code> in CI to catch drift.
+                reviewable shape. Run <code>nyx generate --check</code> in CI to catch drift.
               </li>
               <li>
                 <strong>Call your API.</strong> Path segments are properties, path parameters are
@@ -86,7 +86,7 @@ export default function Home() {
               <Code
                 lang="bash"
                 title="terminal"
-              >{`nyxapi generate --input ./openapi.yaml --output ./src/api`}</Code>
+              >{`nyx generate --input ./openapi.yaml --output ./src/api`}</Code>
               <Code lang="ts" title="app.ts">{`import { createNyxClient } from "@nyxapi/core";
 import { createApi } from "./api/index.js";
 
@@ -208,10 +208,11 @@ const session = await api.auth.login.post({ email, password });`}</Code>
         <div className="wrap">
           <h2>Works with the backend you already have</h2>
           <p className="sub">
-            If your server publishes an OpenAPI 3.x document, NyxAPI can generate a client from it.
-            Nothing about your backend has to change.
+            If your server publishes an OpenAPI or Swagger document or a GraphQL schema, NyxAPI can
+            generate a client from it; if it is tRPC, you wrap the client you already have. Nothing
+            about your backend has to change.
           </p>
-          <div className="grid cols-3">
+          <div className="grid cols-2">
             <Link className="card link" href="/docs/adapters/">
               <h3>NestJS</h3>
               <p>
@@ -225,7 +226,14 @@ const session = await api.auth.login.post({ email, password });`}</Code>
                 such.
               </p>
             </Link>
-            <Link className="card link" href="/docs/codegen/">
+            <Link className="card link" href="/docs/graphql/">
+              <h3>GraphQL and tRPC</h3>
+              <p>
+                Typed queries and mutations from a schema, or typed keys for every tRPC procedure,
+                on the same cache as REST. Subscriptions are not supported.
+              </p>
+            </Link>
+            <Link className="card link" href="/docs/schemas/">
               <h3>Anything else</h3>
               <p>
                 Any server that emits OpenAPI 3.x can be tried. Constructs NyxAPI cannot represent
@@ -240,8 +248,9 @@ const session = await api.auth.login.post({ email, password });`}</Code>
         <div className="wrap">
           <h2>Honest about where it stands</h2>
           <p className="sub">
-            NyxAPI is at version {VERSION}. The API can still change before 0.1, and the packages
-            are not on the npm registry yet. Performance is measured against TanStack Query and RTK
+            NyxAPI is at version {VERSION}. It is pre-1.0, so the API can still change between minor
+            versions; <Link href="/releases/">the release history</Link> says what each version
+            contains and which are on npm. Performance is measured against TanStack Query and RTK
             Query in the repository, with the caveats written next to the numbers and no claim that
             one tool is better.
           </p>

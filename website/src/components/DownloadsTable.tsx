@@ -3,7 +3,7 @@ import data from "@/generated/downloads.json";
 const DESCRIPTION: Record<string, string> = {
   core: "HTTP client, query cache and mutations",
   codegen: "OpenAPI to TypeScript generator",
-  cli: "The nyxapi command",
+  cli: "The nyx command",
   react: "React hooks",
   devtools: "Cache inspector and React panel",
 };

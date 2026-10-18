@@ -64,7 +64,7 @@ pnpm smoke:pack   # installs the packed tarballs into an empty project and runs 
 ## 5. Try the starter project (what beginners download)
 
 ```bash
-unzip website/public/downloads/nyxapi-starter-0.0.1.zip -d /tmp/try
+unzip website/public/downloads/nyxapi-starter-0.1.0.zip -d /tmp/try
 cd /tmp/try/nyxapi-starter
 npm install
 npm run generate     # OpenAPI -> typed client in src/api

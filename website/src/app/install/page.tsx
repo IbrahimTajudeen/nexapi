@@ -30,13 +30,30 @@ export default function Page() {
         {NODE_MIN} or newer.
       </p>
 
-      <Callout kind="warn" title={`Version ${VERSION}: early development`}>
+      <Callout kind="note" title={`Version ${VERSION}, pre-1.0`}>
         <p>
-          The packages are not on the npm registry yet, so the curl installer and tarballs are how
-          you install today. The npm commands below are what will work once they are published. The
-          API can change before 0.1.
+          The API can change between minor versions. The <Link href="/releases/">Releases</Link>{" "}
+          page lists every version and shows which ones are on npm right now. If a version is not on
+          npm yet, the curl installer and tarballs below install it from this site.
         </p>
       </Callout>
+
+      <h2 id="global" style={{ marginTop: 36 }}>
+        The <code>nyx</code> command, installed globally
+      </h2>
+      <p>
+        Install the CLI once and run <code>nyx</code> directly, with no <code>npx</code> or package
+        manager prefix:
+      </p>
+      <PackageInstall packages="@nyxapi/cli" global />
+      <Code lang="bash" title="terminal">{`nyx --version
+nyx init
+nyx generate --watch`}</Code>
+      <p className="hint">
+        <code>nyxapi</code> works as an alias. Not found after installing? Add the folder printed by{" "}
+        <code>npm prefix -g</code> (its <code>bin</code> subfolder on macOS and Linux) to your{" "}
+        <code>PATH</code>.
+      </p>
 
       <h2 id="curl" style={{ marginTop: 36 }}>
         One command with curl
@@ -51,7 +68,7 @@ export default function Page() {
         It detects npm, pnpm, yarn or bun from your lockfile. To also install the React adapter and
         devtools:
       </p>
-      <SiteCommand>{`curl -fsSL {{site}}/install.sh | NYXAPI_PACKAGES="core react cli codegen devtools" sh -s -- {{site}}`}</SiteCommand>
+      <SiteCommand>{`curl -fsSL {{site}}/install.sh | NYXAPI_PACKAGES="core react cli codegen devtools graphql trpc" sh -s -- {{site}}`}</SiteCommand>
       <p className="hint">
         Prefer to read before you run? Open <a href="/install.sh">install.sh</a>. It is short, only
         downloads from the site you give it, and verifies checksums before installing anything. Set{" "}
@@ -137,7 +154,7 @@ pnpm install && pnpm check`}</SiteCommand>
       <h2 id="verify" style={{ marginTop: 36 }}>
         Check the install
       </h2>
-      <Code lang="bash" title="terminal">{`npx nyxapi --help`}</Code>
+      <Code lang="bash" title="terminal">{`npx nyx --help`}</Code>
       <p>
         Then follow the <Link href="/docs/quick-start/">quick start</Link>, or the slower{" "}
         <Link href="/beginners/">beginners guide</Link>.

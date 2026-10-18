@@ -17,9 +17,9 @@ export default function Page() {
       <Code
         lang="bash"
         title="terminal"
-      >{`npx nyxapi generate --input ./openapi.yaml --output ./src/api
-npx nyxapi generate --input https://example.com/openapi.json --output ./src/api
-npx nyxapi validate ./openapi.yaml`}</Code>
+      >{`npx nyx generate --input ./openapi.yaml --output ./src/api
+npx nyx generate --input https://example.com/openapi.json --output ./src/api
+npx nyx validate ./openapi.yaml`}</Code>
       <p>
         A remote schema is fetched only when you pass its URL explicitly with <code>--input</code>.
         A URL written in a config file is rejected, so a config you cloned from somewhere can never
@@ -58,10 +58,10 @@ npx nyxapi validate ./openapi.yaml`}</Code>
 
       <H2>Configuration file</H2>
       <p>
-        Put a <code>nyxapi.config.json</code> next to your <code>package.json</code> and the CLI
-        picks it up. Paths inside are relative to the file.
+        Put a <code>nyx.config.json</code> next to your <code>package.json</code> and the CLI picks
+        it up. Paths inside are relative to the file.
       </p>
-      <Code lang="json" title="nyxapi.config.json">{`{
+      <Code lang="json" title="nyx.config.json">{`{
   "input": "./openapi.yaml",
   "output": "./src/api",
   "validation": true,
@@ -150,11 +150,11 @@ npx nyxapi validate ./openapi.yaml`}</Code>
       <p>
         Anything the generator cannot represent is reported as an error or a warning with a code,
         such as <code>UNSUPPORTED_BODY_SCHEMA</code>. It does not silently skip or guess. Run{" "}
-        <code>nyxapi validate</code> to see them all without writing files.
+        <code>nyx validate</code> to see them all without writing files.
       </p>
 
       <H2>Use it in CI</H2>
-      <Code lang="bash" title="terminal">{`npx nyxapi generate --check`}</Code>
+      <Code lang="bash" title="terminal">{`npx nyx generate --check`}</Code>
       <p>
         <code>--check</code> writes nothing and exits with status 1 when the files on disk are out
         of date. Add it next to your tests so a schema change cannot land without its regenerated

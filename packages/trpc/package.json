@@ -1,0 +1,41 @@
+{
+  "name": "@nyxapi/trpc",
+  "version": "0.1.0",
+  "description": "Put a tRPC client on the NyxAPI cache: typed query keys, prefetch, invalidation and optimistic mutations for every procedure",
+  "keywords": [
+    "nyxapi",
+    "trpc",
+    "query-cache",
+    "typescript",
+    "api-client"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@nyxapi/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@trpc/client": "^11.19.0",
+    "@trpc/server": "^11.19.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

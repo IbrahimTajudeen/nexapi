@@ -9,7 +9,7 @@
 
 Schema-generated, fluent, fully typed API client with a standalone query/mutation engine (no React required) and a React adapter.
 
-> **Status: 0.0.x, first vertical slice.** Not published to npm. See [ROADMAP.md](ROADMAP.md) for what is and isn't done, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) / [docs/API-DESIGN.md](docs/API-DESIGN.md) for the design and public contracts.
+> **Status: 0.1.x, pre-1.0.** The API can change between minor versions; the website has a release history. See [ROADMAP.md](ROADMAP.md) for what is and isn't done, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) / [docs/API-DESIGN.md](docs/API-DESIGN.md) for the design and public contracts.
 
 ```ts
 const user = await api.users.byId("42").get();
@@ -51,11 +51,11 @@ const nyx = createNyxClient({
 const api = createApi(nyx); // one NyxClient per user/request on the server
 ```
 
-Without an OpenAPI schema nothing can be generated: a base URL alone does not reveal a server's routes. Hand-written endpoints are possible with `nyx.query<…>()`/`nyx.mutation<…>()`; adapters that produce the same normalized model from NestJS or ASP.NET Core are on the roadmap.
+NyxAPI generates from **OpenAPI 3.x, Swagger 2.0 and GraphQL** (`nyx generate`), and wraps **tRPC** clients (`@nyxapi/trpc`) without generating anything. Without a schema nothing can be generated: a base URL alone does not reveal a server's routes. GraphQL subscriptions are not supported. Hand-written endpoints are possible with `nyx.query<…>()`/`nyx.mutation<…>()`; adapters that produce the same normalized model from NestJS or ASP.NET Core are on the roadmap.
 
 ## Layout
 
-`packages/{core,codegen,cli,react,devtools}` · `fixtures/openapi` · `examples/basic` · `tests` (end-to-end against a local HTTP server) · `benchmarks` · `docs`
+`packages/{core,codegen,cli,react,devtools,graphql,trpc}` · `fixtures/{openapi,swagger,graphql}` · `examples/basic` · `tests` (end-to-end against a local HTTP server) · `benchmarks` · `docs`
 
 ## Requirements
 

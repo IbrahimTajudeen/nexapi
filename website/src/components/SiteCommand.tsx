@@ -7,7 +7,7 @@ import { SITE_URL } from "@/site";
 const PLACEHOLDER = "https://your-nyxapi-site.example";
 
 /** The address of this site, so copied commands point at the place the visitor is actually on. */
-export function useSiteUrl(): string {
+function useSiteUrl(): string {
   const [url, setUrl] = useState(SITE_URL ?? PLACEHOLDER);
   useEffect(() => {
     if (!SITE_URL && window.location.protocol.startsWith("http")) setUrl(window.location.origin);

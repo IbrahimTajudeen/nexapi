@@ -35,7 +35,7 @@ await app.close();`}</Code>
       <Code
         lang="bash"
         title="terminal"
-      >{`npx nyxapi generate --input openapi.json --output src/api`}</Code>
+      >{`npx nyx generate --input openapi.json --output src/api`}</Code>
       <Callout kind="note" title="Tested on real output">
         The NestJS fixture in the repository was produced by running <code>@nestjs/swagger</code> 11
         on a sample app, and the generated client is type-checked and drift-checked in CI.
@@ -65,10 +65,10 @@ await app.close();`}</Code>
         lang="bash"
         title="terminal"
       >{`dotnet swagger tofile --output openapi.json ./bin/Release/net9.0/Api.dll v1
-npx nyxapi generate --input openapi.json --output src/api --config nyxapi.config.json`}</Code>
+npx nyx generate --input openapi.json --output src/api --config nyx.config.json`}</Code>
       <Code
         lang="json"
-        title="nyxapi.config.json"
+        title="nyx.config.json"
       >{`{ "naming": { "stripPathPrefix": "/api" }, "validation": true }`}</Code>
       <Callout kind="warn" title="About the ASP.NET fixture">
         The development environment had no .NET SDK, so the bundled ASP.NET fixture is{" "}
@@ -102,7 +102,7 @@ npx nyxapi generate --input openapi.json --output src/api --config nyxapi.config
       <H2>Any other backend</H2>
       <p>
         If your server can produce an OpenAPI 3.0 or 3.1 document, you can try it. Run{" "}
-        <code>nyxapi validate</code> first to see anything NyxAPI cannot represent.
+        <code>nyx validate</code> first to see anything NyxAPI cannot represent.
       </p>
     </Doc>
   );

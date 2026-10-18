@@ -187,3 +187,47 @@ components:
         code: { type: string }
         message: { type: string }
 `;
+
+// Copy of fixtures/graphql/blog.graphql (a test keeps them identical).
+export const GRAPHQL_SAMPLE = `"A blog API"
+scalar DateTime
+
+enum Role { ADMIN EDITOR READER }
+
+interface Node { id: ID! }
+
+type User implements Node {
+  id: ID!
+  name: String!
+  email: String
+  role: Role!
+  createdAt: DateTime!
+  posts(first: Int = 10): [Post!]!
+}
+
+type Post implements Node {
+  id: ID!
+  title: String!
+  body: String
+  author: User!
+  tags: [String!]!
+}
+
+union SearchResult = User | Post
+
+input NewPost { title: String!, body: String, tags: [String!] }
+
+type Query {
+  user(id: ID!): User
+  users(role: Role): [User!]!
+  search(text: String!): [SearchResult!]!
+  me: User
+}
+
+type Mutation {
+  createPost(input: NewPost!): Post!
+  deletePost(id: ID!): Boolean!
+}
+
+type Subscription { postAdded: Post! }
+`;

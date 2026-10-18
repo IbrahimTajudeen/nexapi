@@ -9,8 +9,10 @@ const cli = join(root, "packages/cli/dist/cli.js");
 const extra = process.argv.includes("--check") ? ["--check"] : [];
 let failed = false;
 for (const name of readdirSync(join(root, "examples")).sort()) {
-  const config = join(root, "examples", name, "nyxapi.config.json");
-  if (!existsSync(config)) continue;
+  const config = ["nyx.config.json", "nyxapi.config.json"]
+    .map((f) => join(root, "examples", name, f))
+    .find((f) => existsSync(f));
+  if (!config) continue;
   try {
     const out = execFileSync("node", [cli, "generate", "--config", config, ...extra], {
       encoding: "utf8",

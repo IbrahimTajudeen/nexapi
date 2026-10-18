@@ -301,7 +301,7 @@ describe("generated output", () => {
   it("is exactly what the generator produces today (no drift, no irrelevant diffs)", () => {
     const text = readFileSync(new URL("../fixtures/openapi/basic.yaml", import.meta.url), "utf8");
     const config = JSON.parse(
-      readFileSync(new URL("../examples/basic/nyxapi.config.json", import.meta.url), "utf8"),
+      readFileSync(new URL("../examples/basic/nyx.config.json", import.meta.url), "utf8"),
     ) as Parameters<typeof generate>[1];
     for (const file of generate(text, config).files)
       expect(

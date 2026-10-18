@@ -1,6 +1,6 @@
 {
   "name": "@nyxapi/devtools",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Cache inspector and React panel for NyxAPI",
   "keywords": [
     "nyxapi",
@@ -46,7 +46,6 @@
     }
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }

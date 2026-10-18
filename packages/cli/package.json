@@ -1,10 +1,11 @@
 {
   "name": "@nyxapi/cli",
-  "version": "0.0.1",
-  "description": "Schema validation and client generation commands for NyxAPI",
+  "version": "0.1.0",
+  "description": "The `nyx` command: generate typed clients from OpenAPI, Swagger 2.0 or GraphQL",
   "keywords": [
     "nyxapi",
     "openapi",
+    "graphql",
     "cli",
     "typescript",
     "codegen",
@@ -16,6 +17,7 @@
     "node": ">=22.12"
   },
   "bin": {
+    "nyx": "./dist/cli.js",
     "nyxapi": "./dist/cli.js"
   },
   "files": [
@@ -35,7 +37,6 @@
     "@nyxapi/codegen": "workspace:*"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }

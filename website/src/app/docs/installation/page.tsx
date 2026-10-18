@@ -26,12 +26,11 @@ export default function Page() {
         <li>Any modern browser. The only platform APIs used are fetch, AbortController and URL.</li>
       </ul>
 
-      <Callout kind="warn" title={`Version ${VERSION}: not on the npm registry yet`}>
+      <Callout kind="note" title={`Version ${VERSION}`}>
         <p>
-          The commands under “From the npm registry” will work once the packages are published.
-          Until then, use the tarballs or the source. Both are listed on the{" "}
-          <Link href="/install/">Install page</Link>, including a one-line <code>curl</code>{" "}
-          installer.
+          The <Link href="/releases/">Releases page</Link> shows which versions are on npm. If one
+          is not, use the tarballs or the source from the <Link href="/install/">Install page</Link>
+          , which also has a one-line <code>curl</code> installer.
         </p>
       </Callout>
 
@@ -40,6 +39,11 @@ export default function Page() {
       <PackageInstall packages="@nyxapi/core" />
       <p>The command line tool generates your client, so it is a development dependency:</p>
       <PackageInstall packages="@nyxapi/cli" dev />
+      <p>
+        Or install the CLI globally and use <code>nyx</code> from any folder (see{" "}
+        <Link href="/install/#global">Install</Link>). For GraphQL or tRPC also add{" "}
+        <code>@nyxapi/graphql</code> or <code>@nyxapi/trpc</code>.
+      </p>
       <p>Add the React adapter only if you use React:</p>
       <PackageInstall packages="@nyxapi/react" />
       <p>And the devtools while you develop:</p>
@@ -72,7 +76,7 @@ pnpm check        # lint, type-check, tests, build, generated-code check`}</Code
       >{`node packages/cli/dist/cli.js generate --input ./openapi.yaml --output ./src/api`}</Code>
 
       <H2>Check that it works</H2>
-      <Code lang="bash" title="terminal">{`npx nyxapi --help`}</Code>
+      <Code lang="bash" title="terminal">{`npx nyx --help`}</Code>
       <p>You should see the usage text for the generate and validate commands.</p>
 
       <H3>TypeScript settings</H3>

@@ -1,47 +1,59 @@
 {
-  "version": "0.0.1",
+  "version": "0.1.0",
   "files": [
     {
-      "file": "nexapi-cli-0.0.1.tgz",
+      "file": "nyxapi-cli-0.1.0.tgz",
       "kind": "package",
-      "bytes": 5425,
-      "sha256": "5f1fc4f7c0169ced4168fc93801876975f7899a5b0e5eb64aeb01e3b84d59295"
+      "bytes": 10988,
+      "sha256": "1d9857755515591273598887ffa69e009014e43837a41f5eaa97933aeb28b143"
     },
     {
-      "file": "nexapi-codegen-0.0.1.tgz",
+      "file": "nyxapi-codegen-0.1.0.tgz",
       "kind": "package",
-      "bytes": 31353,
-      "sha256": "3667f7a1ff3f14d4d880a16dd041293f2423c36372a2981d5c2c5440b3ae1d5a"
+      "bytes": 49222,
+      "sha256": "9cf8bf322e3621c54b85120c3403b52c5187cce9861c2fe9cdf9f61ae960a665"
     },
     {
-      "file": "nexapi-core-0.0.1.tgz",
+      "file": "nyxapi-core-0.1.0.tgz",
       "kind": "package",
-      "bytes": 64001,
-      "sha256": "1eeb5b8608e705bcd91bdefe324f66b5ef8971de88069e4353d10b49b7c7d1b1"
+      "bytes": 68169,
+      "sha256": "0d30ef39346a983ce9d80c405ef8012c30f25b3298db12d6eb7f3e361d54194b"
     },
     {
-      "file": "nexapi-devtools-0.0.1.tgz",
+      "file": "nyxapi-devtools-0.1.0.tgz",
       "kind": "package",
-      "bytes": 8599,
-      "sha256": "ccc90ddce42b5c2d0d02b94f71cdb87c7857b00ec0b60d79d59e8ddf79cf6839"
+      "bytes": 8677,
+      "sha256": "d54c713cc5bfc19020163a2ce883c1cf3e53a5e0c5c00cd236600f4f70d224ff"
     },
     {
-      "file": "nexapi-react-0.0.1.tgz",
+      "file": "nyxapi-graphql-0.1.0.tgz",
       "kind": "package",
-      "bytes": 7951,
-      "sha256": "9c4df6344f85b18e63d5d42cabd70800cc1e902dcd76b219dc875155925a538e"
+      "bytes": 6004,
+      "sha256": "a26adb26d6e7d1a8c24425dcabb6c471aaf3c38020d31c7b0696aff7cc950cfa"
     },
     {
-      "file": "nexapi-source-0.0.1.zip",
+      "file": "nyxapi-react-0.1.0.tgz",
+      "kind": "package",
+      "bytes": 8017,
+      "sha256": "46c5e8bf60c5b77c7001f1fd6226f404fcf490c809b2f2efe60e904800db76e9"
+    },
+    {
+      "file": "nyxapi-trpc-0.1.0.tgz",
+      "kind": "package",
+      "bytes": 5047,
+      "sha256": "bf851f414ec2edd4ab218eaee60eba8653388c40cc1e983b1cf7283f3680cc2c"
+    },
+    {
+      "file": "nyxapi-source-0.1.0.zip",
       "kind": "source",
-      "bytes": 7761883,
-      "sha256": "e179ccd8986553e7a5dd62e9b97d5cd0207137ef563887ea1d8bfdb51c1716b6"
+      "bytes": 6051115,
+      "sha256": "036d1e7e95bf6e0d8e1517bc4549566600cec8c9b6d45868b84d10e8474ab972"
     },
     {
-      "file": "nexapi-starter-0.0.1.zip",
+      "file": "nyxapi-starter-0.1.0.zip",
       "kind": "starter",
-      "bytes": 106171,
-      "sha256": "43fe04c51d71b14602f9114c0a189b789fdcac7046cb59e8a34718d9102c02e1"
+      "bytes": 134190,
+      "sha256": "4ac8287737d4a9c7a491674aac113c8dd0e16b79b10d18c06906925dae504fb9"
     }
   ]
 }

@@ -12,10 +12,11 @@ const LINKS = [
   { href: "/playground/", label: "Playground" },
   { href: "/beginners/", label: "Beginners" },
   { href: "/install/", label: "Install" },
+  { href: "/releases/", label: "Releases" },
   { href: "/contribute/", label: "Contribute" },
 ];
 
-export function Logo() {
+function Logo() {
   return (
     <Link href="/" className="brand" aria-label="NyxAPI home">
       <Image src="/brand/mark.png" alt="" width={34} height={34} priority />

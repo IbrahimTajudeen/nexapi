@@ -32,11 +32,11 @@ showing that identical requests are shared and cached.
 
 ## Files
 
-| File                 | What it is                                             |
-| -------------------- | ------------------------------------------------------ |
-| `openapi.yaml`       | The API description. The one source of truth.          |
-| `nyxapi.config.json` | Generator settings.                                    |
-| `server.mjs`         | The pet shop API (plain Node, no dependencies).        |
-| `src/main.ts`        | Your program, using the generated client.              |
-| `src/api/`           | Generated. Do not edit; run `npm run generate`.        |
-| `vendor/`            | NyxAPI **VERSION** packages, so no registry is needed. |
+| File              | What it is                                             |
+| ----------------- | ------------------------------------------------------ |
+| `openapi.yaml`    | The API description. The one source of truth.          |
+| `nyx.config.json` | Generator settings.                                    |
+| `server.mjs`      | The pet shop API (plain Node, no dependencies).        |
+| `src/main.ts`     | Your program, using the generated client.              |
+| `src/api/`        | Generated. Do not edit; run `npm run generate`.        |
+| `vendor/`         | NyxAPI **VERSION** packages, so no registry is needed. |

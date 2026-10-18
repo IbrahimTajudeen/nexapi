@@ -12,6 +12,7 @@ import type {
 } from "./ir.js";
 import { synthesizeOperationId, typeName } from "./naming.js";
 
+import { isSwagger2, swagger2ToOpenApi3 } from "./swagger2.js";
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
 const has = (o: Obj, k: string): boolean => Object.prototype.hasOwnProperty.call(o, k);
@@ -23,7 +24,7 @@ const SKIPPED_HEADERS = new Set(["authorization", "accept", "content-type"]);
 const UNKNOWN: TypeNode = { kind: "primitive", type: "unknown" };
 const VOID: TypeNode = { kind: "primitive", type: "void" };
 
-/** Parse an OpenAPI 3.x document into the normalized model. Collects all problems. */
+/** Parse an OpenAPI 3.x (or Swagger 2.0, converted first) document into the normalized model. Collects all problems. */
 export function buildApiModel(
   document: unknown,
   config: NyxApiConfig = {},
@@ -40,13 +41,19 @@ export function buildApiModel(
     error("INVALID_DOCUMENT", "The schema is not an object");
     return { model: empty, diagnostics };
   }
+  if (isSwagger2(document)) {
+    const converted = swagger2ToOpenApi3(document);
+    for (const message of converted.warnings) warn("SWAGGER2", message);
+    document = converted.document;
+  }
+  if (!isObj(document)) return { model: empty, diagnostics };
   const version = str(document["openapi"]);
   if (!version || !/^3\.[01]\.\d+/.test(version)) {
     error(
       "UNSUPPORTED_VERSION",
       version
         ? `OpenAPI ${version} is not supported (3.0.x and 3.1.x are)`
-        : 'Missing "openapi" field (Swagger 2.0 documents are not supported; convert to OpenAPI 3.x)',
+        : 'Missing "openapi" field (expected an OpenAPI 3.x or Swagger 2.0 document)',
     );
     return { model: empty, diagnostics };
   }
@@ -501,6 +508,22 @@ export function buildApiModel(
       if (description) op_.description = description;
       if (body) op_.body = body;
       operations.push(op_);
+    }
+  }
+
+  // A schema that is only an alias of another (`A: $ref B`, `B: $ref A`) has no structure, and
+  // the emitted `type A = B; type B = A` would not compile.
+  const aliasOf = new Map<string, string>();
+  for (const sc of schemas) if (sc.type.kind === "ref") aliasOf.set(sc.name, sc.type.name);
+  for (const start of aliasOf.keys()) {
+    const seen = new Set<string>([start]);
+    for (let next = aliasOf.get(start); next !== undefined; next = aliasOf.get(next)) {
+      if (next === start) {
+        error("REF_CYCLE", `Schema "${start}" is an alias that refers back to itself`);
+        break;
+      }
+      if (seen.has(next)) break; // reported from the schema that starts the cycle
+      seen.add(next);
     }
   }
 

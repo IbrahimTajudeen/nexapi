@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
-const packages = ["core", "codegen", "cli", "react", "devtools"];
+const packages = ["core", "codegen", "cli", "react", "devtools", "graphql", "trpc"];
 const work = mkdtempSync(join(tmpdir(), "nyxapi-smoke-"));
 const run = (cmd, args, cwd) =>
   execFileSync(cmd, args, { cwd, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" });
@@ -82,11 +82,19 @@ try {
   step("generate a client with the installed CLI");
   cpSync(join(root, "fixtures/openapi/basic.yaml"), join(app, "openapi.yaml"));
   writeFileSync(
-    join(app, "nyxapi.config.json"),
+    join(app, "nyx.config.json"),
     JSON.stringify({ input: "openapi.yaml", output: "src/api", validation: true }),
   );
-  run("npx", ["nyxapi", "generate"], app);
-  run("npx", ["nyxapi", "generate", "--check"], app);
+  run("npx", ["nyx", "generate"], app);
+  run("npx", ["nyx", "generate", "--check"], app);
+  // GraphQL: generate from SDL with the same installed CLI (loads the `graphql` package lazily)
+  cpSync(join(root, "fixtures/graphql/blog.graphql"), join(app, "blog.graphql"));
+  writeFileSync(
+    join(app, "gql.config.json"),
+    JSON.stringify({ input: "blog.graphql", output: "src/gql", scalars: { DateTime: "string" } }),
+  );
+  run("npx", ["nyx", "generate", "--config", "gql.config.json"], app);
+  run("npx", ["nyx", "generate", "--config", "gql.config.json", "--check"], app);
 
   step("type-check and run a consumer (strict, NodeNext)");
   mkdirSync(join(app, "src"), { recursive: true });
@@ -112,6 +120,26 @@ const name: string = user.name;
 const missing = await api.users.byId("1").get().catch((e: unknown) => e);
 if (!Array.isArray(inspector.snapshot().queries) || name !== "Ada" || !(missing instanceof HttpError) || missing.status !== 404) process.exit(1);
 console.log("consumer ok");
+`,
+  );
+  writeFileSync(
+    join(app, "src/protocols.ts"),
+    `import { GraphQLClient } from "@nyxapi/graphql";
+import { createNyxTrpc } from "@nyxapi/trpc";
+import { createApi as createGqlApi } from "./gql/index.js";
+
+const gql = new GraphQLClient({
+  url: "https://api.test/graphql",
+  transport: async () => Response.json({ data: { user: { id: "1", name: "Ada", email: null, role: "ADMIN", createdAt: "x", posts: [] } } }),
+});
+const user = await createGqlApi(gql).query.user({ id: "1" });
+const gqlName: string | undefined = user?.name;
+
+const fake = { users: { byId: { query: async (input: { id: string }) => ({ id: input.id, name: "Grace" }) } } };
+const { api } = createNyxTrpc(fake);
+const row = await api.users.byId.query({ id: "7" });
+const trpcName: string = row.name;
+console.log(gqlName === "Ada" && trpcName === "Grace" ? "protocols ok" : "protocols FAILED");
 `,
   );
   writeFileSync(
@@ -153,7 +181,37 @@ export function Name({ api }: { api: Api }) {
   run("npx", ["tsc", "-p", "."], app);
   const out = run("node", ["out/main.js"], app).trim();
   if (out !== "consumer ok") fail(`unexpected consumer output: ${out}`);
-  else console.log("smoke-pack OK");
+  const protocols = run("node", ["out/protocols.js"], app).trim();
+  if (protocols !== "protocols ok") fail(`unexpected protocols output: ${protocols}`);
+
+  step("install the CLI globally and run `nyx` directly");
+  const prefix = join(work, "global");
+  mkdirSync(prefix);
+  run(
+    "npm",
+    [
+      "install",
+      "-g",
+      "--prefix",
+      prefix,
+      "--no-audit",
+      "--no-fund",
+      "--loglevel=error",
+      tarballs.cli,
+      tarballs.codegen,
+      tarballs.core,
+    ],
+    work,
+  );
+  const bin = join(prefix, process.platform === "win32" ? "nyx.cmd" : "bin/nyx");
+  const version = run(bin, ["--version"], work).trim();
+  const expected = JSON.parse(
+    run("tar", ["-xzOf", tarballs.cli, "package/package.json"], work),
+  ).version;
+  if (version !== expected) fail(`nyx --version printed "${version}", expected "${expected}"`);
+  const aliasBin = join(prefix, process.platform === "win32" ? "nyxapi.cmd" : "bin/nyxapi");
+  if (run(aliasBin, ["--version"], work).trim() !== expected) fail("the nyxapi alias is broken");
+  if (!process.exitCode) console.log("smoke-pack OK");
 } catch (error) {
   const text =
     error && typeof error === "object" && "stderr" in error

@@ -29,7 +29,7 @@ function wrap(node: TypeNode, level: number): string {
   return node.kind === "union" || node.kind === "intersection" ? `(${text})` : text;
 }
 
-export function fmt(node: TypeNode, level: number): string {
+function fmt(node: TypeNode, level: number): string {
   switch (node.kind) {
     case "ref":
       return node.name;
@@ -85,7 +85,7 @@ function errorUnion(op: OperationModel): string {
     .join(" | ");
 }
 
-export interface OperationTypes {
+interface OperationTypes {
   prefix: string;
   body?: string;
   data: string;
@@ -93,7 +93,7 @@ export interface OperationTypes {
   request?: string;
 }
 
-export const operationTypes = (op: OperationModel): OperationTypes => {
+const operationTypes = (op: OperationModel): OperationTypes => {
   const prefix = typeName(op.id);
   const t: OperationTypes = { prefix, data: `${prefix}Data`, error: `${prefix}ErrorBody` };
   if (op.body) t.body = `${prefix}Body`;
@@ -122,6 +122,10 @@ const HEADER = (model: ApiModel): string =>
 
 /** Emit `types.ts`, `client.ts` and `index.ts`. Pure and deterministic: same model, same bytes. */
 /** Runtime `Shape` literal (see `@nyxapi/core`) for a type; `void`/`undefined` accept anything. */
+/** `"__proto__": x` in an object literal sets the prototype instead of defining a property. */
+const literalKey = (name: string): string =>
+  name === "__proto__" ? '["__proto__"]' : JSON.stringify(name);
+
 function shapeOf(node: TypeNode, level: number): string {
   const p = (n: number): string => "  ".repeat(n);
   switch (node.kind) {
@@ -150,7 +154,7 @@ function shapeOf(node: TypeNode, level: number): string {
       const props = node.properties
         .map(
           (prop) =>
-            `${p(level + 2)}${JSON.stringify(prop.name)}: { shape: ${shapeOf(prop.type, level + 2)}, required: ${String(prop.required)} },\n`,
+            `${p(level + 2)}${literalKey(prop.name)}: { shape: ${shapeOf(prop.type, level + 2)}, required: ${String(prop.required)} },\n`,
         )
         .join("");
       const body = props ? `{\n${props}${p(level + 1)}}` : "{}";

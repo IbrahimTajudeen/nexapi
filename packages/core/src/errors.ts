@@ -6,6 +6,12 @@
  * error cannot leak credentials.
  */
 export class NyxError extends Error {
+  /**
+   * Whether repeating the same request may succeed. `undefined` leaves the decision to the
+   * engine's defaults (network trouble and timeouts retry; deterministic failures do not).
+   * Protocol adapters set it so the default retry policy works for them too.
+   */
+  readonly retryable?: boolean;
   constructor(message: string, options?: { cause?: unknown }) {
     super(message, options);
     this.name = "NyxError";
@@ -94,6 +100,43 @@ export class RequestError extends NyxError {
   }
 }
 
+/** A response body exceeded `maxResponseBytes`. It is never read in full. */
+export class ResponseTooLargeError extends NyxError {
+  readonly limit: number;
+  override readonly retryable = false;
+  constructor(limit: number) {
+    super(`Response is larger than the configured limit of ${String(limit)} bytes`);
+    this.name = "ResponseTooLargeError";
+    this.limit = limit;
+  }
+}
+
+/**
+ * A remote operation failed in a protocol other than plain HTTP (GraphQL, tRPC, ...). Adapters
+ * subclass it or use it directly; `details` is protocol-specific and never contains request data.
+ */
+export class OperationError<TDetails = unknown> extends NyxError {
+  readonly protocol: string;
+  readonly code: string | undefined;
+  readonly details: TDetails;
+  override readonly retryable: boolean;
+  constructor(init: {
+    protocol: string;
+    message: string;
+    code?: string | undefined;
+    details: TDetails;
+    retryable?: boolean | undefined;
+    cause?: unknown;
+  }) {
+    super(init.message, init.cause === undefined ? undefined : { cause: init.cause });
+    this.name = "OperationError";
+    this.protocol = init.protocol;
+    this.code = init.code;
+    this.details = init.details;
+    this.retryable = init.retryable === true;
+  }
+}
+
 /** A query fetch was cancelled (explicitly, or because every observer went away). */
 export class CancelledError extends NyxError {
   constructor() {
@@ -121,4 +164,5 @@ export type EndpointError<TBody = unknown> =
   | TimeoutError
   | ParseError
   | ResponseValidationError
+  | ResponseTooLargeError
   | RequestError;

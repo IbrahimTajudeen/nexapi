@@ -1,6 +1,6 @@
 import type { Transport } from "@nyxapi/core";
 
-export interface LogEntry {
+interface LogEntry {
   id: number;
   at: number;
   method: string;

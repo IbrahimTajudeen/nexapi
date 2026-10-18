@@ -23,6 +23,7 @@ export function Footer() {
           <h4>Get it</h4>
           <Link href="/install/">Install</Link>
           <Link href="/install/#downloads">Downloads</Link>
+          <Link href="/releases/">Releases</Link>
           <Link href="/docs/cli/">CLI</Link>
           <Link href="/docs/benchmarks/">Benchmarks</Link>
         </div>

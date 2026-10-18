@@ -1,698 +1,824 @@
 [
-  {
-    "title": "Introduction",
-    "page": "Documentation",
-    "href": "/docs/",
-    "text": "What NexAPI is and how the pieces fit."
-  },
-  {
-    "title": "What you get",
-    "page": "Introduction",
-    "href": "/docs/#what-you-get",
-    "text": ""
-  },
-  {
-    "title": "How the pieces fit",
-    "page": "Introduction",
-    "href": "/docs/#how-the-pieces-fit",
-    "text": ""
-  },
-  {
-    "title": "Try it right now",
-    "page": "Introduction",
-    "href": "/docs/#try-it-right-now",
-    "text": ""
-  },
-  {
-    "title": "Reads are blue, writes are green",
-    "page": "Introduction",
-    "href": "/docs/#reads-are-blue-writes-are-green",
-    "text": ""
-  },
-  {
-    "title": "Where to go next",
-    "page": "Introduction",
-    "href": "/docs/#where-to-go-next",
-    "text": ""
-  },
-  {
-    "title": "Installation",
-    "page": "Documentation",
-    "href": "/docs/installation/",
-    "text": "Install from npm, tarballs or source."
-  },
-  {
-    "title": "Requirements",
-    "page": "Installation",
-    "href": "/docs/installation/#requirements",
-    "text": ""
-  },
-  {
-    "title": "From the npm registry",
-    "page": "Installation",
-    "href": "/docs/installation/#from-the-npm-registry",
-    "text": ""
-  },
-  {
-    "title": "From tarballs",
-    "page": "Installation",
-    "href": "/docs/installation/#from-tarballs",
-    "text": ""
-  },
-  {
-    "title": "From source",
-    "page": "Installation",
-    "href": "/docs/installation/#from-source",
-    "text": ""
-  },
-  {
-    "title": "Check that it works",
-    "page": "Installation",
-    "href": "/docs/installation/#check-that-it-works",
-    "text": ""
-  },
-  {
-    "title": "TypeScript settings",
-    "page": "Installation",
-    "href": "/docs/installation/#typescript-settings",
-    "text": ""
-  },
-  {
-    "title": "Quick start",
-    "page": "Documentation",
-    "href": "/docs/quick-start/",
-    "text": "From an OpenAPI file to a typed call in five minutes."
-  },
-  {
-    "title": "What just happened",
-    "page": "Quick start",
-    "href": "/docs/quick-start/#what-just-happened",
-    "text": ""
-  },
-  {
-    "title": "Keep the client in sync",
-    "page": "Quick start",
-    "href": "/docs/quick-start/#keep-the-client-in-sync",
-    "text": ""
-  },
-  {
-    "title": "The fluent API",
-    "page": "Documentation",
-    "href": "/docs/fluent-api/",
-    "text": "How paths become typed calls."
-  },
-  {
-    "title": "How paths become calls",
-    "page": "The fluent API",
-    "href": "/docs/fluent-api/#how-paths-become-calls",
-    "text": ""
-  },
-  {
-    "title": "Arguments",
-    "page": "The fluent API",
-    "href": "/docs/fluent-api/#arguments",
-    "text": ""
-  },
-  {
-    "title": "Everything an endpoint can do",
-    "page": "The fluent API",
-    "href": "/docs/fluent-api/#everything-an-endpoint-can-do",
-    "text": ""
-  },
-  {
-    "title": "Why config is the second argument of options",
-    "page": "The fluent API",
-    "href": "/docs/fluent-api/#why-config-is-the-second-argument-of-options",
-    "text": ""
-  },
-  {
-    "title": "Direct calls and cached calls",
-    "page": "The fluent API",
-    "href": "/docs/fluent-api/#direct-calls-and-cached-calls",
-    "text": ""
-  },
-  {
-    "title": "Hand-written endpoints",
-    "page": "The fluent API",
-    "href": "/docs/fluent-api/#hand-written-endpoints",
-    "text": ""
-  },
-  {
-    "title": "Code generation",
-    "page": "Documentation",
-    "href": "/docs/codegen/",
-    "text": "Config, naming, validation and CI checks."
-  },
-  {
-    "title": "Running it",
-    "page": "Code generation",
-    "href": "/docs/codegen/#running-it",
-    "text": ""
-  },
-  {
-    "title": "What is generated",
-    "page": "Code generation",
-    "href": "/docs/codegen/#what-is-generated",
-    "text": ""
-  },
-  {
-    "title": "Configuration file",
-    "page": "Code generation",
-    "href": "/docs/codegen/#configuration-file",
-    "text": ""
-  },
-  {
-    "title": "Renaming and resolving conflicts",
-    "page": "Code generation",
-    "href": "/docs/codegen/#renaming-and-resolving-conflicts",
-    "text": ""
-  },
-  {
-    "title": "Shared path prefixes",
-    "page": "Code generation",
-    "href": "/docs/codegen/#shared-path-prefixes",
-    "text": ""
-  },
-  {
-    "title": "Checking responses at runtime",
-    "page": "Code generation",
-    "href": "/docs/codegen/#checking-responses-at-runtime",
-    "text": ""
-  },
-  {
-    "title": "What is supported",
-    "page": "Code generation",
-    "href": "/docs/codegen/#what-is-supported",
-    "text": ""
-  },
-  {
-    "title": "Use it in CI",
-    "page": "Code generation",
-    "href": "/docs/codegen/#use-it-in-ci",
-    "text": ""
-  },
-  {
-    "title": "From code",
-    "page": "Code generation",
-    "href": "/docs/codegen/#from-code",
-    "text": ""
-  },
-  {
-    "title": "Queries and caching",
-    "page": "Documentation",
-    "href": "/docs/queries/",
-    "text": "Keys, freshness, single flight, invalidation."
-  },
-  {
-    "title": "Fetch through the cache",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#fetch-through-the-cache",
-    "text": ""
-  },
-  {
-    "title": "One request for many callers",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#one-request-for-many-callers",
-    "text": ""
-  },
-  {
-    "title": "Freshness",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#freshness",
-    "text": ""
-  },
-  {
-    "title": "Retries",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#retries",
-    "text": ""
-  },
-  {
-    "title": "Invalidation",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#invalidation",
-    "text": ""
-  },
-  {
-    "title": "Reading and writing the cache directly",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#reading-and-writing-the-cache-directly",
-    "text": ""
-  },
-  {
-    "title": "Cache keys",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#cache-keys",
-    "text": ""
-  },
-  {
-    "title": "Cancelling",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#cancelling",
-    "text": ""
-  },
-  {
-    "title": "Looking inside",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#looking-inside",
-    "text": ""
-  },
-  {
-    "title": "Offline",
-    "page": "Queries and caching",
-    "href": "/docs/queries/#offline",
-    "text": ""
-  },
-  {
-    "title": "Mutations and optimistic updates",
-    "page": "Documentation",
-    "href": "/docs/mutations/",
-    "text": "Patch-based updates that roll back safely."
-  },
-  {
-    "title": "Run a mutation",
-    "page": "Mutations and optimistic updates",
-    "href": "/docs/mutations/#run-a-mutation",
-    "text": ""
-  },
-  {
-    "title": "Optimistic updates",
-    "page": "Mutations and optimistic updates",
-    "href": "/docs/mutations/#optimistic-updates",
-    "text": ""
-  },
-  {
-    "title": "If the request fails",
-    "page": "Mutations and optimistic updates",
-    "href": "/docs/mutations/#if-the-request-fails",
-    "text": ""
-  },
-  {
-    "title": "Lifecycle callbacks",
-    "page": "Mutations and optimistic updates",
-    "href": "/docs/mutations/#lifecycle-callbacks",
-    "text": ""
-  },
-  {
-    "title": "Keeping writes in order",
-    "page": "Mutations and optimistic updates",
-    "href": "/docs/mutations/#keeping-writes-in-order",
-    "text": ""
-  },
-  {
-    "title": "Retrying a write",
-    "page": "Mutations and optimistic updates",
-    "href": "/docs/mutations/#retrying-a-write",
-    "text": ""
-  },
-  {
-    "title": "Related",
-    "page": "Mutations and optimistic updates",
-    "href": "/docs/mutations/#related",
-    "text": ""
-  },
-  {
-    "title": "Errors",
-    "page": "Documentation",
-    "href": "/docs/errors/",
-    "text": "Typed HTTP errors you can narrow by status."
-  },
-  {
-    "title": "The error classes",
-    "page": "Errors",
-    "href": "/docs/errors/#the-error-classes",
-    "text": ""
-  },
-  {
-    "title": "Narrow by status",
-    "page": "Errors",
-    "href": "/docs/errors/#narrow-by-status",
-    "text": ""
-  },
-  {
-    "title": "What the types do not promise",
-    "page": "Errors",
-    "href": "/docs/errors/#what-the-types-do-not-promise",
-    "text": ""
-  },
-  {
-    "title": "Errors never leak secrets",
-    "page": "Errors",
-    "href": "/docs/errors/#errors-never-leak-secrets",
-    "text": ""
-  },
-  {
-    "title": "Pagination",
-    "page": "Documentation",
-    "href": "/docs/pagination/",
-    "text": "Infinite queries in both directions."
-  },
-  {
-    "title": "Load pages",
-    "page": "Pagination",
-    "href": "/docs/pagination/#load-pages",
-    "text": ""
-  },
-  {
-    "title": "Both directions",
-    "page": "Pagination",
-    "href": "/docs/pagination/#both-directions",
-    "text": ""
-  },
-  {
-    "title": "Limit memory",
-    "page": "Pagination",
-    "href": "/docs/pagination/#limit-memory",
-    "text": ""
-  },
-  {
-    "title": "Refetching",
-    "page": "Pagination",
-    "href": "/docs/pagination/#refetching",
-    "text": ""
-  },
-  {
-    "title": "No races",
-    "page": "Pagination",
-    "href": "/docs/pagination/#no-races",
-    "text": ""
-  },
-  {
-    "title": "In React",
-    "page": "Pagination",
-    "href": "/docs/pagination/#in-react",
-    "text": ""
-  },
-  {
-    "title": "React",
-    "page": "Documentation",
-    "href": "/docs/react/",
-    "text": "Hooks, Suspense and server rendering."
-  },
-  {
-    "title": "Install",
-    "page": "React",
-    "href": "/docs/react/#install",
-    "text": ""
-  },
-  {
-    "title": "useQuery",
-    "page": "React",
-    "href": "/docs/react/#usequery",
-    "text": ""
-  },
-  {
-    "title": "useMutation",
-    "page": "React",
-    "href": "/docs/react/#usemutation",
-    "text": ""
-  },
-  {
-    "title": "Infinite lists",
-    "page": "React",
-    "href": "/docs/react/#infinite-lists",
-    "text": ""
-  },
-  {
-    "title": "Suspense",
-    "page": "React",
-    "href": "/docs/react/#suspense",
-    "text": ""
-  },
-  {
-    "title": "Placeholder data",
-    "page": "React",
-    "href": "/docs/react/#placeholder-data",
-    "text": ""
-  },
-  {
-    "title": "Server rendering",
-    "page": "React",
-    "href": "/docs/react/#server-rendering",
-    "text": ""
-  },
-  {
-    "title": "What is dehydrated",
-    "page": "React",
-    "href": "/docs/react/#what-is-dehydrated",
-    "text": ""
-  },
-  {
-    "title": "NexProvider",
-    "page": "React",
-    "href": "/docs/react/#nexprovider",
-    "text": ""
-  },
-  {
-    "title": "Security",
-    "page": "Documentation",
-    "href": "/docs/security/",
-    "text": "Origin pinning and credential handling."
-  },
-  {
-    "title": "What NexAPI does",
-    "page": "Security",
-    "href": "/docs/security/#what-nexapi-does",
-    "text": ""
-  },
-  {
-    "title": "Server rendering: one client per request",
-    "page": "Security",
-    "href": "/docs/security/#server-rendering-one-client-per-request",
-    "text": ""
-  },
-  {
-    "title": "Cookies",
-    "page": "Security",
-    "href": "/docs/security/#cookies",
-    "text": ""
-  },
-  {
-    "title": "Still your job",
-    "page": "Security",
-    "href": "/docs/security/#still-your-job",
-    "text": ""
-  },
-  {
-    "title": "Reporting a vulnerability",
-    "page": "Security",
-    "href": "/docs/security/#reporting-a-vulnerability",
-    "text": ""
-  },
-  {
-    "title": "Devtools",
-    "page": "Documentation",
-    "href": "/docs/devtools/",
-    "text": "Inspect the cache while you build."
-  },
-  {
-    "title": "Install",
-    "page": "Devtools",
-    "href": "/docs/devtools/#install",
-    "text": ""
-  },
-  {
-    "title": "The React panel",
-    "page": "Devtools",
-    "href": "/docs/devtools/#the-react-panel",
-    "text": ""
-  },
-  {
-    "title": "The inspector, without React",
-    "page": "Devtools",
-    "href": "/docs/devtools/#the-inspector-without-react",
-    "text": ""
-  },
-  {
-    "title": "Private by default",
-    "page": "Devtools",
-    "href": "/docs/devtools/#private-by-default",
-    "text": ""
-  },
-  {
-    "title": "NestJS and ASP.NET Core",
-    "page": "Documentation",
-    "href": "/docs/adapters/",
-    "text": "Use the OpenAPI output you already have."
-  },
-  {
-    "title": "NestJS",
-    "page": "NestJS and ASP.NET Core",
-    "href": "/docs/adapters/#nestjs",
-    "text": ""
-  },
-  {
-    "title": "Things to know",
-    "page": "NestJS and ASP.NET Core",
-    "href": "/docs/adapters/#things-to-know",
-    "text": ""
-  },
-  {
-    "title": "ASP.NET Core",
-    "page": "NestJS and ASP.NET Core",
-    "href": "/docs/adapters/#asp-net-core",
-    "text": ""
-  },
-  {
-    "title": "Things to know",
-    "page": "NestJS and ASP.NET Core",
-    "href": "/docs/adapters/#things-to-know",
-    "text": ""
-  },
-  {
-    "title": "Any other backend",
-    "page": "NestJS and ASP.NET Core",
-    "href": "/docs/adapters/#any-other-backend",
-    "text": ""
-  },
-  {
-    "title": "CLI",
-    "page": "Documentation",
-    "href": "/docs/cli/",
-    "text": "Every command and flag."
-  },
-  {
-    "title": "Usage",
-    "page": "CLI",
-    "href": "/docs/cli/#usage",
-    "text": ""
-  },
-  {
-    "title": "generate",
-    "page": "CLI",
-    "href": "/docs/cli/#generate",
-    "text": ""
-  },
-  {
-    "title": "validate",
-    "page": "CLI",
-    "href": "/docs/cli/#validate",
-    "text": ""
-  },
-  {
-    "title": "Exit codes",
-    "page": "CLI",
-    "href": "/docs/cli/#exit-codes",
-    "text": ""
-  },
-  {
-    "title": "Paths",
-    "page": "CLI",
-    "href": "/docs/cli/#paths",
-    "text": ""
-  },
-  {
-    "title": "In package.json",
-    "page": "CLI",
-    "href": "/docs/cli/#in-package-json",
-    "text": ""
-  },
-  {
-    "title": "Configuration",
-    "page": "Documentation",
-    "href": "/docs/config/",
-    "text": "nexapi.config.json options."
-  },
-  {
-    "title": "Client options",
-    "page": "Documentation",
-    "href": "/docs/client-options/",
-    "text": "createNexClient and QueryClient settings."
-  },
-  {
-    "title": "HTTP",
-    "page": "Client options",
-    "href": "/docs/client-options/#http",
-    "text": ""
-  },
-  {
-    "title": "Middleware example",
-    "page": "Client options",
-    "href": "/docs/client-options/#middleware-example",
-    "text": ""
-  },
-  {
-    "title": "Cache defaults",
-    "page": "Client options",
-    "href": "/docs/client-options/#cache-defaults",
-    "text": ""
-  },
-  {
-    "title": "Sharing a cache",
-    "page": "Client options",
-    "href": "/docs/client-options/#sharing-a-cache",
-    "text": ""
-  },
-  {
-    "title": "Benchmarks",
-    "page": "Documentation",
-    "href": "/docs/benchmarks/",
-    "text": "How performance is measured, and what it does not show."
-  },
-  {
-    "title": "Run them yourself",
-    "page": "Benchmarks",
-    "href": "/docs/benchmarks/#run-them-yourself",
-    "text": ""
-  },
-  {
-    "title": "Method",
-    "page": "Benchmarks",
-    "href": "/docs/benchmarks/#method",
-    "text": ""
-  },
-  {
-    "title": "Headless engine",
-    "page": "Benchmarks",
-    "href": "/docs/benchmarks/#headless-engine",
-    "text": ""
-  },
-  {
-    "title": "React, 500 components",
-    "page": "Benchmarks",
-    "href": "/docs/benchmarks/#react-500-components",
-    "text": ""
-  },
-  {
-    "title": "Memory",
-    "page": "Benchmarks",
-    "href": "/docs/benchmarks/#memory",
-    "text": ""
-  },
-  {
-    "title": "Bundle size",
-    "page": "Benchmarks",
-    "href": "/docs/benchmarks/#bundle-size",
-    "text": ""
-  },
-  {
-    "title": "Not measured yet",
-    "page": "Benchmarks",
-    "href": "/docs/benchmarks/#not-measured-yet",
-    "text": ""
-  },
-  {
-    "title": "Playground",
-    "page": "Try it",
-    "href": "/playground/",
-    "text": "run code live generate a client from OpenAPI in the browser"
-  },
-  {
-    "title": "Beginners",
-    "page": "Learn",
-    "href": "/beginners/",
-    "text": "first steps tutorial local live starter mock server"
-  },
-  {
-    "title": "Install and downloads",
-    "page": "Get it",
-    "href": "/install/",
-    "text": "npm pnpm yarn bun curl tarball zip download script"
-  },
-  {
-    "title": "Contribute",
-    "page": "Project",
-    "href": "/contribute/",
-    "text": "open source contributors issues pull requests development setup"
-  }
+ {
+  "title": "Introduction",
+  "page": "Documentation",
+  "href": "/docs/",
+  "text": "What NyxAPI is and how the pieces fit."
+ },
+ {
+  "title": "What you get",
+  "page": "Introduction",
+  "href": "/docs/#what-you-get",
+  "text": ""
+ },
+ {
+  "title": "How the pieces fit",
+  "page": "Introduction",
+  "href": "/docs/#how-the-pieces-fit",
+  "text": ""
+ },
+ {
+  "title": "Try it right now",
+  "page": "Introduction",
+  "href": "/docs/#try-it-right-now",
+  "text": ""
+ },
+ {
+  "title": "Reads are blue, writes are green",
+  "page": "Introduction",
+  "href": "/docs/#reads-are-blue-writes-are-green",
+  "text": ""
+ },
+ {
+  "title": "Where to go next",
+  "page": "Introduction",
+  "href": "/docs/#where-to-go-next",
+  "text": ""
+ },
+ {
+  "title": "Installation",
+  "page": "Documentation",
+  "href": "/docs/installation/",
+  "text": "Install from npm, tarballs or source."
+ },
+ {
+  "title": "Requirements",
+  "page": "Installation",
+  "href": "/docs/installation/#requirements",
+  "text": ""
+ },
+ {
+  "title": "From the npm registry",
+  "page": "Installation",
+  "href": "/docs/installation/#from-the-npm-registry",
+  "text": ""
+ },
+ {
+  "title": "From tarballs",
+  "page": "Installation",
+  "href": "/docs/installation/#from-tarballs",
+  "text": ""
+ },
+ {
+  "title": "From source",
+  "page": "Installation",
+  "href": "/docs/installation/#from-source",
+  "text": ""
+ },
+ {
+  "title": "Check that it works",
+  "page": "Installation",
+  "href": "/docs/installation/#check-that-it-works",
+  "text": ""
+ },
+ {
+  "title": "TypeScript settings",
+  "page": "Installation",
+  "href": "/docs/installation/#typescript-settings",
+  "text": ""
+ },
+ {
+  "title": "Quick start",
+  "page": "Documentation",
+  "href": "/docs/quick-start/",
+  "text": "From an OpenAPI file to a typed call in five minutes."
+ },
+ {
+  "title": "What just happened",
+  "page": "Quick start",
+  "href": "/docs/quick-start/#what-just-happened",
+  "text": ""
+ },
+ {
+  "title": "Keep the client in sync",
+  "page": "Quick start",
+  "href": "/docs/quick-start/#keep-the-client-in-sync",
+  "text": ""
+ },
+ {
+  "title": "The fluent API",
+  "page": "Documentation",
+  "href": "/docs/fluent-api/",
+  "text": "How paths become typed calls."
+ },
+ {
+  "title": "How paths become calls",
+  "page": "The fluent API",
+  "href": "/docs/fluent-api/#how-paths-become-calls",
+  "text": ""
+ },
+ {
+  "title": "Arguments",
+  "page": "The fluent API",
+  "href": "/docs/fluent-api/#arguments",
+  "text": ""
+ },
+ {
+  "title": "Everything an endpoint can do",
+  "page": "The fluent API",
+  "href": "/docs/fluent-api/#everything-an-endpoint-can-do",
+  "text": ""
+ },
+ {
+  "title": "Why config is the second argument of options",
+  "page": "The fluent API",
+  "href": "/docs/fluent-api/#why-config-is-the-second-argument-of-options",
+  "text": ""
+ },
+ {
+  "title": "Direct calls and cached calls",
+  "page": "The fluent API",
+  "href": "/docs/fluent-api/#direct-calls-and-cached-calls",
+  "text": ""
+ },
+ {
+  "title": "Hand-written endpoints",
+  "page": "The fluent API",
+  "href": "/docs/fluent-api/#hand-written-endpoints",
+  "text": ""
+ },
+ {
+  "title": "Code generation",
+  "page": "Documentation",
+  "href": "/docs/codegen/",
+  "text": "Config, naming, validation and CI checks."
+ },
+ {
+  "title": "Running it",
+  "page": "Code generation",
+  "href": "/docs/codegen/#running-it",
+  "text": ""
+ },
+ {
+  "title": "What is generated",
+  "page": "Code generation",
+  "href": "/docs/codegen/#what-is-generated",
+  "text": ""
+ },
+ {
+  "title": "Configuration file",
+  "page": "Code generation",
+  "href": "/docs/codegen/#configuration-file",
+  "text": ""
+ },
+ {
+  "title": "Renaming and resolving conflicts",
+  "page": "Code generation",
+  "href": "/docs/codegen/#renaming-and-resolving-conflicts",
+  "text": ""
+ },
+ {
+  "title": "Shared path prefixes",
+  "page": "Code generation",
+  "href": "/docs/codegen/#shared-path-prefixes",
+  "text": ""
+ },
+ {
+  "title": "Checking responses at runtime",
+  "page": "Code generation",
+  "href": "/docs/codegen/#checking-responses-at-runtime",
+  "text": ""
+ },
+ {
+  "title": "What is supported",
+  "page": "Code generation",
+  "href": "/docs/codegen/#what-is-supported",
+  "text": ""
+ },
+ {
+  "title": "Use it in CI",
+  "page": "Code generation",
+  "href": "/docs/codegen/#use-it-in-ci",
+  "text": ""
+ },
+ {
+  "title": "From code",
+  "page": "Code generation",
+  "href": "/docs/codegen/#from-code",
+  "text": ""
+ },
+ {
+  "title": "Queries and caching",
+  "page": "Documentation",
+  "href": "/docs/queries/",
+  "text": "Keys, freshness, single flight, invalidation."
+ },
+ {
+  "title": "Fetch through the cache",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#fetch-through-the-cache",
+  "text": ""
+ },
+ {
+  "title": "One request for many callers",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#one-request-for-many-callers",
+  "text": ""
+ },
+ {
+  "title": "Freshness",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#freshness",
+  "text": ""
+ },
+ {
+  "title": "Retries",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#retries",
+  "text": ""
+ },
+ {
+  "title": "Invalidation",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#invalidation",
+  "text": ""
+ },
+ {
+  "title": "Reading and writing the cache directly",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#reading-and-writing-the-cache-directly",
+  "text": ""
+ },
+ {
+  "title": "Cache keys",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#cache-keys",
+  "text": ""
+ },
+ {
+  "title": "Cancelling",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#cancelling",
+  "text": ""
+ },
+ {
+  "title": "Looking inside",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#looking-inside",
+  "text": ""
+ },
+ {
+  "title": "Offline",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#offline",
+  "text": ""
+ },
+ {
+  "title": "Mutations and optimistic updates",
+  "page": "Documentation",
+  "href": "/docs/mutations/",
+  "text": "Patch-based updates that roll back safely."
+ },
+ {
+  "title": "Run a mutation",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#run-a-mutation",
+  "text": ""
+ },
+ {
+  "title": "Optimistic updates",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#optimistic-updates",
+  "text": ""
+ },
+ {
+  "title": "If the request fails",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#if-the-request-fails",
+  "text": ""
+ },
+ {
+  "title": "Lifecycle callbacks",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#lifecycle-callbacks",
+  "text": ""
+ },
+ {
+  "title": "Keeping writes in order",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#keeping-writes-in-order",
+  "text": ""
+ },
+ {
+  "title": "Retrying a write",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#retrying-a-write",
+  "text": ""
+ },
+ {
+  "title": "Related",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#related",
+  "text": ""
+ },
+ {
+  "title": "Errors",
+  "page": "Documentation",
+  "href": "/docs/errors/",
+  "text": "Typed HTTP errors you can narrow by status."
+ },
+ {
+  "title": "The error classes",
+  "page": "Errors",
+  "href": "/docs/errors/#the-error-classes",
+  "text": ""
+ },
+ {
+  "title": "Narrow by status",
+  "page": "Errors",
+  "href": "/docs/errors/#narrow-by-status",
+  "text": ""
+ },
+ {
+  "title": "What the types do not promise",
+  "page": "Errors",
+  "href": "/docs/errors/#what-the-types-do-not-promise",
+  "text": ""
+ },
+ {
+  "title": "Errors never leak secrets",
+  "page": "Errors",
+  "href": "/docs/errors/#errors-never-leak-secrets",
+  "text": ""
+ },
+ {
+  "title": "Pagination",
+  "page": "Documentation",
+  "href": "/docs/pagination/",
+  "text": "Infinite queries in both directions."
+ },
+ {
+  "title": "Load pages",
+  "page": "Pagination",
+  "href": "/docs/pagination/#load-pages",
+  "text": ""
+ },
+ {
+  "title": "Both directions",
+  "page": "Pagination",
+  "href": "/docs/pagination/#both-directions",
+  "text": ""
+ },
+ {
+  "title": "Limit memory",
+  "page": "Pagination",
+  "href": "/docs/pagination/#limit-memory",
+  "text": ""
+ },
+ {
+  "title": "Refetching",
+  "page": "Pagination",
+  "href": "/docs/pagination/#refetching",
+  "text": ""
+ },
+ {
+  "title": "No races",
+  "page": "Pagination",
+  "href": "/docs/pagination/#no-races",
+  "text": ""
+ },
+ {
+  "title": "In React",
+  "page": "Pagination",
+  "href": "/docs/pagination/#in-react",
+  "text": ""
+ },
+ {
+  "title": "Schema formats",
+  "page": "Documentation",
+  "href": "/docs/schemas/",
+  "text": "OpenAPI, Swagger 2.0, GraphQL and tRPC: what works and how it is detected."
+ },
+ {
+  "title": "What works with what",
+  "page": "Schema formats",
+  "href": "/docs/schemas/#what-works-with-what",
+  "text": ""
+ },
+ {
+  "title": "How the kind is chosen",
+  "page": "Schema formats",
+  "href": "/docs/schemas/#how-the-kind-is-chosen",
+  "text": ""
+ },
+ {
+  "title": "Swagger 2.0",
+  "page": "Schema formats",
+  "href": "/docs/schemas/#swagger-2-0",
+  "text": ""
+ },
+ {
+  "title": "Remote schemas",
+  "page": "Schema formats",
+  "href": "/docs/schemas/#remote-schemas",
+  "text": ""
+ },
+ {
+  "title": "Not supported",
+  "page": "Schema formats",
+  "href": "/docs/schemas/#not-supported",
+  "text": ""
+ },
+ {
+  "title": "GraphQL",
+  "page": "Documentation",
+  "href": "/docs/graphql/",
+  "text": "Typed queries and mutations from a schema, on the same cache."
+ },
+ {
+  "title": "Generate",
+  "page": "GraphQL",
+  "href": "/docs/graphql/#generate",
+  "text": ""
+ },
+ {
+  "title": "Use",
+  "page": "GraphQL",
+  "href": "/docs/graphql/#use",
+  "text": ""
+ },
+ {
+  "title": "Types come from the query",
+  "page": "GraphQL",
+  "href": "/docs/graphql/#types-come-from-the-query",
+  "text": ""
+ },
+ {
+  "title": "Your own documents",
+  "page": "GraphQL",
+  "href": "/docs/graphql/#your-own-documents",
+  "text": ""
+ },
+ {
+  "title": "Config keys",
+  "page": "GraphQL",
+  "href": "/docs/graphql/#config-keys",
+  "text": ""
+ },
+ {
+  "title": "Errors",
+  "page": "GraphQL",
+  "href": "/docs/graphql/#errors",
+  "text": ""
+ },
+ {
+  "title": "Security",
+  "page": "GraphQL",
+  "href": "/docs/graphql/#security",
+  "text": ""
+ },
+ {
+  "title": "tRPC",
+  "page": "Documentation",
+  "href": "/docs/trpc/",
+  "text": "Typed keys, prefetch and invalidation for every procedure."
+ },
+ {
+  "title": "Wrap your client",
+  "page": "tRPC",
+  "href": "/docs/trpc/#wrap-your-client",
+  "text": ""
+ },
+ {
+  "title": "Use",
+  "page": "tRPC",
+  "href": "/docs/trpc/#use",
+  "text": ""
+ },
+ {
+  "title": "Errors and retries",
+  "page": "tRPC",
+  "href": "/docs/trpc/#errors-and-retries",
+  "text": ""
+ },
+ {
+  "title": "React",
+  "page": "Documentation",
+  "href": "/docs/react/",
+  "text": "Hooks, Suspense and server rendering."
+ },
+ {
+  "title": "Install",
+  "page": "React",
+  "href": "/docs/react/#install",
+  "text": ""
+ },
+ {
+  "title": "useQuery",
+  "page": "React",
+  "href": "/docs/react/#usequery",
+  "text": ""
+ },
+ {
+  "title": "useMutation",
+  "page": "React",
+  "href": "/docs/react/#usemutation",
+  "text": ""
+ },
+ {
+  "title": "Infinite lists",
+  "page": "React",
+  "href": "/docs/react/#infinite-lists",
+  "text": ""
+ },
+ {
+  "title": "Suspense",
+  "page": "React",
+  "href": "/docs/react/#suspense",
+  "text": ""
+ },
+ {
+  "title": "Placeholder data",
+  "page": "React",
+  "href": "/docs/react/#placeholder-data",
+  "text": ""
+ },
+ {
+  "title": "Server rendering",
+  "page": "React",
+  "href": "/docs/react/#server-rendering",
+  "text": ""
+ },
+ {
+  "title": "What is dehydrated",
+  "page": "React",
+  "href": "/docs/react/#what-is-dehydrated",
+  "text": ""
+ },
+ {
+  "title": "NyxProvider",
+  "page": "React",
+  "href": "/docs/react/#nyxprovider",
+  "text": ""
+ },
+ {
+  "title": "Security",
+  "page": "Documentation",
+  "href": "/docs/security/",
+  "text": "Origin pinning and credential handling."
+ },
+ {
+  "title": "What NyxAPI does",
+  "page": "Security",
+  "href": "/docs/security/#what-nyxapi-does",
+  "text": ""
+ },
+ {
+  "title": "Server rendering: one client per request",
+  "page": "Security",
+  "href": "/docs/security/#server-rendering-one-client-per-request",
+  "text": ""
+ },
+ {
+  "title": "Cookies",
+  "page": "Security",
+  "href": "/docs/security/#cookies",
+  "text": ""
+ },
+ {
+  "title": "Still your job",
+  "page": "Security",
+  "href": "/docs/security/#still-your-job",
+  "text": ""
+ },
+ {
+  "title": "Reporting a vulnerability",
+  "page": "Security",
+  "href": "/docs/security/#reporting-a-vulnerability",
+  "text": ""
+ },
+ {
+  "title": "Devtools",
+  "page": "Documentation",
+  "href": "/docs/devtools/",
+  "text": "Inspect the cache while you build."
+ },
+ {
+  "title": "Install",
+  "page": "Devtools",
+  "href": "/docs/devtools/#install",
+  "text": ""
+ },
+ {
+  "title": "The React panel",
+  "page": "Devtools",
+  "href": "/docs/devtools/#the-react-panel",
+  "text": ""
+ },
+ {
+  "title": "The inspector, without React",
+  "page": "Devtools",
+  "href": "/docs/devtools/#the-inspector-without-react",
+  "text": ""
+ },
+ {
+  "title": "Private by default",
+  "page": "Devtools",
+  "href": "/docs/devtools/#private-by-default",
+  "text": ""
+ },
+ {
+  "title": "NestJS and ASP.NET Core",
+  "page": "Documentation",
+  "href": "/docs/adapters/",
+  "text": "Use the OpenAPI output you already have."
+ },
+ {
+  "title": "NestJS",
+  "page": "NestJS and ASP.NET Core",
+  "href": "/docs/adapters/#nestjs",
+  "text": ""
+ },
+ {
+  "title": "Things to know",
+  "page": "NestJS and ASP.NET Core",
+  "href": "/docs/adapters/#things-to-know",
+  "text": ""
+ },
+ {
+  "title": "ASP.NET Core",
+  "page": "NestJS and ASP.NET Core",
+  "href": "/docs/adapters/#asp-net-core",
+  "text": ""
+ },
+ {
+  "title": "Things to know",
+  "page": "NestJS and ASP.NET Core",
+  "href": "/docs/adapters/#things-to-know",
+  "text": ""
+ },
+ {
+  "title": "Any other backend",
+  "page": "NestJS and ASP.NET Core",
+  "href": "/docs/adapters/#any-other-backend",
+  "text": ""
+ },
+ {
+  "title": "CLI",
+  "page": "Documentation",
+  "href": "/docs/cli/",
+  "text": "Every command and flag."
+ },
+ {
+  "title": "Install",
+  "page": "CLI",
+  "href": "/docs/cli/#install",
+  "text": ""
+ },
+ {
+  "title": "Usage",
+  "page": "CLI",
+  "href": "/docs/cli/#usage",
+  "text": ""
+ },
+ {
+  "title": "init",
+  "page": "CLI",
+  "href": "/docs/cli/#init",
+  "text": ""
+ },
+ {
+  "title": "generate",
+  "page": "CLI",
+  "href": "/docs/cli/#generate",
+  "text": ""
+ },
+ {
+  "title": "validate",
+  "page": "CLI",
+  "href": "/docs/cli/#validate",
+  "text": ""
+ },
+ {
+  "title": "Exit codes",
+  "page": "CLI",
+  "href": "/docs/cli/#exit-codes",
+  "text": ""
+ },
+ {
+  "title": "Paths",
+  "page": "CLI",
+  "href": "/docs/cli/#paths",
+  "text": ""
+ },
+ {
+  "title": "In package.json",
+  "page": "CLI",
+  "href": "/docs/cli/#in-package-json",
+  "text": ""
+ },
+ {
+  "title": "Configuration",
+  "page": "Documentation",
+  "href": "/docs/config/",
+  "text": "nyx.config.json options."
+ },
+ {
+  "title": "Client options",
+  "page": "Documentation",
+  "href": "/docs/client-options/",
+  "text": "createNyxClient and QueryClient settings."
+ },
+ {
+  "title": "HTTP",
+  "page": "Client options",
+  "href": "/docs/client-options/#http",
+  "text": ""
+ },
+ {
+  "title": "Middleware example",
+  "page": "Client options",
+  "href": "/docs/client-options/#middleware-example",
+  "text": ""
+ },
+ {
+  "title": "Cache defaults",
+  "page": "Client options",
+  "href": "/docs/client-options/#cache-defaults",
+  "text": ""
+ },
+ {
+  "title": "Sharing a cache",
+  "page": "Client options",
+  "href": "/docs/client-options/#sharing-a-cache",
+  "text": ""
+ },
+ {
+  "title": "Benchmarks",
+  "page": "Documentation",
+  "href": "/docs/benchmarks/",
+  "text": "How performance is measured, and what it does not show."
+ },
+ {
+  "title": "Run them yourself",
+  "page": "Benchmarks",
+  "href": "/docs/benchmarks/#run-them-yourself",
+  "text": ""
+ },
+ {
+  "title": "Method",
+  "page": "Benchmarks",
+  "href": "/docs/benchmarks/#method",
+  "text": ""
+ },
+ {
+  "title": "Headless engine",
+  "page": "Benchmarks",
+  "href": "/docs/benchmarks/#headless-engine",
+  "text": ""
+ },
+ {
+  "title": "React, 500 components",
+  "page": "Benchmarks",
+  "href": "/docs/benchmarks/#react-500-components",
+  "text": ""
+ },
+ {
+  "title": "Memory",
+  "page": "Benchmarks",
+  "href": "/docs/benchmarks/#memory",
+  "text": ""
+ },
+ {
+  "title": "Bundle size",
+  "page": "Benchmarks",
+  "href": "/docs/benchmarks/#bundle-size",
+  "text": ""
+ },
+ {
+  "title": "Not measured yet",
+  "page": "Benchmarks",
+  "href": "/docs/benchmarks/#not-measured-yet",
+  "text": ""
+ },
+ {
+  "title": "Playground",
+  "page": "Try it",
+  "href": "/playground/",
+  "text": "run code live generate a client from OpenAPI in the browser"
+ },
+ {
+  "title": "Beginners",
+  "page": "Learn",
+  "href": "/beginners/",
+  "text": "first steps tutorial local live starter mock server"
+ },
+ {
+  "title": "Install and downloads",
+  "page": "Get it",
+  "href": "/install/",
+  "text": "npm pnpm yarn bun curl tarball zip download script"
+ },
+ {
+  "title": "Contribute",
+  "page": "Project",
+  "href": "/contribute/",
+  "text": "open source contributors issues pull requests development setup"
+ },
+ {
+  "title": "Releases",
+  "page": "Project",
+  "href": "/releases/",
+  "text": "versions changelog what is new 0.1.0 0.0.1 release notes graphql trpc swagger nyx npm published"
+ }
 ]

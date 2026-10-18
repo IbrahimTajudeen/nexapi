@@ -43,6 +43,13 @@
 - Done: changesets with a fixed-version group, npm provenance in the release workflow, `repository` fields written from the GitHub repository by `scripts/set-repository.mjs`, publish metadata and LICENSE in every package, docs site, size budgets (`benchmarks/size.mjs`). See `docs/RELEASING.md`.
 - Open: first publish (needs the `@nyxapi` npm scope and an `NPM_TOKEN` secret), browser matrix tests.
 
+## Milestone 7: more than OpenAPI ✅ (0.1.0)
+
+- ✅ Swagger 2.0 input (converted to OpenAPI 3), GraphQL generator and `@nyxapi/graphql` runtime (SDL, introspection JSON or endpoint; own documents; custom scalars), `@nyxapi/trpc` adapter, protocol-neutral operations in core.
+- ✅ `nyx` command (global install, `init`, `generate --watch`, `--version`), kind detection, `nyx.config.json` with an editor JSON schema.
+- ✅ Hardening: `maxResponseBytes`, bounded CLI downloads and redirects, `__proto__` property keys, alias cycles.
+- Open: GraphQL subscriptions, uploads and persisted queries; tRPC subscriptions; a live GraphQL demo in the playground.
+
 ## Naming
 
-The project was renamed from NexAPI to NyxAPI before any public release. Packages are `@nyxapi/*`, the CLI is `nyxapi`, the config file is `nyxapi.config.json`, and environment variables use the `NYXAPI_` prefix. Nothing was published under the old name.
+The project was renamed from NexAPI to NyxAPI before any public release. Packages are `@nyxapi/*`, the CLI is `nyx` (`nyxapi` still works as an alias), the config file is `nyx.config.json` (`nyxapi.config.json` is still read), and environment variables use the `NYXAPI_` prefix. Nothing was published under the old name.

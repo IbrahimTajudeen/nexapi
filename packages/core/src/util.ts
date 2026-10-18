@@ -12,6 +12,7 @@ export function noop(): void {
 
 /** Errors worth retrying: network trouble, timeouts and a few retryable HTTP statuses. */
 export function isTransientError(error: unknown): boolean {
+  if (error instanceof NyxError && error.retryable !== undefined) return error.retryable;
   if (error instanceof HttpError)
     return error.status >= 500 || error.status === 408 || error.status === 429;
   if (
@@ -26,6 +27,7 @@ export function isTransientError(error: unknown): boolean {
 /** Default query retry: up to 3 retries, never for deterministic failures (4xx, parse, bad input). */
 export function defaultQueryRetry(failureCount: number, error: unknown): boolean {
   if (failureCount >= 3) return false;
+  if (error instanceof NyxError && error.retryable !== undefined) return error.retryable;
   if (error instanceof HttpError) return isTransientError(error);
   if (
     error instanceof ParseError ||
@@ -61,7 +63,7 @@ export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  * signal. Cancellation therefore always releases waiting callers; a late result from the
  * abandoned promise is swallowed (and can never reach the cache: the run has been replaced).
  */
-export function abortReason(signal: AbortSignal): Error {
+function abortReason(signal: AbortSignal): Error {
   const reason: unknown = signal.reason;
   return reason instanceof Error ? reason : new DOMException("Aborted", "AbortError");
 }
