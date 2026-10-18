@@ -32,7 +32,11 @@ const entries = {
 const results = [];
 for (const [name, { lib, code }] of Object.entries(entries)) {
   const out = await build({
-    stdin: { contents: code, resolveDir: fileURLToPath(new URL(".", import.meta.url)), loader: "js" },
+    stdin: {
+      contents: code,
+      resolveDir: fileURLToPath(new URL(".", import.meta.url)),
+      loader: "js",
+    },
     bundle: true,
     minify: true,
     format: "esm",

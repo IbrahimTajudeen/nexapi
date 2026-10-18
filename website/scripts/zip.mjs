@@ -20,7 +20,7 @@ export function zipDirectory(cwd, folder, target) {
   const central = [];
   let offset = 0;
   const DOS_TIME = 0;
-  const DOS_DATE = (2024 - 1980) << 9 | (1 << 5) | 1;
+  const DOS_DATE = ((2024 - 1980) << 9) | (1 << 5) | 1;
   for (const { full, rel } of entries) {
     const data = readFileSync(full);
     const packed = deflateRawSync(data);

@@ -16,10 +16,10 @@ pnpm test                              # includes website/test (every doc exampl
 
 ## Configuration
 
-| Variable               | Purpose                                              |
-| ---------------------- | ---------------------------------------------------- |
+| Variable               | Purpose                                                      |
+| ---------------------- | ------------------------------------------------------------ |
 | `NEXT_PUBLIC_REPO_URL` | Repository link shown in the header, footer, contribute page |
-| `NEXT_PUBLIC_SITE_URL` | Public origin; used in install `curl` commands and metadata |
+| `NEXT_PUBLIC_SITE_URL` | Public origin; used in install `curl` commands and metadata  |
 
 `build` first runs `scripts/prepare-downloads.mjs`, which packs the workspace packages, the starter
 project and `install.sh` (with SHA-256 checksums) into `public/`. Those outputs are git-ignored.

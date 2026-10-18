@@ -47,9 +47,9 @@ npx serve website/out   # preview it
 
 Set these before building for production:
 
-| Variable               | Purpose                                                       |
-| ---------------------- | ------------------------------------------------------------- |
-| `NEXT_PUBLIC_REPO_URL` | GitHub link shown in header, footer, Contribute page          |
+| Variable               | Purpose                                                         |
+| ---------------------- | --------------------------------------------------------------- |
+| `NEXT_PUBLIC_REPO_URL` | GitHub link shown in header, footer, Contribute page            |
 | `NEXT_PUBLIC_SITE_URL` | Public origin, used in the `curl` install commands and metadata |
 
 Example: `NEXT_PUBLIC_SITE_URL=https://nexapi.dev NEXT_PUBLIC_REPO_URL=https://github.com/you/nexapi pnpm website:build`
@@ -74,11 +74,11 @@ npm start            # terminal 2: the example program
 
 ## Troubleshooting
 
-| Problem | Fix |
-| ------- | --- |
-| `Can't resolve '@/generated/search-index.json'` | The generated files are missing. Run `pnpm website:dev` (it creates them) or `node website/scripts/prepare-downloads.mjs`. |
-| `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND` with `%20` in the path | Old scripts; use the current zip. Spaces in folder names are supported. |
-| `Cannot find module @nexapi/core` | Run `pnpm install` at the repo root, not inside `website/` only. |
-| Port 3000 busy | `PORT=3001 pnpm website:dev` (Windows PowerShell: `$env:PORT=3001; pnpm website:dev`) |
-| Build fails on `./types.js` imports | Use the provided scripts: they call `next ... --webpack`, which maps `.js` imports to `.ts`. |
-| Packages not found on npm | They are not published yet. Use the tarballs, the starter zip or the workspace. |
+| Problem                                                      | Fix                                                                                                                        |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `Can't resolve '@/generated/search-index.json'`              | The generated files are missing. Run `pnpm website:dev` (it creates them) or `node website/scripts/prepare-downloads.mjs`. |
+| `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND` with `%20` in the path | Old scripts; use the current zip. Spaces in folder names are supported.                                                    |
+| `Cannot find module @nexapi/core`                            | Run `pnpm install` at the repo root, not inside `website/` only.                                                           |
+| Port 3000 busy                                               | `PORT=3001 pnpm website:dev` (Windows PowerShell: `$env:PORT=3001; pnpm website:dev`)                                      |
+| Build fails on `./types.js` imports                          | Use the provided scripts: they call `next ... --webpack`, which maps `.js` imports to `.ts`.                               |
+| Packages not found on npm                                    | They are not published yet. Use the tarballs, the starter zip or the workspace.                                            |
