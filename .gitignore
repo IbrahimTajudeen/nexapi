@@ -1,0 +1,15 @@
+node_modules
+dist
+*.tsbuildinfo
+coverage
+.DS_Store
+benchmarks/results/
+
+# website build output and generated downloads
+website/.next/
+website/out/
+website/.stage/
+website/public/downloads/
+website/public/install.sh
+website/next-env.d.ts
+website/*.tsbuildinfo

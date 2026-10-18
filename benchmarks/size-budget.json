@@ -1,0 +1,4 @@
+{
+  "nexapi: createNexClient (HTTP + QueryClient)": 10240,
+  "nexapi: React app (client + useQuery + provider)": 8192
+}

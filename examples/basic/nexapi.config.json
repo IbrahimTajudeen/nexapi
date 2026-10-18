@@ -1,0 +1,12 @@
+{
+  "input": "../../fixtures/openapi/basic.yaml",
+  "output": "generated",
+  "overrides": {
+    "operations": {
+      "listUsers": {
+        "path": ["users", "list"]
+      }
+    }
+  },
+  "validation": true
+}

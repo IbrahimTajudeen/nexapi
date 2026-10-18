@@ -1,0 +1,79 @@
+openapi: 3.0.3
+info:
+  title: Pet shop
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      summary: List pets
+      parameters:
+        - { name: species, in: query, schema: { $ref: "#/components/schemas/Species" } }
+      responses:
+        "200":
+          description: All matching pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Pet" }
+    post:
+      operationId: createPet
+      summary: Add a pet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NewPet" }
+      responses:
+        "201":
+          description: The new pet
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Pet" }
+        "422":
+          description: Invalid pet
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+  /pets/{id}:
+    get:
+      operationId: getPet
+      summary: Fetch one pet
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: The pet
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Pet" }
+        "404":
+          description: No such pet
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+components:
+  schemas:
+    Species:
+      type: string
+      enum: [cat, dog]
+    Pet:
+      type: object
+      required: [id, name, species]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        species: { $ref: "#/components/schemas/Species" }
+    NewPet:
+      type: object
+      required: [name, species]
+      properties:
+        name: { type: string }
+        species: { $ref: "#/components/schemas/Species" }
+    ApiError:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }

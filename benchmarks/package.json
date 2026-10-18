@@ -1,0 +1,24 @@
+{
+  "name": "@nexapi/benchmarks",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "bench": "node --expose-gc run.mjs",
+    "bench:react": "node --expose-gc react.mjs",
+    "bench:memory": "node --expose-gc memory.mjs",
+    "size": "node size.mjs"
+  },
+  "dependencies": {
+    "@nexapi/core": "workspace:*",
+    "@tanstack/query-core": "5.104.2",
+    "@nexapi/react": "workspace:*",
+    "@tanstack/react-query": "5.104.2",
+    "@reduxjs/toolkit": "2.13.0",
+    "react-redux": "9.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "jsdom": "30.1.2",
+    "esbuild": "0.28.2"
+  }
+}

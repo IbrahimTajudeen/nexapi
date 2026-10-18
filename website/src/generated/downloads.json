@@ -1,0 +1,47 @@
+{
+  "version": "0.0.1",
+  "files": [
+    {
+      "file": "nexapi-cli-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 5425,
+      "sha256": "5f1fc4f7c0169ced4168fc93801876975f7899a5b0e5eb64aeb01e3b84d59295"
+    },
+    {
+      "file": "nexapi-codegen-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 31353,
+      "sha256": "3667f7a1ff3f14d4d880a16dd041293f2423c36372a2981d5c2c5440b3ae1d5a"
+    },
+    {
+      "file": "nexapi-core-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 64001,
+      "sha256": "1eeb5b8608e705bcd91bdefe324f66b5ef8971de88069e4353d10b49b7c7d1b1"
+    },
+    {
+      "file": "nexapi-devtools-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 8599,
+      "sha256": "ccc90ddce42b5c2d0d02b94f71cdb87c7857b00ec0b60d79d59e8ddf79cf6839"
+    },
+    {
+      "file": "nexapi-react-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 7951,
+      "sha256": "9c4df6344f85b18e63d5d42cabd70800cc1e902dcd76b219dc875155925a538e"
+    },
+    {
+      "file": "nexapi-source-0.0.1.zip",
+      "kind": "source",
+      "bytes": 7758796,
+      "sha256": "933d862c9325750a21ed304b6aa73e14c75907a0985189626eb79167568c9c74"
+    },
+    {
+      "file": "nexapi-starter-0.0.1.zip",
+      "kind": "starter",
+      "bytes": 106171,
+      "sha256": "43fe04c51d71b14602f9114c0a189b789fdcac7046cb59e8a34718d9102c02e1"
+    }
+  ]
+}
