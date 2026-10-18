@@ -1,4 +1,4 @@
-export interface NexApiConfig {
+export interface NyxApiConfig {
   /** Local OpenAPI file (JSON or YAML), relative to the config file. Remote URLs go through `--input`. */
   input?: string;
   /** Output directory, relative to the config file. */
@@ -39,7 +39,7 @@ export interface ResolvedConfig {
   validation: boolean;
 }
 
-export function validateConfig(raw: unknown): { config: NexApiConfig; problems: string[] } {
+export function validateConfig(raw: unknown): { config: NyxApiConfig; problems: string[] } {
   const problems: string[] = [];
   if (typeof raw !== "object" || raw === null || Array.isArray(raw))
     return { config: {}, problems: ["config must be a JSON object"] };
@@ -103,7 +103,7 @@ export function validateConfig(raw: unknown): { config: NexApiConfig; problems: 
   return { config: c, problems };
 }
 
-export function resolveConfig(config: NexApiConfig): ResolvedConfig {
+export function resolveConfig(config: NyxApiConfig): ResolvedConfig {
   return {
     overrides: config.overrides?.operations ?? {},
     exclude: new Set(config.exclude ?? []),

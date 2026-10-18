@@ -1,4 +1,4 @@
-# Setting up NexAPI and the website
+# Setting up NyxAPI and the website
 
 Everything below was run from a clean unzip, in a folder whose path contains spaces.
 
@@ -26,12 +26,12 @@ pnpm may print a notice about ignored build scripts. It is not an error; nothing
 pnpm website:dev
 ```
 
-(or `pnpm --filter @nexapi/website dev`, or `pnpm dev` inside `website/`).
+(or `pnpm --filter @nyxapi/website dev`, or `pnpm dev` inside `website/`).
 
 The first start takes about a minute. It first runs `website/scripts/prepare-downloads.mjs`, which:
 
 1. builds all packages (`pnpm build`),
-2. packs `@nexapi/*` tarballs, the source zip and the starter project zip into `website/public/downloads`,
+2. packs `@nyxapi/*` tarballs, the source zip and the starter project zip into `website/public/downloads`,
 3. writes `website/public/install.sh` and the checksum file,
 4. writes `website/src/generated/search-index.json` and `downloads.json`.
 
@@ -47,12 +47,12 @@ npx serve website/out   # preview it
 
 Set these before building for production:
 
-| Variable               | Purpose                                                       |
-| ---------------------- | ------------------------------------------------------------- |
-| `NEXT_PUBLIC_REPO_URL` | GitHub link shown in header, footer, Contribute page          |
+| Variable               | Purpose                                                         |
+| ---------------------- | --------------------------------------------------------------- |
+| `NEXT_PUBLIC_REPO_URL` | GitHub link shown in header, footer, Contribute page            |
 | `NEXT_PUBLIC_SITE_URL` | Public origin, used in the `curl` install commands and metadata |
 
-Example: `NEXT_PUBLIC_SITE_URL=https://nexapi.dev NEXT_PUBLIC_REPO_URL=https://github.com/you/nexapi pnpm website:build`
+Example: `NEXT_PUBLIC_SITE_URL=https://nyxapi.dev NEXT_PUBLIC_REPO_URL=https://github.com/you/nyxapi pnpm website:build`
 
 ## 4. Verify the whole repo
 
@@ -64,8 +64,8 @@ pnpm smoke:pack   # installs the packed tarballs into an empty project and runs 
 ## 5. Try the starter project (what beginners download)
 
 ```bash
-unzip website/public/downloads/nexapi-starter-0.0.1.zip -d /tmp/try
-cd /tmp/try/nexapi-starter
+unzip website/public/downloads/nyxapi-starter-0.0.1.zip -d /tmp/try
+cd /tmp/try/nyxapi-starter
 npm install
 npm run generate     # OpenAPI -> typed client in src/api
 npm run api          # terminal 1: pet shop API on :3000
@@ -74,11 +74,11 @@ npm start            # terminal 2: the example program
 
 ## Troubleshooting
 
-| Problem | Fix |
-| ------- | --- |
-| `Can't resolve '@/generated/search-index.json'` | The generated files are missing. Run `pnpm website:dev` (it creates them) or `node website/scripts/prepare-downloads.mjs`. |
-| `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND` with `%20` in the path | Old scripts; use the current zip. Spaces in folder names are supported. |
-| `Cannot find module @nexapi/core` | Run `pnpm install` at the repo root, not inside `website/` only. |
-| Port 3000 busy | `PORT=3001 pnpm website:dev` (Windows PowerShell: `$env:PORT=3001; pnpm website:dev`) |
-| Build fails on `./types.js` imports | Use the provided scripts: they call `next ... --webpack`, which maps `.js` imports to `.ts`. |
-| Packages not found on npm | They are not published yet. Use the tarballs, the starter zip or the workspace. |
+| Problem                                                      | Fix                                                                                                                        |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `Can't resolve '@/generated/search-index.json'`              | The generated files are missing. Run `pnpm website:dev` (it creates them) or `node website/scripts/prepare-downloads.mjs`. |
+| `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND` with `%20` in the path | Old scripts; use the current zip. Spaces in folder names are supported.                                                    |
+| `Cannot find module @nyxapi/core`                            | Run `pnpm install` at the repo root, not inside `website/` only.                                                           |
+| Port 3000 busy                                               | `PORT=3001 pnpm website:dev` (Windows PowerShell: `$env:PORT=3001; pnpm website:dev`)                                      |
+| Build fails on `./types.js` imports                          | Use the provided scripts: they call `next ... --webpack`, which maps `.js` imports to `.ts`.                               |
+| Packages not found on npm                                    | They are not published yet. Use the tarballs, the starter zip or the workspace.                                            |

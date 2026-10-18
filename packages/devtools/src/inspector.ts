@@ -1,4 +1,4 @@
-import type { Query, QueryClient } from "@nexapi/core";
+import type { Query, QueryClient } from "@nyxapi/core";
 
 export interface QueryInfo {
   readonly hash: string;

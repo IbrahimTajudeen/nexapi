@@ -10,12 +10,12 @@ export default function Page() {
     <Doc
       href="/docs/adapters/"
       title="NestJS and ASP.NET Core"
-      lede="Both frameworks already publish an OpenAPI document. NexAPI generates from that, so there is nothing extra to install on your server."
+      lede="Both frameworks already publish an OpenAPI document. NyxAPI generates from that, so there is nothing extra to install on your server."
     >
       <p>
         An adapter that read your controllers directly would have to copy each framework&apos;s
         routing and validation rules and would drift from them. The OpenAPI output is the
-        framework&apos;s own statement of its contract, so that is what NexAPI reads.
+        framework&apos;s own statement of its contract, so that is what NyxAPI reads.
       </p>
 
       <H2>NestJS</H2>
@@ -35,7 +35,7 @@ await app.close();`}</Code>
       <Code
         lang="bash"
         title="terminal"
-      >{`npx nexapi generate --input openapi.json --output src/api`}</Code>
+      >{`npx nyxapi generate --input openapi.json --output src/api`}</Code>
       <Callout kind="note" title="Tested on real output">
         The NestJS fixture in the repository was produced by running <code>@nestjs/swagger</code> 11
         on a sample app, and the generated client is type-checked and drift-checked in CI.
@@ -65,10 +65,10 @@ await app.close();`}</Code>
         lang="bash"
         title="terminal"
       >{`dotnet swagger tofile --output openapi.json ./bin/Release/net9.0/Api.dll v1
-npx nexapi generate --input openapi.json --output src/api --config nexapi.config.json`}</Code>
+npx nyxapi generate --input openapi.json --output src/api --config nyxapi.config.json`}</Code>
       <Code
         lang="json"
-        title="nexapi.config.json"
+        title="nyxapi.config.json"
       >{`{ "naming": { "stripPathPrefix": "/api" }, "validation": true }`}</Code>
       <Callout kind="warn" title="About the ASP.NET fixture">
         The development environment had no .NET SDK, so the bundled ASP.NET fixture is{" "}
@@ -102,7 +102,7 @@ npx nexapi generate --input openapi.json --output src/api --config nexapi.config
       <H2>Any other backend</H2>
       <p>
         If your server can produce an OpenAPI 3.0 or 3.1 document, you can try it. Run{" "}
-        <code>nexapi validate</code> first to see anything NexAPI cannot represent.
+        <code>nyxapi validate</code> first to see anything NyxAPI cannot represent.
       </p>
     </Doc>
   );

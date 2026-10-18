@@ -45,11 +45,11 @@ components:
         code: { type: string }
         message: { type: string }`;
 
-const MAIN = `import { createNexClient, HttpError } from "@nexapi/core";
+const MAIN = `import { createNyxClient, HttpError } from "@nyxapi/core";
 import { createApi } from "./api/index.js";
 
 // A stand-in server, so this file runs with no backend. Delete \`transport\` to use a real one.
-const nex = createNexClient({
+const nyx = createNyxClient({
   baseUrl: "https://api.example.com",
   transport: async (request) => {
     const { pathname } = new URL(request.url);
@@ -57,7 +57,7 @@ const nex = createNexClient({
     return Response.json({ code: "not_found", message: "No such pet" }, { status: 404 });
   },
 });
-const api = createApi(nex);
+const api = createApi(nyx);
 
 const pet = await api.pets.byId("1").get();
 console.log(pet.name, pet.species); // Miso cat
@@ -88,10 +88,10 @@ npm init -y
 npm pkg set type=module`}</Code>
         </li>
         <li>
-          <strong>Install NexAPI.</strong> See <Link href="/docs/installation/">Installation</Link>{" "}
+          <strong>Install NyxAPI.</strong> See <Link href="/docs/installation/">Installation</Link>{" "}
           if the packages are not on the registry yet.
-          <PackageInstall packages="@nexapi/core" />
-          <PackageInstall packages="@nexapi/cli tsx typescript" dev />
+          <PackageInstall packages="@nyxapi/core" />
+          <PackageInstall packages="@nyxapi/cli tsx typescript" dev />
         </li>
         <li>
           <strong>Save a schema.</strong> This is a minimal OpenAPI file. Yours will usually come
@@ -105,7 +105,7 @@ npm pkg set type=module`}</Code>
           <Code
             lang="bash"
             title="terminal"
-          >{`npx nexapi generate --input openapi.yaml --output src/api`}</Code>
+          >{`npx nyxapi generate --input openapi.yaml --output src/api`}</Code>
           You now have <code>src/api/index.ts</code>, <code>client.ts</code> and{" "}
           <code>types.ts</code>. Open <code>types.ts</code>: you will find a <code>Pet</code> type
           that matches your schema.
@@ -156,7 +156,7 @@ No such pet`}</Code>
       <Code
         lang="bash"
         title="terminal"
-      >{`npx nexapi generate --input openapi.yaml --output src/api --check`}</Code>
+      >{`npx nyxapi generate --input openapi.yaml --output src/api --check`}</Code>
     </Doc>
   );
 }

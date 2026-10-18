@@ -1,12 +1,12 @@
 import { parse } from "yaml";
-import { resolveConfig, validateConfig, type NexApiConfig } from "./config.js";
+import { resolveConfig, validateConfig, type NyxApiConfig } from "./config.js";
 import { emit, type GeneratedFile } from "./emit.js";
 import { GenerationError, type ApiModel, type Diagnostic } from "./ir.js";
 import { buildApiModel } from "./model.js";
 import { buildTree } from "./tree.js";
 
 export * from "./ir.js";
-export { validateConfig, resolveConfig, type NexApiConfig, type ResolvedConfig } from "./config.js";
+export { validateConfig, resolveConfig, type NyxApiConfig, type ResolvedConfig } from "./config.js";
 export { buildApiModel } from "./model.js";
 export type { GeneratedFile } from "./emit.js";
 export { toCamel, toPascal, typeName, synthesizeOperationId } from "./naming.js";
@@ -36,7 +36,7 @@ export function parseSchemaText(text: string, sourceName = "schema"): unknown {
 /** Validate a schema without generating. Returns all diagnostics (errors included). */
 export function validateSchema(
   text: string,
-  config: NexApiConfig = {},
+  config: NyxApiConfig = {},
   sourceName?: string,
 ): { model: ApiModel; diagnostics: Diagnostic[] } {
   const doc = parseSchemaText(text, sourceName);
@@ -58,7 +58,7 @@ export function validateSchema(
  */
 export function generate(
   text: string,
-  config: NexApiConfig = {},
+  config: NyxApiConfig = {},
   sourceName?: string,
 ): GenerateResult {
   const { problems } = validateConfig(config);

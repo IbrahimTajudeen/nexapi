@@ -1,7 +1,7 @@
 {
-  "name": "@nexapi/core",
+  "name": "@nyxapi/core",
   "version": "0.0.1",
-  "description": "Framework-independent query cache, mutation engine and Fetch runtime for NexAPI",
+  "description": "Framework-independent query cache, mutation engine and Fetch runtime for NyxAPI",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,

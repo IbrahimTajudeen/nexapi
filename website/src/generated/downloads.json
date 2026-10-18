@@ -1,0 +1,47 @@
+{
+  "version": "0.0.1",
+  "files": [
+    {
+      "file": "nyxapi-cli-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 5426,
+      "sha256": "a8c5819e008fc2c54646f75c7082df03ef9675dc620d299e18789d93d0523edd"
+    },
+    {
+      "file": "nyxapi-codegen-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 31355,
+      "sha256": "aa2d97e74e7a50585139732b83ab4a754e368a593e74059c96e8c66ad189ce60"
+    },
+    {
+      "file": "nyxapi-core-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 64261,
+      "sha256": "1ea5d0cee8689346d1e527044a4b0e3243553cceda311cb209d4b94c2aaee109"
+    },
+    {
+      "file": "nyxapi-devtools-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 8601,
+      "sha256": "0e9dfcbacff4ddda127162f9a6cb3c355a7578b3e4bb97ecf75266bbeeebdb58"
+    },
+    {
+      "file": "nyxapi-react-0.0.1.tgz",
+      "kind": "package",
+      "bytes": 7952,
+      "sha256": "eabe0e1fbfaf97d36e062ba2b8cdd29037c39c83ad6f7e7c0112305e7c369db1"
+    },
+    {
+      "file": "nyxapi-source-0.0.1.zip",
+      "kind": "source",
+      "bytes": 5971341,
+      "sha256": "a9b5e9c7b4de1f50ede508f6851990802f33100a13ddb2a083d91503709b8841"
+    },
+    {
+      "file": "nyxapi-starter-0.0.1.zip",
+      "kind": "starter",
+      "bytes": 106645,
+      "sha256": "493565344ab43a02c93a6d914cb516a3fbc38d2ad08680b1a71129adff6c7d77"
+    }
+  ]
+}

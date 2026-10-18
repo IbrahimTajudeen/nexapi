@@ -1,6 +1,6 @@
 /** Compile-time tests of the types produced by the code generator for the example schema. */
 import { expectTypeOf } from "vitest";
-import { HttpError, createNexClient, type EndpointError } from "@nexapi/core";
+import { HttpError, createNyxClient, type EndpointError } from "@nyxapi/core";
 import {
   createApi,
   type ApiError,
@@ -13,7 +13,7 @@ import {
   type User,
 } from "../examples/basic/generated/index.js";
 
-const api = createApi(createNexClient({ baseUrl: "https://api.test" }));
+const api = createApi(createNyxClient({ baseUrl: "https://api.test" }));
 
 expectTypeOf(api.users.byId("42").get()).toEqualTypeOf<Promise<User>>();
 expectTypeOf(api.auth.login.post({ email: "a", password: "b" })).toEqualTypeOf<Promise<Session>>();

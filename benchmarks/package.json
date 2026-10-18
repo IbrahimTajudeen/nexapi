@@ -1,5 +1,5 @@
 {
-  "name": "@nexapi/benchmarks",
+  "name": "@nyxapi/benchmarks",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,9 +10,9 @@
     "size": "node size.mjs"
   },
   "dependencies": {
-    "@nexapi/core": "workspace:*",
+    "@nyxapi/core": "workspace:*",
     "@tanstack/query-core": "5.104.2",
-    "@nexapi/react": "workspace:*",
+    "@nyxapi/react": "workspace:*",
     "@tanstack/react-query": "5.104.2",
     "@reduxjs/toolkit": "2.13.0",
     "react-redux": "9.3.0",

@@ -15,7 +15,7 @@ export default function Page() {
       <Callout kind="warn" title="Read this before the numbers">
         <ul style={{ margin: 0 }}>
           <li>
-            NexAPI does <strong>less</strong> per operation than TanStack Query: no scheduler
+            NyxAPI does <strong>less</strong> per operation than TanStack Query: no scheduler
             batching, no tracked-property result proxies, structural sharing is opt-in, and there
             are no persisters. A faster number can simply mean fewer features.
           </li>
@@ -33,10 +33,10 @@ export default function Page() {
 
       <H2>Run them yourself</H2>
       <Code lang="bash" title="terminal">{`pnpm build
-pnpm --filter @nexapi/benchmarks bench           # headless engine comparison
-pnpm --filter @nexapi/benchmarks bench:react     # React, jsdom, three libraries
-pnpm --filter @nexapi/benchmarks bench:memory    # retained heap, fresh process each
-pnpm --filter @nexapi/benchmarks size            # bundle size and budgets`}</Code>
+pnpm --filter @nyxapi/benchmarks bench           # headless engine comparison
+pnpm --filter @nyxapi/benchmarks bench:react     # React, jsdom, three libraries
+pnpm --filter @nyxapi/benchmarks bench:memory    # retained heap, fresh process each
+pnpm --filter @nyxapi/benchmarks size            # bundle size and budgets`}</Code>
       <p>
         Each result file records the Node and V8 versions, OS, CPU, library versions, cache policy
         and sample counts, so a number always travels with the conditions that produced it.
@@ -45,7 +45,7 @@ pnpm --filter @nexapi/benchmarks size            # bundle size and budgets`}</Co
       <H2>Method</H2>
       <ul>
         <li>
-          The headless benchmarks compare <code>@nexapi/core</code> with{" "}
+          The headless benchmarks compare <code>@nyxapi/core</code> with{" "}
           <code>@tanstack/query-core</code>, pinned, with no React and no network.
         </li>
         <li>
@@ -66,7 +66,7 @@ pnpm --filter @nexapi/benchmarks size            # bundle size and budgets`}</Co
       <H2>Headless engine</H2>
       <p>Per operation, lower is faster. Sample run:</p>
       <Table
-        head={["Scenario", "NexAPI", "TanStack Query"]}
+        head={["Scenario", "NyxAPI", "TanStack Query"]}
         rows={[
           ["Warm read, getData (key hashed each call)", "167 ns", "695 ns"],
           ["Warm read, fetchQuery on fresh data", "465 ns", "1.42 µs"],
@@ -77,7 +77,7 @@ pnpm --filter @nexapi/benchmarks size            # bundle size and budgets`}</Co
         ]}
       />
       <p>
-        The last row is not like for like: NexAPI notifies listeners synchronously, while TanStack
+        The last row is not like for like: NyxAPI notifies listeners synchronously, while TanStack
         batches through its scheduler.
       </p>
 
@@ -89,17 +89,17 @@ pnpm --filter @nexapi/benchmarks size            # bundle size and budgets`}</Co
       <Table
         head={["Scenario", "Library", "Mount", "One write", "Renders at mount"]}
         rows={[
-          ["Same key (1 request)", "NexAPI", "26 ms", "8.4 ms", "1000"],
+          ["Same key (1 request)", "NyxAPI", "26 ms", "8.4 ms", "1000"],
           ["Same key (1 request)", "TanStack Query", "46 ms", "19.6 ms", "1000"],
           ["Same key (1 request)", "RTK Query", "154 ms", "36.8 ms", "1500"],
-          ["Distinct keys (500 requests)", "NexAPI", "28 ms", "2.6 ms", "1000"],
+          ["Distinct keys (500 requests)", "NyxAPI", "28 ms", "2.6 ms", "1000"],
           ["Distinct keys (500 requests)", "TanStack Query", "157 ms", "3.1 ms", "1000"],
           ["Distinct keys (500 requests)", "RTK Query", "513 ms", "24.3 ms", "1500"],
         ]}
       />
       <p>
         RTK Query&apos;s update time includes its frame batching by design. This benchmark also
-        found a real redundant render in NexAPI on mount (an extra notification), which is fixed and
+        found a real redundant render in NyxAPI on mount (an extra notification), which is fixed and
         covered by a test.
       </p>
 
@@ -111,12 +111,12 @@ pnpm --filter @nexapi/benchmarks size            # bundle size and budgets`}</Co
       <Table
         head={["Library", "Bytes per cache entry", "Bytes per observer"]}
         rows={[
-          ["NexAPI", "1206", "624"],
+          ["NyxAPI", "1206", "624"],
           ["TanStack Query", "990", "1505"],
         ]}
       />
       <p>
-        NexAPI retained more per entry and less per observer in these runs. Neither is better; they
+        NyxAPI retained more per entry and less per observer in these runs. Neither is better; they
         trade differently.
       </p>
 
@@ -125,16 +125,16 @@ pnpm --filter @nexapi/benchmarks size            # bundle size and budgets`}</Co
       <Table
         head={["Entry", "Minified", "Gzip"]}
         rows={[
-          ["NexAPI: createNexClient (HTTP + QueryClient)", "24.4 KiB", "8.5 KiB"],
-          ["NexAPI: React app (client + useQuery + provider)", "19.2 KiB", "6.5 KiB"],
+          ["NyxAPI: createNyxClient (HTTP + QueryClient)", "24.4 KiB", "8.5 KiB"],
+          ["NyxAPI: React app (client + useQuery + provider)", "19.2 KiB", "6.5 KiB"],
           ["TanStack: query-core QueryClient", "23.9 KiB", "7.1 KiB"],
           ["TanStack: React app (client + useQuery + provider)", "32.2 KiB", "9.7 KiB"],
           ["RTK Query: React createApi + store", "73.4 KiB", "25.8 KiB"],
         ]}
       />
       <p>
-        The entries are not feature-equivalent. NexAPI&apos;s first row includes its HTTP client and
-        endpoint runtime, which TanStack Query does not have. NexAPI entries have budgets in CI that
+        The entries are not feature-equivalent. NyxAPI&apos;s first row includes its HTTP client and
+        endpoint runtime, which TanStack Query does not have. NyxAPI entries have budgets in CI that
         fail the build when exceeded.
       </p>
 

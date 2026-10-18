@@ -5,17 +5,17 @@ import { renderToPipeableStream, renderToString } from "react-dom/server";
 import { Writable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-  createNexClient,
+  createNyxClient,
   dehydrate,
   hydrate,
   keepPreviousData,
-  type NexClient,
+  type NyxClient,
   type QueryOptions,
   type Transport,
-} from "@nexapi/core";
+} from "@nyxapi/core";
 import { createApi } from "../../../examples/basic/generated/index.js";
 import {
-  NexProvider,
+  NyxProvider,
   useInfiniteQuery,
   useMutation,
   useQuery,
@@ -26,7 +26,7 @@ import {
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 interface Rig {
-  nex: NexClient;
+  nyx: NyxClient;
   api: ReturnType<typeof createApi>;
   requests: { method: string; path: string; signal: AbortSignal }[];
   users: Record<string, { id: string; name: string; role: "admin" | "member" }>;
@@ -41,7 +41,7 @@ function makeRig(): Rig {
       "2": { id: "2", name: "Linus", role: "member" },
     },
     delay: 0,
-    nex: undefined as never,
+    nyx: undefined as never,
     api: undefined as never,
   };
   const transport: Transport = async (req) => {
@@ -61,12 +61,12 @@ function makeRig(): Rig {
       ? Response.json(user)
       : Response.json({ code: "not_found", message: "x" }, { status: 404 });
   };
-  rig.nex = createNexClient({
+  rig.nyx = createNyxClient({
     baseUrl: "https://api.test/v1",
     transport,
     queryClient: { defaultOptions: { queries: { retry: false } } },
   });
-  rig.api = createApi(rig.nex);
+  rig.api = createApi(rig.nyx);
   return rig;
 }
 
@@ -187,7 +187,7 @@ describe("useQuery", () => {
     await render(<App show={0} />);
     await settle(5);
     expect(rig.requests[0]?.signal.aborted).toBe(true);
-    expect(rig.nex.queryClient.isFetching()).toBe(0);
+    expect(rig.nyx.queryClient.isFetching()).toBe(0);
   });
 
   it("always uses the latest queryFn closure (no stale closures)", async () => {
@@ -197,7 +197,7 @@ describe("useQuery", () => {
       const q = useQuery<string, Error>({
         queryKey: ["probe"],
         queryFn: () => (calls.push(label), Promise.resolve(label)),
-        queryClient: rig.nex.queryClient,
+        queryClient: rig.nyx.queryClient,
         staleTime: Infinity,
       });
       return <p>{q.data}</p>;
@@ -207,7 +207,7 @@ describe("useQuery", () => {
     expect(host.textContent).toBe("first");
     await render(<Probe label="second" />); // same key, new closure; fresh data → no refetch yet
     expect(calls).toEqual(["first"]);
-    await act(async () => rig.nex.queryClient.invalidateQueries(["probe"])); // e.g. triggered by a mutation
+    await act(async () => rig.nyx.queryClient.invalidateQueries(["probe"])); // e.g. triggered by a mutation
     await settle();
     expect(calls).toEqual(["first", "second"]);
     expect(host.textContent).toBe("second");
@@ -230,16 +230,16 @@ describe("useQuery", () => {
     expect(host.textContent).toBe("Ada");
     const settled = renders;
     rig.users["1"] = { id: "1", name: "Ada", role: "member" }; // different object, same selected name
-    await act(async () => rig.nex.queryClient.invalidateQueries());
+    await act(async () => rig.nyx.queryClient.invalidateQueries());
     await settle();
     expect(renders).toBe(settled); // fetchStatus flips and the identical selected value did not wake the component
     rig.users["1"] = { id: "1", name: "Grace", role: "member" };
-    await act(async () => rig.nex.queryClient.invalidateQueries());
+    await act(async () => rig.nyx.queryClient.invalidateQueries());
     await settle();
     expect(host.textContent).toBe("Grace");
   });
 
-  it("works with hand-written options through <NexProvider>, and refuses to guess a client", async () => {
+  it("works with hand-written options through <NyxProvider>, and refuses to guess a client", async () => {
     const rig = makeRig();
     const options: QueryOptions<string> = {
       queryKey: ["x"],
@@ -249,9 +249,9 @@ describe("useQuery", () => {
       return <p>{useQuery(options).data ?? "…"}</p>;
     }
     await render(
-      <NexProvider client={rig.nex.queryClient}>
+      <NyxProvider client={rig.nyx.queryClient}>
         <Plain />
-      </NexProvider>,
+      </NyxProvider>,
     );
     await settle();
     expect(host.textContent).toBe("from provider");
@@ -345,10 +345,10 @@ describe("server rendering", () => {
   it("hydrates a dehydrated server cache so the client renders data with no request", async () => {
     const server = makeRig();
     await server.api.users.byId("1").get.prefetch();
-    const payload = JSON.stringify(dehydrate(server.nex.queryClient)).replace(/</g, "\\u003c");
+    const payload = JSON.stringify(dehydrate(server.nyx.queryClient)).replace(/</g, "\\u003c");
 
     const browser = makeRig();
-    hydrate(browser.nex.queryClient, JSON.parse(payload));
+    hydrate(browser.nyx.queryClient, JSON.parse(payload));
     function User(): ReactElement {
       const q = useQuery(browser.api.users.byId("1").get.options(undefined, { staleTime: 60_000 }));
       return <p>{q.data?.name ?? "loading"}</p>;
@@ -389,7 +389,7 @@ describe("useInfiniteQuery", () => {
           Promise.resolve({ n: pageParam, next: pageParam < 2 ? pageParam + 1 : null }),
         initialPageParam: 0,
         getNextPageParam: (last) => last.next,
-        queryClient: rig.nex.queryClient,
+        queryClient: rig.nyx.queryClient,
         retry: false,
       });
       fns.add(q.fetchNextPage);
@@ -465,7 +465,7 @@ describe("useSuspenseQuery", () => {
 
   it("does not suspend on cached data, even stale; refetches in the background", async () => {
     const rig = makeRig();
-    rig.nex.queryClient.buildQuery({
+    rig.nyx.queryClient.buildQuery({
       queryKey: rig.api.users.byId("1").get.key(),
       initialData: { id: "1", name: "Cached", role: "admin" },
       initialDataUpdatedAt: 1, // long ago, so stale
@@ -536,7 +536,7 @@ describe("useSuspenseQuery", () => {
     delete rig.users["1"]; // the next refetch 404s
     await act(
       async () =>
-        void (await rig.nex.queryClient.refetchQueries({ queryKey: [] }).catch(() => undefined)),
+        void (await rig.nyx.queryClient.refetchQueries({ queryKey: [] }).catch(() => undefined)),
     );
     await settle(30);
     expect(host.textContent).toBe("Ada");
@@ -562,11 +562,11 @@ describe("useSuspenseQuery", () => {
         },
       });
       const stream = renderToPipeableStream(
-        <NexProvider client={rig.nex.queryClient}>
+        <NyxProvider client={rig.nyx.queryClient}>
           <Suspense fallback={<i>loading</i>}>
             <User />
           </Suspense>
-        </NexProvider>,
+        </NyxProvider>,
         { onAllReady: () => stream.pipe(sink), onError: reject },
       );
     });
@@ -592,7 +592,7 @@ describe("useSuspenseInfiniteQuery", () => {
     },
     initialPageParam: 0,
     getNextPageParam: (last) => last.next,
-    queryClient: rig.nex.queryClient,
+    queryClient: rig.nyx.queryClient,
     retry: false,
   });
 
@@ -648,7 +648,7 @@ describe("useSuspenseInfiniteQuery", () => {
     expect(calls).toEqual([0]);
     fail.on = false;
     await act(async () => {
-      void rig.nex.queryClient.invalidateQueries({ queryKey: ["suspense-feed"] });
+      void rig.nyx.queryClient.invalidateQueries({ queryKey: ["suspense-feed"] });
       host.querySelector("button")?.click();
     });
     await settle(60);

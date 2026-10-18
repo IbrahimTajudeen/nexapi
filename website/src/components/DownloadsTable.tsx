@@ -3,7 +3,7 @@ import data from "@/generated/downloads.json";
 const DESCRIPTION: Record<string, string> = {
   core: "HTTP client, query cache and mutations",
   codegen: "OpenAPI to TypeScript generator",
-  cli: "The nexapi command",
+  cli: "The nyxapi command",
   react: "React hooks",
   devtools: "Cache inspector and React panel",
 };
@@ -28,7 +28,7 @@ export function DownloadsTable() {
         </thead>
         <tbody>
           {data.files.map((f) => {
-            const pkg = /^nexapi-([a-z]+)-/.exec(f.file)?.[1] ?? "";
+            const pkg = /^nyxapi-([a-z]+)-/.exec(f.file)?.[1] ?? "";
             return (
               <tr key={f.file}>
                 <td>

@@ -10,9 +10,9 @@ export default function Page() {
     <Doc
       href="/docs/security/"
       title="Security"
-      lede="NexAPI is built so that the easy way to use it is also the safe way. Here is what it does for you, and what is still your job."
+      lede="NyxAPI is built so that the easy way to use it is also the safe way. Here is what it does for you, and what is still your job."
     >
-      <H2>What NexAPI does</H2>
+      <H2>What NyxAPI does</H2>
       <ul>
         <li>
           <strong>The origin is pinned.</strong> Every request goes to the origin of your{" "}
@@ -58,7 +58,7 @@ export default function Page() {
         let one visitor&apos;s cached data reach another.
       </Callout>
       <Code lang="ts">{`// per request, not at module scope
-const nex = createNexClient({ baseUrl, getToken: () => session.token });`}</Code>
+const nyx = createNyxClient({ baseUrl, getToken: () => session.token });`}</Code>
       <p>
         When you embed dehydrated state in HTML, escape <code>&lt;</code> as shown in the{" "}
         <a href="/docs/react/">React guide</a> so the data cannot close a script tag.
@@ -69,8 +69,8 @@ const nex = createNexClient({ baseUrl, getToken: () => session.token });`}</Code
         Browsers do not let scripts set a <code>Cookie</code> header. For cookie sessions, set the
         fetch credentials mode:
       </p>
-      <Code lang="ts">{`createNexClient({ baseUrl, credentials: "include" }); // cross-origin API with CORS credentials
-createNexClient({ baseUrl, credentials: "same-origin" });`}</Code>
+      <Code lang="ts">{`createNyxClient({ baseUrl, credentials: "include" }); // cross-origin API with CORS credentials
+createNyxClient({ baseUrl, credentials: "same-origin" });`}</Code>
       <p>
         The mode applies only to the pinned origin. Outside a browser, send a cookie yourself with
         the client&apos;s <code>headers</code> option.

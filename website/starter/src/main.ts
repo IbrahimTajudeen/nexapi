@@ -1,9 +1,9 @@
-import { createNexClient, HttpError } from "@nexapi/core";
+import { createNyxClient, HttpError } from "@nyxapi/core";
 import { createApi } from "./api/index.js";
 
 // Count the requests that really leave this program, so you can see what the cache saves.
 let requestsSent = 0;
-const nex = createNexClient({
+const nyx = createNyxClient({
   baseUrl: process.env.API_URL ?? "http://localhost:3000",
   middleware: [
     async (request, next) => {
@@ -12,7 +12,7 @@ const nex = createNexClient({
     },
   ],
 });
-const api = createApi(nex);
+const api = createApi(nyx);
 
 console.log("1. List all pets");
 console.log(await api.pets.get());
@@ -36,14 +36,14 @@ try {
 console.log("\n5. Five callers ask for the same pet at once");
 requestsSent = 0;
 const options = api.pets.byId(created.id).get.options();
-await Promise.all(Array.from({ length: 5 }, () => nex.queryClient.fetchQuery(options)));
+await Promise.all(Array.from({ length: 5 }, () => nyx.queryClient.fetchQuery(options)));
 console.log("Requests sent:", requestsSent, "(not 5)");
 
 console.log("\n6. Ask again with staleTime, so the cache answers");
 requestsSent = 0;
 const fresh = api.pets.byId("1").get.options(undefined, { staleTime: 60_000 });
-await nex.queryClient.fetchQuery(fresh);
-await nex.queryClient.fetchQuery(fresh);
+await nyx.queryClient.fetchQuery(fresh);
+await nyx.queryClient.fetchQuery(fresh);
 console.log(
   "Requests sent:",
   requestsSent,

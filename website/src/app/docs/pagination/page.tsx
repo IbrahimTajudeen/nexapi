@@ -62,7 +62,7 @@ export default function Page() {
   queryFn: ({ pageParam, signal }) =>
     api.users.list.get({ query: { page: pageParam, limit: 20 }, signal }),
   getNextPageParam: (last, all) => (all.length * 20 < last.total ? all.length + 1 : undefined),
-  queryClient: nex.queryClient,
+  queryClient: nyx.queryClient,
 });
 
 pages.data?.pages.flatMap((p) => p.items);

@@ -9,14 +9,14 @@ import {
   toPascal,
   typeName,
   validateSchema,
-  type NexApiConfig,
+  type NyxApiConfig,
 } from "../src/index.js";
 
 const fixture = readFileSync(
   new URL("../../../fixtures/openapi/basic.yaml", import.meta.url),
   "utf8",
 );
-const config: NexApiConfig = {
+const config: NyxApiConfig = {
   overrides: { operations: { listUsers: { path: ["users", "list"] } } },
 };
 
@@ -26,7 +26,7 @@ const doc = (paths: string, schemas = ""): string =>
 const op = (extra = ""): string =>
   `      responses:\n        "200":\n          description: ok\n          content:\n            application/json:\n              schema: { type: string }\n${extra}`;
 
-function errorsOf(text: string, cfg: NexApiConfig = {}): string[] {
+function errorsOf(text: string, cfg: NyxApiConfig = {}): string[] {
   try {
     generate(text, cfg);
     return [];
@@ -107,7 +107,7 @@ describe("generate: the basic fixture", () => {
     expect(types).toContain("role: Role;"); // required
     expect(types).toContain("export type DeleteUserData = void;");
     expect(types).toContain("export type LoginErrorBody = ErrorCase<401, ApiError>;");
-    expect(types).toContain('import type { ErrorCase } from "@nexapi/core";');
+    expect(types).toContain('import type { ErrorCase } from "@nyxapi/core";');
     expect(types).toContain("export type GetUserErrorBody = ErrorCase<404, ApiError>;");
     expect(types).toMatch(
       /export interface ListUsersRequest \{\n {2}query\?: \{\n[\s\S]*role\?: Role\[\];/,

@@ -8,13 +8,13 @@ import { SITE_URL } from "@/site";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "NexAPI: typed API clients generated from your schema",
-    template: "%s · NexAPI",
+    default: "NyxAPI: typed API clients generated from your schema",
+    template: "%s · NyxAPI",
   },
   description:
-    "NexAPI turns an OpenAPI schema into a fluent, fully typed TypeScript client, with a built-in query and mutation engine and a React adapter. Open source.",
+    "NyxAPI turns an OpenAPI schema into a fluent, fully typed TypeScript client, with a built-in query and mutation engine and a React adapter. Open source.",
   openGraph: {
-    title: "NexAPI",
+    title: "NyxAPI",
     description:
       "Typed API clients generated from your schema, with caching built in. Open source.",
     type: "website",

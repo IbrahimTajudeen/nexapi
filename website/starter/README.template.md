@@ -1,12 +1,12 @@
-# NexAPI starter
+# NyxAPI starter
 
-A small project to try NexAPI on your own computer, with a pet shop API included.
+A small project to try NyxAPI on your own computer, with a pet shop API included.
 You need Node.js 22.12 or newer.
 
 ## Run it
 
 ```bash
-npm install            # installs NexAPI from the files in ./vendor
+npm install            # installs NyxAPI from the files in ./vendor
 npm run generate       # reads openapi.yaml and writes the typed client to src/api
 npm run api            # starts the pet shop API on http://localhost:3000 (leave it running)
 ```
@@ -35,8 +35,8 @@ showing that identical requests are shared and cached.
 | File                 | What it is                                             |
 | -------------------- | ------------------------------------------------------ |
 | `openapi.yaml`       | The API description. The one source of truth.          |
-| `nexapi.config.json` | Generator settings.                                    |
+| `nyxapi.config.json` | Generator settings.                                    |
 | `server.mjs`         | The pet shop API (plain Node, no dependencies).        |
 | `src/main.ts`        | Your program, using the generated client.              |
 | `src/api/`           | Generated. Do not edit; run `npm run generate`.        |
-| `vendor/`            | NexAPI **VERSION** packages, so no registry is needed. |
+| `vendor/`            | NyxAPI **VERSION** packages, so no registry is needed. |

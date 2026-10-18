@@ -15,7 +15,7 @@ export const EXAMPLES = {
     `
 // Five components ask for the same user at once.
 const options = api.users.byId("1").get.options();
-const fetchUser = () => nex.queryClient.fetchQuery(options);
+const fetchUser = () => nyx.queryClient.fetchQuery(options);
 const users = await Promise.all([1, 2, 3, 4, 5].map(fetchUser));
 log(users[0].name, "was shared by", users.length, "callers");
 log("Requests sent:", server.requestCount());
@@ -74,12 +74,12 @@ try {
     `
 // staleTime: how long fetched data counts as fresh.
 const options = api.users.byId("1").get.options(undefined, { staleTime: 60_000 });
-await nex.queryClient.fetchQuery(options);
-await nex.queryClient.fetchQuery(options); // fresh: answered from the cache
+await nyx.queryClient.fetchQuery(options);
+await nyx.queryClient.fetchQuery(options); // fresh: answered from the cache
 log("Requests after two fetches:", server.requestCount());
 
 await api.users.byId("1").get.invalidate(); // mark it stale
-await nex.queryClient.fetchQuery(options);
+await nyx.queryClient.fetchQuery(options);
 log("Requests after invalidating:", server.requestCount());
 `,
     ["Requests after two fetches: 1", "Requests after invalidating: 2"],
@@ -90,7 +90,7 @@ log("Requests after invalidating:", server.requestCount());
 // prefetch() fills the cache; getData() reads it without any request.
 await api.users.byId("2").get.prefetch();
 const before = server.requestCount();
-const cached = nex.queryClient.getData(api.users.byId("2").get.key());
+const cached = nyx.queryClient.getData(api.users.byId("2").get.key());
 log("Read from cache:", cached.name);
 log("Extra requests for the read:", server.requestCount() - before);
 `,
@@ -99,12 +99,12 @@ log("Extra requests for the read:", server.requestCount() - before);
 
   optimistic: ex(
     `
-const qc = nex.queryClient;
+const qc = nyx.queryClient;
 const key = api.users.byId("1").get.key();
 await qc.fetchQuery(api.users.byId("1").get.options());
 
 const rename = api.users.byId("1").patch.options(undefined, {
-  // Show the change immediately. NexAPI undoes exactly this change if the request fails.
+  // Show the change immediately. NyxAPI undoes exactly this change if the request fails.
   onMutate: (patch, { optimistic }) => {
     optimistic(key, (old) => (old ? { ...old, ...patch } : old));
   },
@@ -126,7 +126,7 @@ log("After the server confirms:", qc.getData(key).name);
   rollback: ex(
     `
 // The server rejects an empty name (422), so the optimistic change is rolled back.
-const qc = nex.queryClient;
+const qc = nyx.queryClient;
 const key = api.users.byId("1").get.key();
 await qc.fetchQuery(api.users.byId("1").get.options());
 
@@ -156,7 +156,7 @@ log("Rolled back to:", qc.getData(key).name);
 server.failing = true;
 const options = api.users.byId("1").get.options(undefined, { retry: 2, retryDelay: 100 });
 try {
-  await nex.queryClient.fetchQuery(options);
+  await nyx.queryClient.fetchQuery(options);
 } catch (error) {
   log("Gave up after", server.requestCount(), "requests:", error.status, error.body.message);
 }
@@ -166,7 +166,7 @@ try {
 
   pagination: ex(
     `
-const qc = nex.queryClient;
+const qc = nyx.queryClient;
 const options = {
   queryKey: ["users", "paged"],
   staleTime: 60_000,
@@ -210,7 +210,7 @@ log(api.users.list.get.key({ query: { page: 2 } }));
 // What is in the cache right now?
 await api.users.byId("1").get.prefetch();
 await api.users.byId("2").get.prefetch();
-for (const query of nex.queryClient.findAll()) {
+for (const query of nyx.queryClient.findAll()) {
   log(JSON.stringify(query.key), query.state.status, "updated at", query.state.dataUpdatedAt > 0);
 }
 `,

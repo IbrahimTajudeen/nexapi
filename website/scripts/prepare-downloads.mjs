@@ -44,8 +44,8 @@ for (const name of PACKAGES) {
 for (const file of readdirSync(out).sort()) files.push({ file, kind: "package" });
 
 // Source archive: tracked-looking files only (no dependencies, build output or dev artifacts).
-const stage = mkdtempSync(join(tmpdir(), "nexapi-src-"));
-const srcDir = join(stage, "nexapi");
+const stage = mkdtempSync(join(tmpdir(), "nyxapi-src-"));
+const srcDir = join(stage, "nyxapi");
 mkdirSync(srcDir, { recursive: true });
 const skip = new Set([
   "node_modules",
@@ -71,15 +71,15 @@ cpSync(repo, srcDir, {
     );
   },
 });
-const zip = `nexapi-source-${version}.zip`;
-zipDirectory(stage, "nexapi", join(out, zip));
+const zip = `nyxapi-source-${version}.zip`;
+zipDirectory(stage, "nyxapi", join(out, zip));
 rmSync(stage, { recursive: true, force: true });
 files.push({ file: zip, kind: "source" });
 
-// Starter project for beginners: self-contained, with the NexAPI tarballs vendored inside.
+// Starter project for beginners: self-contained, with the NyxAPI tarballs vendored inside.
 {
-  const stage = mkdtempSync(join(tmpdir(), "nexapi-starter-"));
-  const dir = join(stage, "nexapi-starter");
+  const stage = mkdtempSync(join(tmpdir(), "nyxapi-starter-"));
+  const dir = join(stage, "nyxapi-starter");
   cpSync(join(site, "starter"), dir, {
     recursive: true,
     filter: (src) => !src.endsWith("README.template.md"),
@@ -87,28 +87,28 @@ files.push({ file: zip, kind: "source" });
   mkdirSync(join(dir, "vendor"));
   for (const name of ["core", "codegen", "cli"])
     cpSync(
-      join(out, `nexapi-${name}-${version}.tgz`),
-      join(dir, "vendor", `nexapi-${name}-${version}.tgz`),
+      join(out, `nyxapi-${name}-${version}.tgz`),
+      join(dir, "vendor", `nyxapi-${name}-${version}.tgz`),
     );
-  const v = (n) => `file:./vendor/nexapi-${n}-${version}.tgz`;
+  const v = (n) => `file:./vendor/nyxapi-${n}-${version}.tgz`;
   writeFileSync(
     join(dir, "package.json"),
     JSON.stringify(
       {
-        name: "nexapi-starter",
+        name: "nyxapi-starter",
         private: true,
         type: "module",
         scripts: {
           api: "node server.mjs",
-          generate: "nexapi generate",
-          "generate:check": "nexapi generate --check",
+          generate: "nyxapi generate",
+          "generate:check": "nyxapi generate --check",
           start: "tsx src/main.ts",
           check: "tsc --noEmit",
         },
-        dependencies: { "@nexapi/core": v("core") },
+        dependencies: { "@nyxapi/core": v("core") },
         devDependencies: {
-          "@nexapi/cli": v("cli"),
-          "@nexapi/codegen": v("codegen"),
+          "@nyxapi/cli": v("cli"),
+          "@nyxapi/codegen": v("codegen"),
           tsx: "^4.20.0",
           typescript: "~5.9.3",
           "@types/node": "^22.0.0",
@@ -125,8 +125,8 @@ files.push({ file: zip, kind: "source" });
       version,
     ),
   );
-  const starterZip = `nexapi-starter-${version}.zip`;
-  zipDirectory(stage, "nexapi-starter", join(out, starterZip));
+  const starterZip = `nyxapi-starter-${version}.zip`;
+  zipDirectory(stage, "nyxapi-starter", join(out, starterZip));
   rmSync(stage, { recursive: true, force: true });
   files.push({ file: starterZip, kind: "starter" });
 }

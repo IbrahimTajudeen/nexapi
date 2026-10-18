@@ -67,7 +67,7 @@ export interface OperationModel {
   responseKind: "json" | "none" | "text" | "blob";
 }
 
-/** How the request body is sent (matches `@nexapi/core`'s `BodyKind`). */
+/** How the request body is sent (matches `@nyxapi/core`'s `BodyKind`). */
 export type BodyKind = "json" | "form-data" | "urlencoded" | "binary" | "text";
 
 export interface ApiModel {

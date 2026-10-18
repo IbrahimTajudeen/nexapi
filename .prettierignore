@@ -3,3 +3,9 @@ node_modules
 pnpm-lock.yaml
 examples/*/generated
 fixtures
+website/.next
+website/out
+website/public
+website/src/generated
+website/src/demo/api
+website/next-env.d.ts

@@ -14,13 +14,14 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nyxapi/website prepare:site # builds packages and the website's generated files, which lint and typecheck need
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
       - run: pnpm generate:check
-      - run: pnpm --filter @nexapi/benchmarks size # fails if a NexAPI entry exceeds its gzip budget
+      - run: pnpm --filter @nyxapi/benchmarks size # fails if a NyxAPI entry exceeds its gzip budget
       - run: node scripts/smoke-pack.mjs # pack, install into an empty project, generate, type-check, run
   bench:
     if: github.event_name == 'workflow_dispatch'

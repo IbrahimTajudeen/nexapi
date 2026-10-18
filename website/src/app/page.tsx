@@ -30,7 +30,7 @@ export default function Home() {
             </div>
             <h1>Your OpenAPI schema, as a typed client that caches for you.</h1>
             <p className="lead">
-              NexAPI generates a fluent TypeScript client from your schema, then handles caching,
+              NyxAPI generates a fluent TypeScript client from your schema, then handles caching,
               retries and optimistic updates. It works without React, and comes with a React adapter
               when you want one.
             </p>
@@ -71,11 +71,11 @@ export default function Home() {
           <div className="split">
             <ol className="steps" style={{ margin: 0 }}>
               <li>
-                <strong>Point NexAPI at your schema.</strong> A local file or a URL, JSON or YAML.
+                <strong>Point NyxAPI at your schema.</strong> A local file or a URL, JSON or YAML.
               </li>
               <li>
                 <strong>Generate the client.</strong> The output is plain TypeScript with a stable,
-                reviewable shape. Run <code>nexapi generate --check</code> in CI to catch drift.
+                reviewable shape. Run <code>nyxapi generate --check</code> in CI to catch drift.
               </li>
               <li>
                 <strong>Call your API.</strong> Path segments are properties, path parameters are
@@ -86,12 +86,12 @@ export default function Home() {
               <Code
                 lang="bash"
                 title="terminal"
-              >{`nexapi generate --input ./openapi.yaml --output ./src/api`}</Code>
-              <Code lang="ts" title="app.ts">{`import { createNexClient } from "@nexapi/core";
+              >{`nyxapi generate --input ./openapi.yaml --output ./src/api`}</Code>
+              <Code lang="ts" title="app.ts">{`import { createNyxClient } from "@nyxapi/core";
 import { createApi } from "./api/index.js";
 
-const nex = createNexClient({ baseUrl: "https://api.example.com/v1" });
-const api = createApi(nex);
+const nyx = createNyxClient({ baseUrl: "https://api.example.com/v1" });
+const api = createApi(nyx);
 
 const user = await api.users.byId("42").get();
 //    ^? { id: string; name: string; role: "admin" | "member" }
@@ -208,7 +208,7 @@ const session = await api.auth.login.post({ email, password });`}</Code>
         <div className="wrap">
           <h2>Works with the backend you already have</h2>
           <p className="sub">
-            If your server publishes an OpenAPI 3.x document, NexAPI can generate a client from it.
+            If your server publishes an OpenAPI 3.x document, NyxAPI can generate a client from it.
             Nothing about your backend has to change.
           </p>
           <div className="grid cols-3">
@@ -228,7 +228,7 @@ const session = await api.auth.login.post({ email, password });`}</Code>
             <Link className="card link" href="/docs/codegen/">
               <h3>Anything else</h3>
               <p>
-                Any server that emits OpenAPI 3.x can be tried. Constructs NexAPI cannot represent
+                Any server that emits OpenAPI 3.x can be tried. Constructs NyxAPI cannot represent
                 are reported as clear errors or warnings, never skipped silently.
               </p>
             </Link>
@@ -240,7 +240,7 @@ const session = await api.auth.login.post({ email, password });`}</Code>
         <div className="wrap">
           <h2>Honest about where it stands</h2>
           <p className="sub">
-            NexAPI is at version {VERSION}. The API can still change before 0.1, and the packages
+            NyxAPI is at version {VERSION}. The API can still change before 0.1, and the packages
             are not on the npm registry yet. Performance is measured against TanStack Query and RTK
             Query in the repository, with the caveats written next to the numbers and no claim that
             one tool is better.
@@ -267,7 +267,7 @@ const session = await api.auth.login.post({ email, password });`}</Code>
       <section className="section" id="contribute">
         <div className="wrap">
           <div className="contrib">
-            <h2>NexAPI is open source and needs contributors</h2>
+            <h2>NyxAPI is open source and needs contributors</h2>
             <p className="sub" style={{ marginBottom: 20 }}>
               The core, code generator, React adapter and devtools are written and tested, and there
               is plenty left: more framework guides, more schema edge cases, browser test matrices,

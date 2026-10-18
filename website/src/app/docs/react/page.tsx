@@ -12,10 +12,10 @@ export default function Page() {
     <Doc
       href="/docs/react/"
       title="React"
-      lede="The React adapter is thin on purpose. Hooks subscribe to the same cache the rest of NexAPI uses, so there is no second copy of your data."
+      lede="The React adapter is thin on purpose. Hooks subscribe to the same cache the rest of NyxAPI uses, so there is no second copy of your data."
     >
       <H2>Install</H2>
-      <PackageInstall packages="@nexapi/react" />
+      <PackageInstall packages="@nyxapi/react" />
       <p>React 18 or 19 is a peer dependency.</p>
 
       <H2>useQuery</H2>
@@ -23,7 +23,7 @@ export default function Page() {
         Pass an endpoint&apos;s <code>options()</code>. The options already carry their client, so
         no provider is needed:
       </p>
-      <Code lang="tsx">{`import { useQuery } from "@nexapi/react";
+      <Code lang="tsx">{`import { useQuery } from "@nyxapi/react";
 
 function UserName({ id }: { id: string }) {
   const user = useQuery(api.users.byId(id).get.options(undefined, { staleTime: 30_000 }));
@@ -62,7 +62,7 @@ function UserName({ id }: { id: string }) {
       </Callout>
 
       <H2>useMutation</H2>
-      <Code lang="tsx">{`import { useMutation } from "@nexapi/react";
+      <Code lang="tsx">{`import { useMutation } from "@nyxapi/react";
 
 function Rename({ id }: { id: string }) {
   const rename = useMutation(
@@ -133,7 +133,7 @@ function Profile({ id }: { id: string }) {
         Show something while a query has no data, without writing it to the cache. With{" "}
         <code>keepPreviousData</code>, the previous page stays visible while the next key loads:
       </p>
-      <Code lang="tsx">{`import { keepPreviousData } from "@nexapi/core";
+      <Code lang="tsx">{`import { keepPreviousData } from "@nyxapi/core";
 
 const users = useQuery(
   api.users.list.get.options({ query: { page } }, { placeholderData: keepPreviousData }),
@@ -147,20 +147,20 @@ users.isPlaceholder; // true while showing the previous page`}</Code>
         <code>renderToPipeableStream</code>, Suspense hooks wait for data inside the request&apos;s
         own client.
       </p>
-      <Code lang="tsx" title="server">{`import { createNexClient, dehydrate } from "@nexapi/core";
-import { NexProvider } from "@nexapi/react";
+      <Code lang="tsx" title="server">{`import { createNyxClient, dehydrate } from "@nyxapi/core";
+import { NyxProvider } from "@nyxapi/react";
 
 export async function render(request: Request) {
-  const nex = createNexClient({ baseUrl: process.env.API_URL!, getToken: () => tokenFrom(request) });
-  const api = createApi(nex);
+  const nyx = createNyxClient({ baseUrl: process.env.API_URL!, getToken: () => tokenFrom(request) });
+  const api = createApi(nyx);
   await api.users.byId("1").get.prefetch();
 
-  const state = JSON.stringify(dehydrate(nex.queryClient)).replace(/</g, "\\\\u003c");
-  // render <NexProvider client={nex.queryClient}><App /></NexProvider> and embed \`state\` in the HTML
+  const state = JSON.stringify(dehydrate(nyx.queryClient)).replace(/</g, "\\\\u003c");
+  // render <NyxProvider client={nyx.queryClient}><App /></NyxProvider> and embed \`state\` in the HTML
 }`}</Code>
-      <Code lang="tsx" title="browser">{`import { hydrate } from "@nexapi/core";
+      <Code lang="tsx" title="browser">{`import { hydrate } from "@nyxapi/core";
 
-hydrate(nex.queryClient, window.__NEX_STATE__); // validated before anything is written`}</Code>
+hydrate(nyx.queryClient, window.__NYX_STATE__); // validated before anything is written`}</Code>
       <H3>What is dehydrated</H3>
       <p>
         Only confirmed, successful data. Never errors, optimistic patches or requests in flight.
@@ -168,9 +168,9 @@ hydrate(nex.queryClient, window.__NEX_STATE__); // validated before anything is 
         newer data already in the cache.
       </p>
 
-      <H2>NexProvider</H2>
+      <H2>NyxProvider</H2>
       <p>
-        Optional. Wrap your tree in <code>{"<NexProvider client={nex.queryClient}>"}</code> when you
+        Optional. Wrap your tree in <code>{"<NyxProvider client={nyx.queryClient}>"}</code> when you
         build query options by hand without a bound client. Generated endpoint options need no
         provider.
       </p>

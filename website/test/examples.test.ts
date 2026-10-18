@@ -22,7 +22,7 @@ describe("site examples run against the real engine and say what the docs say", 
 });
 
 import { readFileSync } from "node:fs";
-import { generate } from "@nexapi/codegen";
+import { generate } from "@nyxapi/codegen";
 import { SAMPLE_SCHEMA } from "../src/lib/sample-schema";
 
 describe("playground sample schema", () => {

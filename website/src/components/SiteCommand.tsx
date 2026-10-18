@@ -4,7 +4,7 @@ import { highlight, type Lang } from "@/lib/highlight";
 import { CopyButton } from "./CopyButton";
 import { SITE_URL } from "@/site";
 
-const PLACEHOLDER = "https://your-nexapi-site.example";
+const PLACEHOLDER = "https://your-nyxapi-site.example";
 
 /** The address of this site, so copied commands point at the place the visitor is actually on. */
 export function useSiteUrl(): string {

@@ -10,7 +10,7 @@ import { NODE_MIN, VERSION } from "@/site";
 export const metadata: Metadata = {
   title: "Beginners",
   description:
-    "A gentle path into NexAPI: try it in your browser, then run a starter project on your own computer.",
+    "A gentle path into NyxAPI: try it in your browser, then run a starter project on your own computer.",
 };
 
 const WORDS: [string, string][] = [
@@ -21,7 +21,7 @@ const WORDS: [string, string][] = [
   ],
   [
     "Client",
-    "The code in your app that calls the API. NexAPI writes this part for you, from the schema.",
+    "The code in your app that calls the API. NyxAPI writes this part for you, from the schema.",
   ],
   [
     "Type",
@@ -40,7 +40,7 @@ export default function Page() {
     <div className="wrap" style={{ padding: "36px 0 80px", maxWidth: 900 }}>
       <h1 style={{ fontSize: "clamp(2rem,4vw,2.7rem)" }}>Beginners</h1>
       <p style={{ color: "var(--muted)", fontSize: "1.15rem" }}>
-        New to typed API clients? Start here. First you will try NexAPI in this page with nothing to
+        New to typed API clients? Start here. First you will try NyxAPI in this page with nothing to
         install. Then you will run a small project on your own computer, with an API included.
       </p>
 
@@ -64,7 +64,7 @@ export default function Page() {
         Path 1: try it here, right now
       </h2>
       <p>
-        This is real NexAPI code running in your browser against a pretend server. Press{" "}
+        This is real NyxAPI code running in your browser against a pretend server. Press{" "}
         <strong>Run</strong>, then change the id <code>&quot;1&quot;</code> to{" "}
         <code>&quot;99&quot;</code> and run it again to see an error.
       </p>
@@ -80,16 +80,16 @@ export default function Page() {
       <p>
         You need <a href="https://nodejs.org">Node.js</a> {NODE_MIN} or newer. Check with{" "}
         <code>node --version</code>. The starter project includes a small pet shop API and a
-        ready-to-run program, and carries NexAPI {VERSION} inside it, so it needs no account and no
+        ready-to-run program, and carries NyxAPI {VERSION} inside it, so it needs no account and no
         registry.
       </p>
       <ol className="steps">
         <li>
           <strong>Download the starter and open it.</strong>
-          <SiteCommand>{`curl -fsSLO {{site}}/downloads/nexapi-starter-${VERSION}.zip
-unzip nexapi-starter-${VERSION}.zip
-cd nexapi-starter`}</SiteCommand>
-          No curl? <a href={`/downloads/nexapi-starter-${VERSION}.zip`}>Download the zip</a> in your
+          <SiteCommand>{`curl -fsSLO {{site}}/downloads/nyxapi-starter-${VERSION}.zip
+unzip nyxapi-starter-${VERSION}.zip
+cd nyxapi-starter`}</SiteCommand>
+          No curl? <a href={`/downloads/nyxapi-starter-${VERSION}.zip`}>Download the zip</a> in your
           browser and unzip it.
         </li>
         <li>
@@ -132,7 +132,7 @@ cd nexapi-starter`}</SiteCommand>
         <li>
           In <code>server.mjs</code> change the first pet to <code>name: 42</code> and run{" "}
           <code>npm start</code>. The schema says a name is text, and validation is on in{" "}
-          <code>nexapi.config.json</code>, so you get a response validation error instead of bad
+          <code>nyxapi.config.json</code>, so you get a response validation error instead of bad
           data reaching your code.
         </li>
       </ul>

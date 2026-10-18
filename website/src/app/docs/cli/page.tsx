@@ -9,15 +9,15 @@ export default function Page() {
     <Doc
       href="/docs/cli/"
       title="CLI"
-      lede="The nexapi command generates and validates clients. It reads your config file, writes files, and exits with a status your CI can act on."
+      lede="The nyxapi command generates and validates clients. It reads your config file, writes files, and exits with a status your CI can act on."
     >
       <H2>Usage</H2>
       <Code
         lang="text"
         copy={false}
-        title="nexapi --help"
-      >{`nexapi generate [--config <file>] [--input <path|url>] [--output <dir>] [--check]
-nexapi validate [<path|url>] [--config <file>]`}</Code>
+        title="nyxapi --help"
+      >{`nyxapi generate [--config <file>] [--input <path|url>] [--output <dir>] [--check]
+nyxapi validate [<path|url>] [--config <file>]`}</Code>
 
       <H2>generate</H2>
       <p>Reads a schema and writes the client into the output directory.</p>
@@ -27,7 +27,7 @@ nexapi validate [<path|url>] [--config <file>]`}</Code>
           [
             <code key="a">--config</code>,
             <>
-              A JSON config file. Defaults to <code>./nexapi.config.json</code> when it exists.
+              A JSON config file. Defaults to <code>./nyxapi.config.json</code> when it exists.
             </>,
           ],
           [
@@ -46,15 +46,15 @@ nexapi validate [<path|url>] [--config <file>]`}</Code>
           ],
         ]}
       />
-      <Code lang="bash" title="terminal">{`nexapi generate --input ./openapi.yaml --output ./src/api
-nexapi generate --check`}</Code>
+      <Code lang="bash" title="terminal">{`nyxapi generate --input ./openapi.yaml --output ./src/api
+nyxapi generate --check`}</Code>
 
       <H2>validate</H2>
       <p>
         Parses the schema and runs the whole generator without writing, printing every error and
         warning.
       </p>
-      <Code lang="bash" title="terminal">{`nexapi validate ./openapi.yaml
+      <Code lang="bash" title="terminal">{`nyxapi validate ./openapi.yaml
 # OK: 8 operation(s), 7 schema(s)`}</Code>
 
       <H2>Exit codes</H2>
@@ -80,8 +80,8 @@ nexapi generate --check`}</Code>
       <H2>In package.json</H2>
       <Code lang="json" title="package.json">{`{
   "scripts": {
-    "api:generate": "nexapi generate",
-    "api:check": "nexapi generate --check"
+    "api:generate": "nyxapi generate",
+    "api:check": "nyxapi generate --check"
   }
 }`}</Code>
     </Doc>

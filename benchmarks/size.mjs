@@ -1,19 +1,19 @@
 // Bundle size of what an app actually imports, minified + gzipped, built with esbuild (ESM, tree-shaken).
-// Run: pnpm build && pnpm --filter @nexapi/benchmarks size
-// Fails (exit 1) when a NexAPI entry exceeds its budget in size-budget.json.
+// Run: pnpm build && pnpm --filter @nyxapi/benchmarks size
+// Fails (exit 1) when a NyxAPI entry exceeds its budget in size-budget.json.
 import { build } from "esbuild";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { fileURLToPath } from "node:url";
 
 const entries = {
-  "nexapi: createNexClient (HTTP + QueryClient)": {
-    lib: "nexapi",
-    code: `import { createNexClient, QueryClient } from "@nexapi/core"; console.log(createNexClient, QueryClient);`,
+  "nyxapi: createNyxClient (HTTP + QueryClient)": {
+    lib: "nyxapi",
+    code: `import { createNyxClient, QueryClient } from "@nyxapi/core"; console.log(createNyxClient, QueryClient);`,
   },
-  "nexapi: React app (client + useQuery + provider)": {
-    lib: "nexapi",
-    code: `import { QueryClient } from "@nexapi/core"; import { useQuery, NexProvider } from "@nexapi/react"; console.log(QueryClient, useQuery, NexProvider);`,
+  "nyxapi: React app (client + useQuery + provider)": {
+    lib: "nyxapi",
+    code: `import { QueryClient } from "@nyxapi/core"; import { useQuery, NyxProvider } from "@nyxapi/react"; console.log(QueryClient, useQuery, NyxProvider);`,
   },
   "tanstack: query-core QueryClient": {
     lib: "tanstack",
@@ -32,7 +32,11 @@ const entries = {
 const results = [];
 for (const [name, { lib, code }] of Object.entries(entries)) {
   const out = await build({
-    stdin: { contents: code, resolveDir: fileURLToPath(new URL(".", import.meta.url)), loader: "js" },
+    stdin: {
+      contents: code,
+      resolveDir: fileURLToPath(new URL(".", import.meta.url)),
+      loader: "js",
+    },
     bundle: true,
     minify: true,
     format: "esm",

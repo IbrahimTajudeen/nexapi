@@ -1,4 +1,4 @@
-import type { Transport } from "@nexapi/core";
+import type { Transport } from "@nyxapi/core";
 
 export interface LogEntry {
   id: number;
@@ -43,7 +43,7 @@ const json = (status: number, body: unknown): Response =>
 
 /**
  * An in-memory implementation of `fixtures/openapi/basic.yaml`, so the docs can run the real
- * NexAPI engine in the browser without any network. No data leaves the page.
+ * NyxAPI engine in the browser without any network. No data leaves the page.
  */
 export function createMockServer(): MockServer {
   let users = seed();

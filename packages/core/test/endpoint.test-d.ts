@@ -4,7 +4,7 @@
  */
 import { expectTypeOf } from "vitest";
 import {
-  createNexClient,
+  createNyxClient,
   type EndpointError,
   type MutationEndpoint,
   type NoRequest,
@@ -22,7 +22,7 @@ interface ApiErr {
 }
 type Err = EndpointError<ApiErr>;
 
-const client = createNexClient({ baseUrl: "https://api.test" });
+const client = createNyxClient({ baseUrl: "https://api.test" });
 
 // 1. endpoint with no input -----------------------------------------------------------------
 const me = client.query<NoRequest, User, ApiErr>({ method: "get", path: "/me" });

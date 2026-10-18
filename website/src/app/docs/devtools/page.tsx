@@ -14,16 +14,16 @@ export default function Page() {
       lede="See what is in your cache while you build: which queries exist, what state they are in, who is watching, and what just happened."
     >
       <H2>Install</H2>
-      <PackageInstall packages="@nexapi/devtools" dev />
+      <PackageInstall packages="@nyxapi/devtools" dev />
 
       <H2>The React panel</H2>
-      <Code lang="tsx">{`import { NexProvider } from "@nexapi/react";
-import { NexDevtools } from "@nexapi/devtools/react";
+      <Code lang="tsx">{`import { NyxProvider } from "@nyxapi/react";
+import { NyxDevtools } from "@nyxapi/devtools/react";
 
-<NexProvider client={nex.queryClient}>
+<NyxProvider client={nyx.queryClient}>
   <App />
-  <NexDevtools />
-</NexProvider>`}</Code>
+  <NyxDevtools />
+</NyxProvider>`}</Code>
       <p>
         A small button opens the panel. Each query shows its key, status, fetch status and number of
         observers, with buttons to refetch, invalidate or remove it. Data is hidden until you click{" "}
@@ -36,7 +36,7 @@ import { NexDevtools } from "@nexapi/devtools/react";
       <Table
         head={["Prop", "Meaning"]}
         rows={[
-          [<code key="a">client</code>, "A QueryClient. Defaults to the one from NexProvider."],
+          [<code key="a">client</code>, "A QueryClient. Defaults to the one from NyxProvider."],
           [<code key="b">defaultOpen</code>, "Start expanded."],
           [<code key="c">force</code>, "Render in production builds."],
           [<code key="d">redact</code>, "Control what the data view may show (see below)."],
@@ -47,9 +47,9 @@ import { NexDevtools } from "@nexapi/devtools/react";
       <p>
         The panel is built on <code>createInspector</code>, which works anywhere:
       </p>
-      <Code lang="ts">{`import { createInspector } from "@nexapi/devtools";
+      <Code lang="ts">{`import { createInspector } from "@nyxapi/devtools";
 
-const inspector = createInspector(nex.queryClient, {
+const inspector = createInspector(nyx.queryClient, {
   maxEvents: 200,
   redact: (key, data) => (key[1] === "/auth/login" ? "[hidden]" : data),
 });

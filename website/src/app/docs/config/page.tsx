@@ -10,9 +10,9 @@ export default function Page() {
     <Doc
       href="/docs/config/"
       title="Configuration"
-      lede="Everything the generator can be told, in nexapi.config.json. Unknown keys are rejected so a typo never silently does nothing."
+      lede="Everything the generator can be told, in nyxapi.config.json. Unknown keys are rejected so a typo never silently does nothing."
     >
-      <Code lang="json" title="nexapi.config.json">{`{
+      <Code lang="json" title="nyxapi.config.json">{`{
   "input": "./openapi.yaml",
   "output": "./src/api",
   "validation": false,

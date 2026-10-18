@@ -1,0 +1,6 @@
+{
+  "input": "../../fixtures/openapi/aspnet-swashbuckle.json",
+  "output": "generated",
+  "naming": { "stripPathPrefix": "/api" },
+  "validation": true
+}

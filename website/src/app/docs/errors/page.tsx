@@ -48,7 +48,7 @@ export default function Page() {
         ]}
       />
       <p>
-        All of them extend <code>NexError</code>. Import them from <code>@nexapi/core</code>.
+        All of them extend <code>NyxError</code>. Import them from <code>@nyxapi/core</code>.
       </p>
 
       <H2>Narrow by status</H2>

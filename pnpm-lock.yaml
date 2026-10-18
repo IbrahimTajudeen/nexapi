@@ -47,10 +47,10 @@ importers:
 
   benchmarks:
     dependencies:
-      '@nexapi/core':
+      '@nyxapi/core':
         specifier: workspace:*
         version: link:../packages/core
-      '@nexapi/react':
+      '@nyxapi/react':
         specifier: workspace:*
         version: link:../packages/react
       '@reduxjs/toolkit':
@@ -80,7 +80,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@nexapi/codegen':
+      '@nyxapi/codegen':
         specifier: workspace:*
         version: link:../codegen
 
@@ -94,10 +94,10 @@ importers:
 
   packages/devtools:
     dependencies:
-      '@nexapi/core':
+      '@nyxapi/core':
         specifier: workspace:*
         version: link:../core
-      '@nexapi/react':
+      '@nyxapi/react':
         specifier: workspace:*
         version: link:../react
       react:
@@ -106,7 +106,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@nexapi/core':
+      '@nyxapi/core':
         specifier: workspace:*
         version: link:../core
       react:
@@ -121,16 +121,16 @@ importers:
       '@fontsource-variable/schibsted-grotesk':
         specifier: ^5.3.0
         version: 5.3.0
-      '@nexapi/codegen':
+      '@nyxapi/codegen':
         specifier: workspace:*
         version: link:../packages/codegen
-      '@nexapi/core':
+      '@nyxapi/core':
         specifier: workspace:*
         version: link:../packages/core
-      '@nexapi/devtools':
+      '@nyxapi/devtools':
         specifier: workspace:*
         version: link:../packages/devtools
-      '@nexapi/react':
+      '@nyxapi/react':
         specifier: workspace:*
         version: link:../packages/react
       next:

@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="footer">
       <div className="wrap footer-grid">
         <div>
-          <strong style={{ color: "var(--ink)" }}>NexAPI</strong>
+          <strong style={{ color: "var(--ink)" }}>NyxAPI</strong>
           <p style={{ marginTop: 8, maxWidth: "24em" }}>
             An open source, schema-generated API client with a built-in query and mutation engine.
             MIT licensed. Version {VERSION}, early development.

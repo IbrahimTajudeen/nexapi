@@ -5,7 +5,7 @@ const config: NextConfig = {
   trailingSlash: true,
   images: { unoptimized: true },
   reactStrictMode: true,
-  // Generated NexAPI code imports siblings as "./types.js" (what Node ESM requires). Tell webpack
+  // Generated NyxAPI code imports siblings as "./types.js" (what Node ESM requires). Tell webpack
   // that such an import may be satisfied by the TypeScript source next to it.
   webpack: (webpackConfig: { resolve?: { extensionAlias?: Record<string, string[]> } }) => {
     const resolve = webpackConfig.resolve ?? {};

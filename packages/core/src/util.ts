@@ -1,6 +1,6 @@
 import {
   HttpError,
-  NexError,
+  NyxError,
   ParseError,
   RequestError,
   ResponseValidationError,
@@ -20,7 +20,7 @@ export function isTransientError(error: unknown): boolean {
     error instanceof RequestError
   )
     return false;
-  return error instanceof NexError; // NetworkError, TimeoutError
+  return error instanceof NyxError; // NetworkError, TimeoutError
 }
 
 /** Default query retry: up to 3 retries, never for deterministic failures (4xx, parse, bad input). */

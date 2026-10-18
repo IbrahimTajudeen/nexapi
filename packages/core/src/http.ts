@@ -1,7 +1,7 @@
 import {
   HttpError,
   NetworkError,
-  NexError,
+  NyxError,
   ParseError,
   RequestError,
   TimeoutError,
@@ -371,7 +371,7 @@ export class HttpClient {
         if (timedOut && timeoutMs !== undefined) throw new TimeoutError(timeoutMs);
         if (userSignal?.aborted)
           throw userSignal.reason ?? new DOMException("Aborted", "AbortError");
-        if (error instanceof NexError) throw error;
+        if (error instanceof NyxError) throw error;
         throw new NetworkError(`Network request failed: ${method} ${safeUrl}`, { cause: error });
       }
 
