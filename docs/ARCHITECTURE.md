@@ -15,11 +15,11 @@ generated/{types,client,index}.ts      ← committed, readable, deterministic
 
 ## Packages
 
-| Package            | Responsibility                                                                                   | Depends on                             |
-| ------------------ | ------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| Package             | Responsibility                                                                                   | Depends on                             |
+| ------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------- |
 | `@syncapi/core`     | HTTP runtime, query cache, mutations, endpoint contracts. **No React, no runtime dependencies.** | –                                      |
 | `@syncapi/codegen`  | OpenAPI → IR → TypeScript. Pure functions (`generate(text, config)`), no file I/O.               | `yaml`                                 |
-| `@syncapi/cli`      | `syncapi generate                                                                                 | validate`, file I/O, `--check` for CI. | codegen |
+| `@syncapi/cli`      | `syncapi generate                                                                                | validate`, file I/O, `--check` for CI. | codegen |
 | `@syncapi/react`    | `useQuery`, `useMutation`, `NexProvider`. Thin: one observer per hook, no second cache.          | core, react (peer)                     |
 | `@syncapi/devtools` | Reserved, not implemented.                                                                       | –                                      |
 

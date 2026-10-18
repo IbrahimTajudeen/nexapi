@@ -6,7 +6,12 @@ import { buildApiModel } from "./model.js";
 import { buildTree } from "./tree.js";
 
 export * from "./ir.js";
-export { validateConfig, resolveConfig, type syncapiConfig, type ResolvedConfig } from "./config.js";
+export {
+  validateConfig,
+  resolveConfig,
+  type syncapiConfig,
+  type ResolvedConfig,
+} from "./config.js";
 export { buildApiModel } from "./model.js";
 export type { GeneratedFile } from "./emit.js";
 export { toCamel, toPascal, typeName, synthesizeOperationId } from "./naming.js";

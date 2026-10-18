@@ -163,7 +163,9 @@ export async function run(argv: readonly string[], io: CliIo): Promise<number> {
     }
     if (values.check) {
       if (stale.length > 0) {
-        io.stderr(`Generated files are out of date: ${stale.join(", ")}. Run "syncapi generate".\n`);
+        io.stderr(
+          `Generated files are out of date: ${stale.join(", ")}. Run "syncapi generate".\n`,
+        );
         return 1;
       }
       io.stdout("Generated files are up to date\n");
