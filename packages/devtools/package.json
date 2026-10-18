@@ -2,15 +2,24 @@
   "name": "@nyxapi/devtools",
   "version": "0.0.1",
   "description": "Cache inspector and React panel for NyxAPI",
-  "type": "module",
+  "keywords": [
+    "nyxapi",
+    "devtools",
+    "react",
+    "query-cache",
+    "debugging",
+    "openapi"
+  ],
   "license": "MIT",
+  "type": "module",
   "sideEffects": false,
   "engines": {
     "node": ">=22.12"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -35,5 +44,9 @@
     "react": {
       "optional": true
     }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

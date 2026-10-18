@@ -40,7 +40,8 @@
 ## Milestone 6: release
 
 - ✅ LICENSE, package READMEs, `pnpm smoke:pack` (pack → empty-project install → CLI generate → strict type-check → run), CI step, `docs/RELEASING.md`.
-- Open: changesets, npm provenance, `repository` manifest field (needs the real URL), CHANGELOG, docs site, browser matrix tests. (Size budgets: done via `benchmarks/size.mjs`.)
+- Done: changesets with a fixed-version group, npm provenance in the release workflow, `repository` fields written from the GitHub repository by `scripts/set-repository.mjs`, publish metadata and LICENSE in every package, docs site, size budgets (`benchmarks/size.mjs`). See `docs/RELEASING.md`.
+- Open: first publish (needs the `@nyxapi` npm scope and an `NPM_TOKEN` secret), browser matrix tests.
 
 ## Naming
 

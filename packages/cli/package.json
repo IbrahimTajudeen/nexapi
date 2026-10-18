@@ -2,8 +2,16 @@
   "name": "@nyxapi/cli",
   "version": "0.0.1",
   "description": "Schema validation and client generation commands for NyxAPI",
-  "type": "module",
+  "keywords": [
+    "nyxapi",
+    "openapi",
+    "cli",
+    "typescript",
+    "codegen",
+    "api-client"
+  ],
   "license": "MIT",
+  "type": "module",
   "engines": {
     "node": ">=22.12"
   },
@@ -11,7 +19,9 @@
     "nyxapi": "./dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -23,5 +33,9 @@
   },
   "dependencies": {
     "@nyxapi/codegen": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
