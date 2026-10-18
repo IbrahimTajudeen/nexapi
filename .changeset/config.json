@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [
+    ["@nyxapi/core", "@nyxapi/codegen", "@nyxapi/cli", "@nyxapi/react", "@nyxapi/devtools"]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": ["@nyxapi/website", "@nyxapi/benchmarks"],
+  "privatePackages": { "version": false, "tag": false }
+}

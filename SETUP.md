@@ -72,6 +72,10 @@ npm run api          # terminal 1: pet shop API on :3000
 npm start            # terminal 2: the example program
 ```
 
+## Publishing to npm
+
+See [docs/RELEASING.md](docs/RELEASING.md).
+
 ## Troubleshooting
 
 | Problem                                                      | Fix                                                                                                                        |

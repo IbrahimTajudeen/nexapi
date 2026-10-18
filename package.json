@@ -22,9 +22,15 @@
     "website:dev": "pnpm --filter @nyxapi/website dev",
     "website:build": "pnpm --filter @nyxapi/website build",
     "check": "pnpm --filter @nyxapi/website prepare:site && pnpm lint && pnpm typecheck && pnpm test && pnpm generate:check",
-    "smoke:pack": "pnpm build && node scripts/smoke-pack.mjs"
+    "smoke:pack": "pnpm build && node scripts/smoke-pack.mjs",
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm install --lockfile-only",
+    "release": "pnpm --filter @nyxapi/website prepare:site && changeset publish",
+    "publish:dry": "pnpm build && pnpm -r --filter './packages/*' publish --dry-run --no-git-checks --access public",
+    "set-repository": "node scripts/set-repository.mjs"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.0",
     "@types/node": "^22.19.0",
     "@types/react": "^19.2.0",
