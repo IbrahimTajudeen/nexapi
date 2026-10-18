@@ -18,7 +18,7 @@ export const DOCS_NAV: NavSection[] = [
   {
     title: "Start here",
     items: [
-      { title: "Introduction", href: "/docs/", summary: "What NexAPI is and how the pieces fit." },
+      { title: "Introduction", href: "/docs/", summary: "What NyxAPI is and how the pieces fit." },
       {
         title: "Installation",
         href: "/docs/installation/",
@@ -82,11 +82,11 @@ export const DOCS_NAV: NavSection[] = [
     title: "Reference",
     items: [
       { title: "CLI", href: "/docs/cli/", summary: "Every command and flag." },
-      { title: "Configuration", href: "/docs/config/", summary: "nexapi.config.json options." },
+      { title: "Configuration", href: "/docs/config/", summary: "nyxapi.config.json options." },
       {
         title: "Client options",
         href: "/docs/client-options/",
-        summary: "createNexClient and QueryClient settings.",
+        summary: "createNyxClient and QueryClient settings.",
       },
       {
         title: "Benchmarks",

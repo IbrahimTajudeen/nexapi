@@ -1,4 +1,4 @@
 {
-  "nexapi: createNexClient (HTTP + QueryClient)": 10240,
-  "nexapi: React app (client + useQuery + provider)": 8192
+  "nyxapi: createNyxClient (HTTP + QueryClient)": 10240,
+  "nyxapi: React app (client + useQuery + provider)": 8192
 }

@@ -11,11 +11,11 @@ export default function Page() {
     <Doc
       href="/docs/client-options/"
       title="Client options"
-      lede="Settings for createNexClient: how requests are sent, and how the cache behaves."
+      lede="Settings for createNyxClient: how requests are sent, and how the cache behaves."
     >
-      <Code lang="ts">{`import { createNexClient } from "@nexapi/core";
+      <Code lang="ts">{`import { createNyxClient } from "@nyxapi/core";
 
-const nex = createNexClient({
+const nyx = createNyxClient({
   baseUrl: "https://api.example.com/v1",
   getToken: () => session.token,
   timeoutMs: 10_000,
@@ -69,7 +69,7 @@ const nex = createNexClient({
       />
 
       <H2>Middleware example</H2>
-      <Code lang="ts">{`const nex = createNexClient({
+      <Code lang="ts">{`const nyx = createNyxClient({
   baseUrl,
   middleware: [
     async (request, next) => {
@@ -81,7 +81,7 @@ const nex = createNexClient({
   ],
 });`}</Code>
       <Callout kind="warn">
-        Do not log the request inside middleware if it carries credentials. NexAPI itself never
+        Do not log the request inside middleware if it carries credentials. NyxAPI itself never
         logs.
       </Callout>
 
@@ -118,11 +118,11 @@ const nex = createNexClient({
       <p>
         Pass an existing <code>QueryClient</code> to give several clients one cache:
       </p>
-      <Code lang="ts">{`import { QueryClient, createNexClient } from "@nexapi/core";
+      <Code lang="ts">{`import { QueryClient, createNyxClient } from "@nyxapi/core";
 
 const cache = new QueryClient();
-const a = createNexClient({ baseUrl: "https://a.example.com", queryClient: cache });
-const b = createNexClient({ baseUrl: "https://b.example.com", queryClient: cache });`}</Code>
+const a = createNyxClient({ baseUrl: "https://a.example.com", queryClient: cache });
+const b = createNyxClient({ baseUrl: "https://b.example.com", queryClient: cache });`}</Code>
     </Doc>
   );
 }

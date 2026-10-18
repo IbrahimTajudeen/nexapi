@@ -1,5 +1,5 @@
 /**
- * Runtime description of a response type, emitted by `@nexapi/codegen` (`"validation": true`)
+ * Runtime description of a response type, emitted by `@nyxapi/codegen` (`"validation": true`)
  * and checked by `checkShape`. Plain JSON-compatible data so it can be generated, serialized and
  * tested; it carries no code.
  */

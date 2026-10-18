@@ -12,7 +12,7 @@ export default function Page() {
     <Doc
       href="/docs/mutations/"
       title="Mutations and optimistic updates"
-      lede="A mutation changes something on the server. NexAPI runs each one once, keeps the cache honest, and lets you show the result before the server answers."
+      lede="A mutation changes something on the server. NyxAPI runs each one once, keeps the cache honest, and lets you show the result before the server answers."
     >
       <Callout kind="write" title="Writes">
         Writes follow stricter rules than reads, because running one twice can mean two orders or
@@ -30,7 +30,7 @@ export default function Page() {
   invalidates: [api.users.byId("1").get.key()],
 });
 
-const updated = await nex.queryClient.mutate(rename, { name: "Ada Lovelace" });`}</Code>
+const updated = await nyx.queryClient.mutate(rename, { name: "Ada Lovelace" });`}</Code>
       <p>
         <code>invalidates</code> lists the cached reads that are now out of date. After the mutation
         succeeds they are marked stale, and the ones being watched refetch. The mutation resolves
@@ -40,13 +40,13 @@ const updated = await nex.queryClient.mutate(rename, { name: "Ada Lovelace" });`
       <H2>Optimistic updates</H2>
       <p>
         An optimistic update shows the expected result immediately, then confirms it or undoes it
-        when the server answers. In NexAPI an update is a small function applied on top of the
+        when the server answers. In NyxAPI an update is a small function applied on top of the
         cached data, called a patch.
       </p>
       <Runnable id="optimistic" rows={18} />
       <H3>If the request fails</H3>
       <p>
-        When the mutation fails, NexAPI removes exactly the patch you added. Other patches, and any
+        When the mutation fails, NyxAPI removes exactly the patch you added. Other patches, and any
         newer data from the server, stay. Compare with the approach of saving a snapshot and
         restoring it: a snapshot taken before a slow request can erase newer changes made while it
         was running.

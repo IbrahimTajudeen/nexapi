@@ -13,10 +13,10 @@ export default function Page() {
     <Doc
       href="/docs/"
       title="Introduction"
-      lede="NexAPI turns an OpenAPI schema into a typed TypeScript client, and gives that client a cache, retries and optimistic updates. Here is what each piece does and how they fit."
+      lede="NyxAPI turns an OpenAPI schema into a typed TypeScript client, and gives that client a cache, retries and optimistic updates. Here is what each piece does and how they fit."
     >
       <Callout kind="warn" title="Early development">
-        NexAPI is at version 0.0.1. The API can change before 0.1, and the packages are not on the
+        NyxAPI is at version 0.0.1. The API can change before 0.1, and the packages are not on the
         npm registry yet. See <Link href="/docs/installation/">Installation</Link> for what works
         today.
       </Callout>
@@ -26,25 +26,25 @@ export default function Page() {
         head={["Package", "What it does"]}
         rows={[
           [
-            <code key="a">@nexapi/core</code>,
+            <code key="a">@nyxapi/core</code>,
             "The HTTP client, the query cache and the mutation engine. No React, no runtime dependencies.",
           ],
           [
-            <code key="b">@nexapi/codegen</code>,
+            <code key="b">@nyxapi/codegen</code>,
             "Reads an OpenAPI 3.x document and produces TypeScript. Pure functions: text in, files out.",
           ],
           [
-            <code key="c">@nexapi/cli</code>,
+            <code key="c">@nyxapi/cli</code>,
             <>
-              The <code>nexapi</code> command: <code>generate</code> and <code>validate</code>.
+              The <code>nyxapi</code> command: <code>generate</code> and <code>validate</code>.
             </>,
           ],
           [
-            <code key="d">@nexapi/react</code>,
+            <code key="d">@nyxapi/react</code>,
             "Hooks over the same cache: useQuery, useMutation, useInfiniteQuery and Suspense variants.",
           ],
           [
-            <code key="e">@nexapi/devtools</code>,
+            <code key="e">@nyxapi/devtools</code>,
             "A cache inspector and a small React panel for development.",
           ],
         ]}
@@ -58,14 +58,14 @@ export default function Page() {
         own copy.
       </p>
       <Code lang="text" copy={false} title="data flow">{`openapi.yaml
-   │  nexapi generate
+   │  nyxapi generate
    ▼
 src/api/*.ts           readable, deterministic, safe to commit
-   │  createApi(nex)
+   │  createApi(nyx)
    ▼
-@nexapi/core           HTTP client  →  query cache  →  mutations
+@nyxapi/core           HTTP client  →  query cache  →  mutations
    ▲
-@nexapi/react          hooks subscribe to the cache`}</Code>
+@nyxapi/react          hooks subscribe to the cache`}</Code>
 
       <H2>Try it right now</H2>
       <p>

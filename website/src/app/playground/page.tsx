@@ -4,7 +4,7 @@ import { PlaygroundTabs } from "@/components/PlaygroundTabs";
 export const metadata: Metadata = {
   title: "Playground",
   description:
-    "Run NexAPI code, try a React demo, or generate a typed client from your own OpenAPI schema, all in your browser.",
+    "Run NyxAPI code, try a React demo, or generate a typed client from your own OpenAPI schema, all in your browser.",
 };
 
 export default function Page() {

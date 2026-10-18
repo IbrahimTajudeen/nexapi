@@ -7,11 +7,11 @@
     "sourceMap": false,
     "baseUrl": ".",
     "paths": {
-      "@nexapi/core": ["packages/core/src/index.ts"],
-      "@nexapi/codegen": ["packages/codegen/src/index.ts"],
-      "@nexapi/react": ["packages/react/src/index.ts"],
-      "@nexapi/devtools": ["packages/devtools/src/index.ts"],
-      "@nexapi/devtools/react": ["packages/devtools/src/react.tsx"]
+      "@nyxapi/core": ["packages/core/src/index.ts"],
+      "@nyxapi/codegen": ["packages/codegen/src/index.ts"],
+      "@nyxapi/react": ["packages/react/src/index.ts"],
+      "@nyxapi/devtools": ["packages/devtools/src/index.ts"],
+      "@nyxapi/devtools/react": ["packages/devtools/src/react.tsx"]
     }
   },
   "include": [

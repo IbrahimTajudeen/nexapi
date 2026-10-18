@@ -58,8 +58,8 @@ export function PlaygroundTabs() {
       {tab === "code" && (
         <div>
           <p className="hint" style={{ marginTop: 0 }}>
-            Real NexAPI against an in-memory mock API (users, login, pagination). In scope:{" "}
-            <code>api</code>, <code>nex</code>, <code>core</code>, <code>server</code>,{" "}
+            Real NyxAPI against an in-memory mock API (users, login, pagination). In scope:{" "}
+            <code>api</code>, <code>nyx</code>, <code>core</code>, <code>server</code>,{" "}
             <code>log</code> and <code>sleep</code>. Ctrl+Enter runs.
           </p>
           <div className="cta-row" style={{ alignItems: "center" }}>

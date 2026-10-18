@@ -1,7 +1,7 @@
 // Copy of fixtures/openapi/basic.yaml (a test keeps them identical).
 export const SAMPLE_SCHEMA = `openapi: 3.0.3
 info:
-  title: NexAPI Example API
+  title: NyxAPI Example API
   version: 1.0.0
 paths:
   /auth/login:

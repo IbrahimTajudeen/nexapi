@@ -2,14 +2,14 @@
 
 ```
 OpenAPI 3.x (JSON/YAML)
-   │  @nexapi/codegen  parse ──▶ normalized ApiModel (IR) ──▶ validate + name ──▶ emit
+   │  @nyxapi/codegen  parse ──▶ normalized ApiModel (IR) ──▶ validate + name ──▶ emit
    ▼
 generated/{types,client,index}.ts      ← committed, readable, deterministic
-   │  createApi(nexClient)  → plain objects + real functions (no Proxy)
+   │  createApi(nyxClient)  → plain objects + real functions (no Proxy)
    ▼
-@nexapi/core
-   NexClient ── HttpClient (Fetch transport, middleware, auth, timeouts, URL safety)
-        └────── QueryClient ── Query entries ── QueryObserver(s) ◀── @nexapi/react (useSyncExternalStore)
+@nyxapi/core
+   NyxClient ── HttpClient (Fetch transport, middleware, auth, timeouts, URL safety)
+        └────── QueryClient ── Query entries ── QueryObserver(s) ◀── @nyxapi/react (useSyncExternalStore)
                     └───────── MutationCache / Mutation / MutationObserver
 ```
 
@@ -17,11 +17,11 @@ generated/{types,client,index}.ts      ← committed, readable, deterministic
 
 | Package            | Responsibility                                                                                      | Depends on                             |
 | ------------------ | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `@nexapi/core`     | HTTP runtime, query cache, mutations, endpoint contracts. **No React, no runtime dependencies.**    | –                                      |
-| `@nexapi/codegen`  | OpenAPI → IR → TypeScript. Pure functions (`generate(text, config)`), no file I/O.                  | `yaml`                                 |
-| `@nexapi/cli`      | `nexapi generate                                                                                    | validate`, file I/O, `--check` for CI. | codegen |
-| `@nexapi/react`    | `useQuery`, `useMutation`, `NexProvider`. Thin: one observer per hook, no second cache.             | core, react (peer)                     |
-| `@nexapi/devtools` | Cache inspector (`createInspector`) and minimal React panel, built on `QueryClient.subscribeCache`. | –                                      |
+| `@nyxapi/core`     | HTTP runtime, query cache, mutations, endpoint contracts. **No React, no runtime dependencies.**    | –                                      |
+| `@nyxapi/codegen`  | OpenAPI → IR → TypeScript. Pure functions (`generate(text, config)`), no file I/O.                  | `yaml`                                 |
+| `@nyxapi/cli`      | `nyxapi generate                                                                                    | validate`, file I/O, `--check` for CI. | codegen |
+| `@nyxapi/react`    | `useQuery`, `useMutation`, `NyxProvider`. Thin: one observer per hook, no second cache.             | core, react (peer)                     |
+| `@nyxapi/devtools` | Cache inspector (`createInspector`) and minimal React panel, built on `QueryClient.subscribeCache`. | –                                      |
 
 ## Core design
 

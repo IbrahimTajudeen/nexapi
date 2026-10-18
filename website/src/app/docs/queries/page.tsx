@@ -21,11 +21,11 @@ export default function Page() {
 
       <H2>Fetch through the cache</H2>
       <p>
-        Every NexAPI client has a query client at <code>nex.queryClient</code>. Hand it an
+        Every NyxAPI client has a query client at <code>nyx.queryClient</code>. Hand it an
         endpoint&apos;s <code>options()</code> and it fetches, stores and shares the result:
       </p>
       <Code lang="ts">{`const options = api.users.byId("1").get.options();
-const user = await nex.queryClient.fetchQuery(options);`}</Code>
+const user = await nyx.queryClient.fetchQuery(options);`}</Code>
 
       <H2>One request for many callers</H2>
       <p>
@@ -95,7 +95,7 @@ const user = await nex.queryClient.fetchQuery(options);`}</Code>
         Set defaults for every query when you create the client, and override per query through the
         second argument of <code>options()</code>:
       </p>
-      <Code lang="ts">{`const nex = createNexClient({
+      <Code lang="ts">{`const nyx = createNyxClient({
   baseUrl: "https://api.example.com/v1",
   queryClient: { defaultOptions: { queries: { staleTime: 30_000 } } },
 });
@@ -120,14 +120,14 @@ api.users.byId("1").get.options(undefined, { staleTime: 5 * 60_000 });`}</Code>
 await api.users.list.get.invalidate({ query: { page: 2 } }); // one variant
 
 // or by key prefix, across routes
-await nex.queryClient.invalidateQueries(["GET", "/users"]);`}</Code>
+await nyx.queryClient.invalidateQueries(["GET", "/users"]);`}</Code>
 
       <H2>Reading and writing the cache directly</H2>
       <Runnable id="prefetch" />
-      <Code lang="ts">{`nex.queryClient.getData(key);                 // read, never fetches
-nex.queryClient.setData(key, (old) => ({ ...old, name: "New" })); // write confirmed data
-nex.queryClient.removeQueries(filter);        // delete entries
-nex.queryClient.clear();                      // delete everything`}</Code>
+      <Code lang="ts">{`nyx.queryClient.getData(key);                 // read, never fetches
+nyx.queryClient.setData(key, (old) => ({ ...old, name: "New" })); // write confirmed data
+nyx.queryClient.removeQueries(filter);        // delete entries
+nyx.queryClient.clear();                      // delete everything`}</Code>
       <p>
         A manual <code>setData</code> beats any request that started before it, so a slow response
         cannot overwrite a newer write.
@@ -151,7 +151,7 @@ nex.queryClient.clear();                      // delete everything`}</Code>
         is waiting for it any more: no watching component and no caller of <code>fetchQuery</code>.
         Cancelling always settles waiting callers, even when your function ignores the signal.
       </p>
-      <Code lang="ts">{`nex.queryClient.cancelQueries(api.users.byId("1").get.key());`}</Code>
+      <Code lang="ts">{`nyx.queryClient.cancelQueries(api.users.byId("1").get.key());`}</Code>
 
       <H3>Looking inside</H3>
       <Runnable id="inspect" />

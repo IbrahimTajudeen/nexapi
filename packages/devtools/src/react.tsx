@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, useSyncExternalStore, type ReactElement } from "react";
-import type { QueryClient } from "@nexapi/core";
-import { useQueryClient } from "@nexapi/react";
+import type { QueryClient } from "@nyxapi/core";
+import { useQueryClient } from "@nyxapi/react";
 import { createInspector, type Inspector, type QueryInfo } from "./inspector.js";
 
-export interface NexDevtoolsProps {
-  /** Defaults to the client from `NexProvider`. */
+export interface NyxDevtoolsProps {
+  /** Defaults to the client from `NyxProvider`. */
   client?: QueryClient;
   /** Render even when `process.env.NODE_ENV === "production"`. Default false. */
   force?: boolean;
@@ -72,12 +72,12 @@ const list = { listStyle: "none", padding: 0, margin: "8px 0" } as const;
  * refetch/invalidate/remove. Cached data is not rendered unless "data" is clicked for a row.
  * Renders nothing in production unless `force` is set.
  */
-export function NexDevtools(props: NexDevtoolsProps): ReactElement | null {
+export function NyxDevtools(props: NyxDevtoolsProps): ReactElement | null {
   if (!props.force && isProduction()) return null;
   return <Panel {...props} />;
 }
 
-function Panel({ client, defaultOpen = false, redact }: NexDevtoolsProps): ReactElement {
+function Panel({ client, defaultOpen = false, redact }: NyxDevtoolsProps): ReactElement {
   const target = useQueryClient(client);
   const inspector: Inspector = useMemo(
     () => createInspector(target, redact ? { redact } : {}),
@@ -92,13 +92,13 @@ function Panel({ client, defaultOpen = false, redact }: NexDevtoolsProps): React
     return (
       <div style={box}>
         <button type="button" style={button} onClick={() => setOpen(true)}>
-          NexAPI ({snap.queries.length})
+          NyxAPI ({snap.queries.length})
         </button>
       </div>
     );
   }
   return (
-    <div style={box} data-testid="nex-devtools">
+    <div style={box} data-testid="nyx-devtools">
       <button type="button" style={button} onClick={() => setOpen(false)}>
         close
       </button>{" "}
@@ -131,7 +131,7 @@ function Panel({ client, defaultOpen = false, redact }: NexDevtoolsProps): React
             </button>
             {shown === q.hash && (
               <pre
-                data-testid="nex-devtools-data"
+                data-testid="nyx-devtools-data"
                 style={{ margin: "6px 0 0", whiteSpace: "pre-wrap", color: "#c9e6a8" }}
               >
                 {JSON.stringify(inspector.inspectData(q.hash), null, 2) ?? "undefined"}

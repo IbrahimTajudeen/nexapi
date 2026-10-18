@@ -1,6 +1,6 @@
-# Contributing to NexAPI
+# Contributing to NyxAPI
 
-NexAPI is open source (MIT) and looking for contributors. Bug reports, schema edge cases, docs fixes, tests and code are all welcome.
+NyxAPI is open source (MIT) and looking for contributors. Bug reports, schema edge cases, docs fixes, tests and code are all welcome.
 
 ## Set up
 
@@ -11,7 +11,7 @@ pnpm install
 pnpm check          # lint, type-check, tests, build, generated-code check
 ```
 
-Other useful commands: `pnpm test`, `pnpm lint`, `pnpm format`, `pnpm smoke:pack` (pack, install into an empty project, generate, run), `pnpm --filter @nexapi/website dev` (the documentation site).
+Other useful commands: `pnpm test`, `pnpm lint`, `pnpm format`, `pnpm smoke:pack` (pack, install into an empty project, generate, run), `pnpm --filter @nyxapi/website dev` (the documentation site).
 
 ## Layout
 

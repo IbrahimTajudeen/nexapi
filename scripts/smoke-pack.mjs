@@ -8,7 +8,7 @@ import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const packages = ["core", "codegen", "cli", "react", "devtools"];
-const work = mkdtempSync(join(tmpdir(), "nexapi-smoke-"));
+const work = mkdtempSync(join(tmpdir(), "nyxapi-smoke-"));
 const run = (cmd, args, cwd) =>
   execFileSync(cmd, args, { cwd, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" });
 const step = (name) => console.log(`- ${name}`);
@@ -26,7 +26,7 @@ try {
     run("pnpm", ["pack", "--pack-destination", packDir], join(root, "packages", name));
   }
   for (const file of readdirSync(packDir)) {
-    const name = /^nexapi-(\w+)-/.exec(file)?.[1];
+    const name = /^nyxapi-(\w+)-/.exec(file)?.[1];
     if (name) tarballs[name] = join(packDir, file);
   }
   for (const name of packages) if (!tarballs[name]) throw new Error(`no tarball for ${name}`);
@@ -55,7 +55,7 @@ try {
   const app = join(work, "app");
   mkdirSync(app);
   const overrides = Object.fromEntries(
-    packages.map((n) => [`@nexapi/${n}`, `file:${tarballs[n]}`]),
+    packages.map((n) => [`@nyxapi/${n}`, `file:${tarballs[n]}`]),
   );
   writeFileSync(
     join(app, "package.json"),
@@ -82,21 +82,21 @@ try {
   step("generate a client with the installed CLI");
   cpSync(join(root, "fixtures/openapi/basic.yaml"), join(app, "openapi.yaml"));
   writeFileSync(
-    join(app, "nexapi.config.json"),
+    join(app, "nyxapi.config.json"),
     JSON.stringify({ input: "openapi.yaml", output: "src/api", validation: true }),
   );
-  run("npx", ["nexapi", "generate"], app);
-  run("npx", ["nexapi", "generate", "--check"], app);
+  run("npx", ["nyxapi", "generate"], app);
+  run("npx", ["nyxapi", "generate", "--check"], app);
 
   step("type-check and run a consumer (strict, NodeNext)");
   mkdirSync(join(app, "src"), { recursive: true });
   writeFileSync(
     join(app, "src/main.ts"),
-    `import { createNexClient, HttpError } from "@nexapi/core";
+    `import { createNyxClient, HttpError } from "@nyxapi/core";
 import { createApi } from "./api/index.js";
-import { createInspector } from "@nexapi/devtools";
+import { createInspector } from "@nyxapi/devtools";
 
-const nex = createNexClient({
+const nyx = createNyxClient({
   baseUrl: "https://api.test/v1",
   transport: async (req) => {
     const path = new URL(req.url).pathname;
@@ -105,8 +105,8 @@ const nex = createNexClient({
       : Response.json({ code: "nope", message: "x" }, { status: 404 });
   },
 });
-const api = createApi(nex);
-const inspector = createInspector(nex.queryClient);
+const api = createApi(nyx);
+const inspector = createInspector(nyx.queryClient);
 const user = await api.users.byId("42").get();
 const name: string = user.name;
 const missing = await api.users.byId("1").get().catch((e: unknown) => e);
@@ -116,13 +116,13 @@ console.log("consumer ok");
   );
   writeFileSync(
     join(app, "src/hooks.tsx"),
-    `import { useQuery, useSuspenseQuery } from "@nexapi/react";
-import { NexDevtools } from "@nexapi/devtools/react";
+    `import { useQuery, useSuspenseQuery } from "@nyxapi/react";
+import { NyxDevtools } from "@nyxapi/devtools/react";
 import type { Api } from "./api/index.js";
 export function Name({ api }: { api: Api }) {
   const q = useQuery(api.users.byId("1").get.options());
   const s = useSuspenseQuery(api.users.byId("1").get.options());
-  return <p>{q.data?.name}{s.data.name}<NexDevtools /></p>;
+  return <p>{q.data?.name}{s.data.name}<NyxDevtools /></p>;
 }
 `,
   );

@@ -2,7 +2,7 @@
 export type QueryKey = readonly unknown[];
 
 /** A query key that remembers (at the type level only) what data it addresses. */
-export type TypedKey<TData> = QueryKey & { readonly __nexData?: TData };
+export type TypedKey<TData> = QueryKey & { readonly __nyxData?: TData };
 
 const MAX_DEPTH = 32;
 

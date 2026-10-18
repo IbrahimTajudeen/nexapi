@@ -21,7 +21,7 @@ export function formatValue(value: unknown): string {
 }
 
 /**
- * Run a snippet as the body of an async function. In scope: `api`, `nex`, `core`, `server`,
+ * Run a snippet as the body of an async function. In scope: `api`, `nyx`, `core`, `server`,
  * `log`, `sleep`. Used by the playground and by the test that keeps every example honest.
  */
 export async function runSnippet(
@@ -30,6 +30,6 @@ export async function runSnippet(
   log: (...values: unknown[]) => void,
 ): Promise<unknown> {
   const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
-  const fn = new AsyncFunction("api", "nex", "core", "log", "sleep", "server", source);
-  return fn(engine.api, engine.nex, engine.core, log, sleep, engine.server);
+  const fn = new AsyncFunction("api", "nyx", "core", "log", "sleep", "server", source);
+  return fn(engine.api, engine.nyx, engine.core, log, sleep, engine.server);
 }

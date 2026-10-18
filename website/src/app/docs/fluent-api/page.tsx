@@ -129,7 +129,7 @@ mutation endpoint  post(body, request?)     or     delete(request?)`}</Code>
 const user = await api.users.byId("42").get();
 
 // cached: shared, fresh for 30 seconds
-const cached = await nex.queryClient.fetchQuery(
+const cached = await nyx.queryClient.fetchQuery(
   api.users.byId("42").get.options(undefined, { staleTime: 30_000 }),
 );`}</Code>
       <Callout kind="read">
@@ -142,10 +142,10 @@ const cached = await nex.queryClient.fetchQuery(
       <H2>Hand-written endpoints</H2>
       <p>
         If an operation is not in your schema, or you excluded it, you can define one with{" "}
-        <code>nex.query</code> or <code>nex.mutation</code>. The generated client is built from
+        <code>nyx.query</code> or <code>nyx.mutation</code>. The generated client is built from
         exactly these calls.
       </p>
-      <Code lang="ts">{`const health = nex.query<NoRequest, { ok: boolean }, unknown>({
+      <Code lang="ts">{`const health = nyx.query<NoRequest, { ok: boolean }, unknown>({
   method: "get",
   path: "/health",
 });

@@ -23,8 +23,8 @@ export function Tabs({ tabs, group }: { tabs: TabDef[]; group?: string }) {
       const d = (e as CustomEvent<{ group: string; id: string }>).detail;
       if (d.group === group && tabs.some((t) => t.id === d.id)) setActive(d.id);
     };
-    window.addEventListener("nex-tab", onChange);
-    return () => window.removeEventListener("nex-tab", onChange);
+    window.addEventListener("nyx-tab", onChange);
+    return () => window.removeEventListener("nyx-tab", onChange);
   }, [group]);
   const choose = (id: string): void => {
     setActive(id);
@@ -34,7 +34,7 @@ export function Tabs({ tabs, group }: { tabs: TabDef[]; group?: string }) {
     } catch {
       /* ignore */
     }
-    window.dispatchEvent(new CustomEvent("nex-tab", { detail: { group, id } }));
+    window.dispatchEvent(new CustomEvent("nyx-tab", { detail: { group, id } }));
   };
   return (
     <div className="tabs">

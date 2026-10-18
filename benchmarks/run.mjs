@@ -1,4 +1,4 @@
-// Reproducible micro/meso benchmarks: NexAPI core vs @tanstack/query-core.
+// Reproducible micro/meso benchmarks: NyxAPI core vs @tanstack/query-core.
 // Run from the repo root:  pnpm build && pnpm bench
 // Everything is headless (no React, no network). See README.md for what this does NOT measure.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import {
   QueryClient as TanstackClient,
   QueryObserver as TanstackObserver,
 } from "@tanstack/query-core";
-import { QueryClient as NexClient, QueryObserver as NexObserver } from "@nexapi/core";
+import { QueryClient as NyxClient, QueryObserver as NyxObserver } from "@nyxapi/core";
 
 const SAMPLES = Number(process.env.BENCH_SAMPLES ?? 200);
 const WARMUP = Number(process.env.BENCH_WARMUP ?? 30);
@@ -37,7 +37,7 @@ async function measure(name, opsPerSample, setup, run) {
   return { name, opsPerSample, ...stats(samples) };
 }
 
-const nexOpts = (key, queryFn, extra = {}) => ({
+const nyxOpts = (key, queryFn, extra = {}) => ({
   queryKey: key,
   queryFn,
   retry: false,
@@ -52,8 +52,8 @@ const tanOpts = (key, queryFn, extra = {}) => ({
   ...extra,
 });
 const FOCUS_OFF = { subscribe: () => () => {}, isFocused: () => true };
-const mkNex = () =>
-  new NexClient({
+const mkNyx = () =>
+  new NyxClient({
     focusManager: FOCUS_OFF,
     onlineManager: { subscribe: () => () => {}, isOnline: () => true },
   });
@@ -66,19 +66,19 @@ const record = (scenario, library, r) => results.push({ scenario, library, ...r 
 {
   const OPS = 20_000;
   const payload = { id: 1, name: "x", tags: ["a", "b"] };
-  const nex = mkNex();
-  await nex.fetchQuery(nexOpts(["user", 1], () => Promise.resolve(payload)));
+  const nyx = mkNyx();
+  await nyx.fetchQuery(nyxOpts(["user", 1], () => Promise.resolve(payload)));
   const tan = mkTan();
   await tan.fetchQuery(tanOpts(["user", 1], () => Promise.resolve(payload)));
   record(
     "warm read: getData / getQueryData (sync, key hashed each call)",
-    "nexapi",
+    "nyxapi",
     await measure(
       "",
       OPS,
       () => 0,
       () => {
-        for (let i = 0; i < OPS; i++) nex.getData(["user", 1]);
+        for (let i = 0; i < OPS; i++) nyx.getData(["user", 1]);
       },
     ),
   );
@@ -97,15 +97,15 @@ const record = (scenario, library, r) => results.push({ scenario, library, ...r 
   const OPS2 = 5_000;
   record(
     "warm read: fetchQuery on fresh data (async, staleTime=Infinity)",
-    "nexapi",
+    "nyxapi",
     await measure(
       "",
       OPS2,
       () => 0,
       async () => {
         for (let i = 0; i < OPS2; i++)
-          await nex.fetchQuery(
-            nexOpts(["user", 1], () => Promise.resolve(payload), { staleTime: Infinity }),
+          await nyx.fetchQuery(
+            nyxOpts(["user", 1], () => Promise.resolve(payload), { staleTime: Infinity }),
           );
       },
     ),
@@ -133,14 +133,14 @@ for (const N of [1, 1000]) {
     N === 1
       ? "cold query: one fetchQuery, resolved queryFn"
       : "concurrent identical: 1000 fetchQuery calls, one key";
-  let nexCalls = 0;
+  let nyxCalls = 0;
   let tanCalls = 0;
   record(
     label,
-    "nexapi",
-    await measure("", N, mkNex, async (c) => {
-      const fn = () => (nexCalls++, Promise.resolve({ ok: true }));
-      await Promise.all(Array.from({ length: N }, () => c.fetchQuery(nexOpts(["k"], fn))));
+    "nyxapi",
+    await measure("", N, mkNyx, async (c) => {
+      const fn = () => (nyxCalls++, Promise.resolve({ ok: true }));
+      await Promise.all(Array.from({ length: N }, () => c.fetchQuery(nyxOpts(["k"], fn))));
     }),
   );
   record(
@@ -153,9 +153,9 @@ for (const N of [1, 1000]) {
   );
   // correctness guard: a benchmark that does not deduplicate would be measuring the wrong thing
   const expected = WARMUP + SAMPLES;
-  if (nexCalls !== expected || tanCalls !== expected)
+  if (nyxCalls !== expected || tanCalls !== expected)
     throw new Error(
-      `dedup check failed for "${label}": nexapi=${nexCalls} tanstack=${tanCalls} expected=${expected}`,
+      `dedup check failed for "${label}": nyxapi=${nyxCalls} tanstack=${tanCalls} expected=${expected}`,
     );
 }
 
@@ -163,22 +163,22 @@ for (const N of [1, 1000]) {
 {
   const SIZE = 50_000;
   const OPS = 20_000;
-  const nex = mkNex();
+  const nyx = mkNyx();
   const tan = mkTan();
   for (let i = 0; i < SIZE; i++) {
-    nex.setData(["item", i, { v: 1 }], { i });
+    nyx.setData(["item", i, { v: 1 }], { i });
     tan.setQueryData(["item", i, { v: 1 }], { i });
   }
   const picks = Array.from({ length: OPS }, (_, i) => (i * 7919) % SIZE);
   record(
     `large cache: ${SIZE} entries, point lookup`,
-    "nexapi",
+    "nyxapi",
     await measure(
       "",
       OPS,
       () => 0,
       () => {
-        for (const i of picks) nex.getData(["item", i, { v: 1 }]);
+        for (const i of picks) nyx.getData(["item", i, { v: 1 }]);
       },
     ),
   );
@@ -225,19 +225,19 @@ for (const N of [1, 1000]) {
     unsubs.forEach((u) => u());
     return ms;
   };
-  const samples = { nexapi: [], tanstack: [] };
+  const samples = { nyxapi: [], tanstack: [] };
   for (let i = 0; i < Math.max(10, WARMUP / 3) + Math.min(SAMPLES, 40); i++) {
-    const a = await run(mkNex, NexObserver, nexOpts, (c) => c.setData(["shared"], { v: i }));
+    const a = await run(mkNyx, NyxObserver, nyxOpts, (c) => c.setData(["shared"], { v: i }));
     const b = await run(mkTan, TanstackObserver, tanOpts, (c) =>
       c.setQueryData(["shared"], { v: i }),
     );
     if (i >= Math.max(10, WARMUP / 3)) {
-      samples.nexapi.push((a * 1e6) / OBSERVERS);
+      samples.nyxapi.push((a * 1e6) / OBSERVERS);
       samples.tanstack.push((b * 1e6) / OBSERVERS);
     }
   }
   const label = `${OBSERVERS} observers on one key: setData → last listener called`;
-  record(label, "nexapi", { name: "", opsPerSample: OBSERVERS, ...stats(samples.nexapi) });
+  record(label, "nyxapi", { name: "", opsPerSample: OBSERVERS, ...stats(samples.nyxapi) });
   record(label, "tanstack", { name: "", opsPerSample: OBSERVERS, ...stats(samples.tanstack) });
 }
 
@@ -253,7 +253,7 @@ const env = {
   warmup: WARMUP,
   versions: {
     "@tanstack/query-core": version("@tanstack/query-core"),
-    "@nexapi/core": JSON.parse(
+    "@nyxapi/core": JSON.parse(
       readFileSync(new URL("../packages/core/package.json", import.meta.url), "utf8"),
     ).version,
   },

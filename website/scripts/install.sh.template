@@ -1,34 +1,34 @@
 #!/bin/sh
-# NexAPI installer (version __VERSION__)
+# NyxAPI installer (version __VERSION__)
 #
-# Downloads the NexAPI package tarballs from the site you ran this from, checks their SHA-256
-# sums, saves them in ./.nexapi/ and installs them with your package manager.
+# Downloads the NyxAPI package tarballs from the site you ran this from, checks their SHA-256
+# sums, saves them in ./.nyxapi/ and installs them with your package manager.
 #
 #   curl -fsSL https://YOUR-SITE/install.sh | sh -s -- https://YOUR-SITE
 #
 # Environment:
-#   NEXAPI_PACKAGES  space-separated list (default: "core cli codegen"; also: react devtools)
-#   NEXAPI_PM        npm | pnpm | yarn | bun (default: detected from your lockfile, else npm)
+#   NYXAPI_PACKAGES  space-separated list (default: "core cli codegen"; also: react devtools)
+#   NYXAPI_PM        npm | pnpm | yarn | bun (default: detected from your lockfile, else npm)
 #
-# Read it first if you like: it only downloads from the site you give it, writes to ./.nexapi/
+# Read it first if you like: it only downloads from the site you give it, writes to ./.nyxapi/
 # and runs "<package manager> add/install" for those files.
 set -eu
 
 VERSION="__VERSION__"
-BASE="${1:-${NEXAPI_BASE:-}}"
+BASE="${1:-${NYXAPI_BASE:-}}"
 if [ -z "$BASE" ]; then
   echo "usage: curl -fsSL <site>/install.sh | sh -s -- <site-url>" >&2
   exit 1
 fi
 BASE="${BASE%/}"
-PACKAGES="${NEXAPI_PACKAGES:-core cli codegen}"
+PACKAGES="${NYXAPI_PACKAGES:-core cli codegen}"
 
 if [ ! -f package.json ]; then
   echo "No package.json here. Run this inside your project (npm init -y creates one)." >&2
   exit 1
 fi
 
-PM="${NEXAPI_PM:-}"
+PM="${NYXAPI_PM:-}"
 if [ -z "$PM" ]; then
   if [ -f pnpm-lock.yaml ]; then PM=pnpm
   elif [ -f yarn.lock ]; then PM=yarn
@@ -39,7 +39,7 @@ fi
 command -v "$PM" >/dev/null 2>&1 || { echo "$PM was not found on your PATH." >&2; exit 1; }
 command -v curl >/dev/null 2>&1 || { echo "curl was not found on your PATH." >&2; exit 1; }
 
-DIR=".nexapi"
+DIR=".nyxapi"
 mkdir -p "$DIR"
 
 echo "Downloading checksums from $BASE/downloads/SHA256SUMS"
@@ -56,7 +56,7 @@ RUNTIME=""
 DEV=""
 MAP=""
 for pkg in $PACKAGES; do
-  file="nexapi-$pkg-$VERSION.tgz"
+  file="nyxapi-$pkg-$VERSION.tgz"
   echo "Downloading $file"
   curl -fsSL "$BASE/downloads/$file" -o "$DIR/$file"
   expected="$(grep "  $file\$" "$DIR/SHA256SUMS" | cut -d' ' -f1)"
@@ -67,31 +67,31 @@ for pkg in $PACKAGES; do
     exit 1
   fi
   if [ -z "$actual" ]; then echo "Warning: no sha256sum or shasum found, so $file was not verified." >&2; fi
-  MAP="$MAP @nexapi/$pkg=file:./$DIR/$file"
+  MAP="$MAP @nyxapi/$pkg=file:./$DIR/$file"
   case "$pkg" in
     cli|codegen|devtools) DEV="$DEV file:./$DIR/$file" ;;
     *) RUNTIME="$RUNTIME file:./$DIR/$file" ;;
   esac
 done
 
-# The packages depend on each other and are not on the registry yet, so list every @nexapi/*
+# The packages depend on each other and are not on the registry yet, so list every @nyxapi/*
 # package as a file dependency (and, where the package manager needs it, as an override), then
 # install normally. Otherwise the package manager would look the dependencies up online.
 command -v node >/dev/null 2>&1 || { echo "node was not found on your PATH." >&2; exit 1; }
-NEXAPI_RUNTIME="$RUNTIME" NEXAPI_DEV="$DEV" NEXAPI_MAP="$MAP" NEXAPI_PM_NAME="$PM" node -e '
+NYXAPI_RUNTIME="$RUNTIME" NYXAPI_DEV="$DEV" NYXAPI_MAP="$MAP" NYXAPI_PM_NAME="$PM" node -e '
 const fs = require("fs");
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const pairs = (v) => v.trim().split(/\s+/).filter(Boolean).map((spec) => {
   const file = spec.replace(/^file:/, "");
-  const name = "@nexapi/" + file.replace(/^.*nexapi-/, "").replace(/-[0-9][^/]*\.tgz$/, "");
+  const name = "@nyxapi/" + file.replace(/^.*nyxapi-/, "").replace(/-[0-9][^/]*\.tgz$/, "");
   return [name, spec];
 });
-const runtime = Object.fromEntries(pairs(process.env.NEXAPI_RUNTIME));
-const dev = Object.fromEntries(pairs(process.env.NEXAPI_DEV));
+const runtime = Object.fromEntries(pairs(process.env.NYXAPI_RUNTIME));
+const dev = Object.fromEntries(pairs(process.env.NYXAPI_DEV));
 pkg.dependencies = { ...pkg.dependencies, ...runtime };
 pkg.devDependencies = { ...pkg.devDependencies, ...dev };
-const map = Object.fromEntries(process.env.NEXAPI_MAP.trim().split(/\s+/).map((e) => e.split("=")));
-const pm = process.env.NEXAPI_PM_NAME;
+const map = Object.fromEntries(process.env.NYXAPI_MAP.trim().split(/\s+/).map((e) => e.split("=")));
+const pm = process.env.NYXAPI_PM_NAME;
 if (pm === "pnpm") { pkg.pnpm = pkg.pnpm || {}; pkg.pnpm.overrides = { ...pkg.pnpm.overrides, ...map }; }
 else if (pm === "yarn") pkg.resolutions = { ...pkg.resolutions, ...Object.fromEntries(Object.entries(map).map(([k, v]) => ["**/" + k, v])) };
 else if (pm === "bun") pkg.overrides = { ...pkg.overrides, ...map };
@@ -101,5 +101,5 @@ fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + "\n");
 "$PM" install
 
 echo
-echo "NexAPI $VERSION installed with $PM. Next:"
-echo "  npx nexapi generate --input ./openapi.yaml --output ./src/api"
+echo "NyxAPI $VERSION installed with $PM. Next:"
+echo "  npx nyxapi generate --input ./openapi.yaml --output ./src/api"

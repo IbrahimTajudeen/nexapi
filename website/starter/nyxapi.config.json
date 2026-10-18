@@ -1,0 +1,5 @@
+{
+  "input": "./openapi.yaml",
+  "output": "./src/api",
+  "validation": true
+}

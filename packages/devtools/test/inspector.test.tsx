@@ -2,10 +2,10 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { NexProvider } from "@nexapi/react";
-import { QueryClient } from "@nexapi/core";
-import { createInspector } from "@nexapi/devtools";
-import { NexDevtools } from "@nexapi/devtools/react";
+import { NyxProvider } from "@nyxapi/react";
+import { QueryClient } from "@nyxapi/core";
+import { createInspector } from "@nyxapi/devtools";
+import { NyxDevtools } from "@nyxapi/devtools/react";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -78,7 +78,7 @@ describe("createInspector", () => {
   });
 });
 
-describe("NexDevtools", () => {
+describe("NyxDevtools", () => {
   let host: HTMLElement | undefined;
   afterEach(() => {
     host?.remove();
@@ -99,17 +99,17 @@ describe("NexDevtools", () => {
       retry: false,
     });
     await mount(
-      <NexProvider client={client}>
-        <NexDevtools defaultOpen />
-      </NexProvider>,
+      <NyxProvider client={client}>
+        <NyxDevtools defaultOpen />
+      </NyxProvider>,
     );
-    const panel = host?.querySelector('[data-testid="nex-devtools"]');
+    const panel = host?.querySelector('[data-testid="nyx-devtools"]');
     expect(panel?.textContent).toContain('["a"]');
-    expect(host?.querySelector('[data-testid="nex-devtools-data"]')).toBeNull();
+    expect(host?.querySelector('[data-testid="nyx-devtools-data"]')).toBeNull();
     const button = (name: string): HTMLButtonElement | undefined =>
       [...(host?.querySelectorAll("button") ?? [])].find((b) => b.textContent === name);
     await act(async () => button("data")?.click());
-    expect(host?.querySelector('[data-testid="nex-devtools-data"]')?.textContent).toContain(
+    expect(host?.querySelector('[data-testid="nyx-devtools-data"]')?.textContent).toContain(
       '"v": 1',
     );
     await act(async () => button("remove")?.click());
@@ -119,11 +119,11 @@ describe("NexDevtools", () => {
   it("renders nothing in production unless forced", async () => {
     vi.stubEnv("NODE_ENV", "production");
     const client = newClient();
-    await mount(<NexDevtools client={client} defaultOpen />);
+    await mount(<NyxDevtools client={client} defaultOpen />);
     expect(host?.innerHTML).toBe("");
     await act(async () => void 0);
     host?.remove();
-    await mount(<NexDevtools client={client} defaultOpen force />);
-    expect(host?.querySelector('[data-testid="nex-devtools"]')).not.toBeNull();
+    await mount(<NyxDevtools client={client} defaultOpen force />);
+    expect(host?.querySelector('[data-testid="nyx-devtools"]')).not.toBeNull();
   });
 });

@@ -1,11 +1,11 @@
-# @nexapi/devtools
+# @nyxapi/devtools
 
-Cache diagnostics for NexAPI.
+Cache diagnostics for NyxAPI.
 
 ```ts
-import { createInspector } from "@nexapi/devtools";
+import { createInspector } from "@nyxapi/devtools";
 
-const inspector = createInspector(nex.queryClient, {
+const inspector = createInspector(nyx.queryClient, {
   redact: (key, data) => data, // decide what `inspectData` may reveal
 });
 inspector.subscribe(() => console.log(inspector.snapshot().queries));
@@ -17,12 +17,12 @@ inspector.subscribe(() => console.log(inspector.snapshot().queries));
 - `inspectData(hash)` returns one entry's data through `redact`.
 - `refetch`, `invalidate`, `remove` act on one entry. `dispose()` stops listening.
 
-React panel (requires `@nexapi/react`):
+React panel (requires `@nyxapi/react`):
 
 ```tsx
-import { NexDevtools } from "@nexapi/devtools/react";
+import { NyxDevtools } from "@nyxapi/devtools/react";
 
-<NexDevtools defaultOpen />; // client from <NexProvider>, or pass `client`
+<NyxDevtools defaultOpen />; // client from <NyxProvider>, or pass `client`
 ```
 
 It renders nothing when `process.env.NODE_ENV === "production"` unless `force` is set. Not yet

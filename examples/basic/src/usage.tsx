@@ -1,13 +1,13 @@
-import { createNexClient } from "@nexapi/core";
-import { useMutation, useQuery } from "@nexapi/react";
+import { createNyxClient } from "@nyxapi/core";
+import { useMutation, useQuery } from "@nyxapi/react";
 import { createApi } from "../generated/index.js";
 
-// One NexClient per user/request: it owns the HTTP credentials *and* the cache.
-export const nex = createNexClient({
+// One NyxClient per user/request: it owns the HTTP credentials *and* the cache.
+export const nyx = createNyxClient({
   baseUrl: "https://api.example.com/v1",
   getToken: () => localStorage.getItem("token"),
 });
-export const api = createApi(nex);
+export const api = createApi(nyx);
 
 export function UserCard({ userId }: { userId: string }) {
   const user = useQuery(api.users.byId(userId).get.options(undefined, { staleTime: 30_000 }));

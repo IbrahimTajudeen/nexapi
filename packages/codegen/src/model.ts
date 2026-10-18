@@ -1,4 +1,4 @@
-import { resolveConfig, type NexApiConfig } from "./config.js";
+import { resolveConfig, type NyxApiConfig } from "./config.js";
 import type {
   ApiModel,
   BodyKind,
@@ -26,7 +26,7 @@ const VOID: TypeNode = { kind: "primitive", type: "void" };
 /** Parse an OpenAPI 3.x document into the normalized model. Collects all problems. */
 export function buildApiModel(
   document: unknown,
-  config: NexApiConfig = {},
+  config: NyxApiConfig = {},
 ): { model: ApiModel; diagnostics: Diagnostic[] } {
   const cfg = resolveConfig(config);
   const diagnostics: Diagnostic[] = [];

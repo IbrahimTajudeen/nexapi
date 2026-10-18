@@ -1,6 +1,6 @@
 # Framework adapters: NestJS and ASP.NET Core
 
-NexAPI generates from an OpenAPI 3.x document. Both frameworks already emit one, so the "adapter" is a
+NyxAPI generates from an OpenAPI 3.x document. Both frameworks already emit one, so the "adapter" is a
 recipe plus tests that the generator copes with what they emit, not a second parser that reads framework
 source. (An adapter that read controllers directly would have to re-implement each framework's routing,
 DTO and validation rules and would drift from them; the OpenAPI output is the framework's own statement of
@@ -27,7 +27,7 @@ await app.close();
 ```
 
 ```bash
-npx nexapi generate --input openapi.json --output src/api
+npx nyxapi generate --input openapi.json --output src/api
 ```
 
 Verified against real output: `fixtures/openapi/nestjs-swagger.json` was produced by `@nestjs/swagger` 11 from
@@ -52,7 +52,7 @@ Things to know:
 
 ```bash
 dotnet swagger tofile --output openapi.json ./bin/Release/net9.0/Api.dll v1     # Swashbuckle CLI
-npx nexapi generate --input openapi.json --output src/api --config nexapi.config.json
+npx nyxapi generate --input openapi.json --output src/api --config nyxapi.config.json
 ```
 
 ```json

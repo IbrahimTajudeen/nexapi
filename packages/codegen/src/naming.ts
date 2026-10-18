@@ -97,7 +97,7 @@ export const RESERVED_TYPE_NAMES = new Set([
   "Readonly",
   "Omit",
   "Pick",
-  "NexClient",
+  "NyxClient",
   "NoRequest",
 ]);
 

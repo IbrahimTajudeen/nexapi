@@ -1,9 +1,10 @@
 {
-  "name": "@nexapi/website",
+  "name": "@nyxapi/website",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "prepare:site": "node scripts/prepare-downloads.mjs",
     "predev": "node scripts/prepare-downloads.mjs",
     "dev": "next dev --webpack",
     "prebuild": "node scripts/prepare-downloads.mjs",
@@ -14,10 +15,10 @@
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource-variable/schibsted-grotesk": "^5.3.0",
-    "@nexapi/codegen": "workspace:*",
-    "@nexapi/core": "workspace:*",
-    "@nexapi/devtools": "workspace:*",
-    "@nexapi/react": "workspace:*",
+    "@nyxapi/codegen": "workspace:*",
+    "@nyxapi/core": "workspace:*",
+    "@nyxapi/devtools": "workspace:*",
+    "@nyxapi/react": "workspace:*",
     "next": "16.4.2",
     "react": "19.3.1",
     "react-dom": "19.3.1"

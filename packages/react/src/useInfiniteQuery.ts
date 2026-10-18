@@ -4,7 +4,7 @@ import {
   type InfiniteQueryOptions,
   type InfiniteQueryResult,
   type QueryClient,
-} from "@nexapi/core";
+} from "@nyxapi/core";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { useQueryClient } from "./context.js";
 

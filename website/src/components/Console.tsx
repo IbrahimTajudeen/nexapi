@@ -15,8 +15,8 @@ export interface Preset {
 }
 
 /**
- * Editable JavaScript that runs against the real NexAPI engine and an in-memory mock API.
- * Variables in scope: `api`, `nex`, `core`, `log`, `sleep`, `server`. Nothing leaves the page.
+ * Editable JavaScript that runs against the real NyxAPI engine and an in-memory mock API.
+ * Variables in scope: `api`, `nyx`, `core`, `log`, `sleep`, `server`. Nothing leaves the page.
  */
 export function Console({
   code,
@@ -73,7 +73,7 @@ export function Console({
   }, [engine, running, source, push]);
 
   const reset = (): void => {
-    engine?.nex.queryClient.clear();
+    engine?.nyx.queryClient.clear();
     engine?.server.reset();
     if (engine) engine.server.failing = false;
     setFailing(false);

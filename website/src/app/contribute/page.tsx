@@ -7,13 +7,13 @@ import { REPO_URL } from "@/site";
 export const metadata: Metadata = {
   title: "Contribute",
   description:
-    "NexAPI is open source and looking for contributors. Here is how to set up, what to work on, and how we work.",
+    "NyxAPI is open source and looking for contributors. Here is how to set up, what to work on, and how we work.",
 };
 
 const AREAS: [string, string][] = [
   [
     "Try it on your schema",
-    "Run nexapi validate on a real OpenAPI document and report anything that is rejected or generated wrongly. Large and unusual schemas are the most valuable.",
+    "Run nyxapi validate on a real OpenAPI document and report anything that is rejected or generated wrongly. Large and unusual schemas are the most valuable.",
   ],
   [
     "Framework guides",
@@ -44,9 +44,9 @@ const AREAS: [string, string][] = [
 export default function Page() {
   return (
     <div className="wrap" style={{ padding: "36px 0 80px", maxWidth: 900 }}>
-      <h1 style={{ fontSize: "clamp(2rem,4vw,2.7rem)" }}>Contribute to NexAPI</h1>
+      <h1 style={{ fontSize: "clamp(2rem,4vw,2.7rem)" }}>Contribute to NyxAPI</h1>
       <p style={{ color: "var(--muted)", fontSize: "1.15rem" }}>
-        NexAPI is open source under the MIT licence, and it is looking for contributors. The engine,
+        NyxAPI is open source under the MIT licence, and it is looking for contributors. The engine,
         generator, React adapter and devtools exist and are tested. What it needs now is people who
         use it, break it, and make it better.
       </p>
@@ -87,7 +87,7 @@ export default function Page() {
       </p>
       <Code lang="bash" title="terminal">{`pnpm install
 pnpm check                              # lint, type-check, tests, build, generated-code check
-pnpm --filter @nexapi/website dev       # this website, with hot reload`}</Code>
+pnpm --filter @nyxapi/website dev       # this website, with hot reload`}</Code>
       <p>
         If <code>pnpm check</code> passes, you are ready. It runs the whole suite, and it is what
         runs in CI.
@@ -103,7 +103,7 @@ pnpm --filter @nexapi/website dev       # this website, with hot reload`}</Code>
                 "HTTP client, query cache, mutations. No React, no runtime dependencies.",
               ],
               ["packages/codegen", "OpenAPI to TypeScript. Pure functions, no file access."],
-              ["packages/cli", "The nexapi command."],
+              ["packages/cli", "The nyxapi command."],
               ["packages/react", "Hooks over the core cache."],
               ["packages/devtools", "Cache inspector and React panel."],
               ["fixtures/openapi", "Test schemas, including real NestJS output."],

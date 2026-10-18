@@ -40,11 +40,11 @@ Types: `QueryEndpoint<TReq, TData, TErrBody>`, `MutationEndpoint<TReq, TBody, TD
 
 ### Cookies
 
-Browsers forbid scripts from setting a `Cookie` header, so a generated `in: cookie` parameter could never work from a web page and would only work in non-browser runtimes with different semantics. Codegen therefore leaves cookie parameters out of the request type and warns. Cookie _sessions_ are supported the way the platform does it: `createNexClient({ credentials: "include" })` (cross-origin API with CORS credentials) or `"same-origin"`. The mode applies only to requests to the pinned origin; a request that leaves it (the opt-in `allowAbsoluteUrls`) always uses `"omit"`. Outside a browser, send a cookie explicitly with the client's `headers` option. Server-side Node `fetch` keeps no cookie jar.
+Browsers forbid scripts from setting a `Cookie` header, so a generated `in: cookie` parameter could never work from a web page and would only work in non-browser runtimes with different semantics. Codegen therefore leaves cookie parameters out of the request type and warns. Cookie _sessions_ are supported the way the platform does it: `createNyxClient({ credentials: "include" })` (cross-origin API with CORS credentials) or `"same-origin"`. The mode applies only to requests to the pinned origin; a request that leaves it (the opt-in `allowAbsoluteUrls`) always uses `"omit"`. Outside a browser, send a cookie explicitly with the client's `headers` option. Server-side Node `fetch` keeps no cookie jar.
 
 ### Optional response validation
 
-With `"validation": true` in `nexapi.config.json`, codegen also emits `shapes.ts` (plain data, no code, no dependency) and attaches the shape of every JSON success response to its endpoint. The runtime then checks each response and rejects with `ResponseValidationError` (`issues: { path, expected, received }[]`, at most 10) when it differs; turn it off per client with `createNexClient({ validateResponses: false })`. Reports contain positions and types, never values, because responses may carry personal data. A mismatch is deterministic, so it is never retried, and it lands in query state like any error.
+With `"validation": true` in `nyxapi.config.json`, codegen also emits `shapes.ts` (plain data, no code, no dependency) and attaches the shape of every JSON success response to its endpoint. The runtime then checks each response and rejects with `ResponseValidationError` (`issues: { path, expected, received }[]`, at most 10) when it differs; turn it off per client with `createNyxClient({ validateResponses: false })`. Reports contain positions and types, never values, because responses may carry personal data. A mismatch is deterministic, so it is never retried, and it lands in query state like any error.
 
 What is checked: types, required properties, literals/enums, arrays, unions (one member must match), intersections, declared `additionalProperties` types. What is not: undeclared extra properties are accepted (servers add fields without breaking clients), and `integer`, `format`, length, pattern and range constraints are not represented, so they are not enforced. Validation runs once per fetch on the parsed body (cost is linear in its size; benchmark before enabling on very large payloads). Turning the option off later leaves `shapes.ts` on disk, unreferenced; delete it.
 
@@ -82,8 +82,8 @@ Off by default. Enabling requires `{ idempotent: true, attempts }` (compile-time
 
 ## Security defaults
 
-No logging anywhere. Errors never include headers, bodies or query strings. Base origin is pinned; `allowAbsoluteUrls` is an explicit opt-in. Auth tokens are only attached to requests to the configured origin. Create one `NexClient` per user/request on servers.
+No logging anywhere. Errors never include headers, bodies or query strings. Base origin is pinned; `allowAbsoluteUrls` is an explicit opt-in. Auth tokens are only attached to requests to the configured origin. Create one `NyxClient` per user/request on servers.
 
 ## Breaking-change policy (from 0.1)
 
-Public = everything exported from package entry points plus the _shape_ of generated code. Generated-code shape changes require a major version of `@nexapi/codegen` and a note in the changelog; `nexapi generate --check` in CI makes drift visible.
+Public = everything exported from package entry points plus the _shape_ of generated code. Generated-code shape changes require a major version of `@nyxapi/codegen` and a note in the changelog; `nyxapi generate --check` in CI makes drift visible.

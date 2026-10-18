@@ -11,15 +11,15 @@ import { NODE_MIN, VERSION } from "@/site";
 export const metadata: Metadata = {
   title: "Install and downloads",
   description:
-    "Install NexAPI with a one-line curl command, with npm, pnpm, yarn or bun, or download the packages and source.",
+    "Install NyxAPI with a one-line curl command, with npm, pnpm, yarn or bun, or download the packages and source.",
 };
 
 const PS = `$site = "{{site}}"
-$files = "core", "cli", "codegen" | ForEach-Object { "nexapi-$_-${VERSION}.tgz" }
-New-Item -ItemType Directory -Force .nexapi | Out-Null
-foreach ($f in $files) { curl.exe -fsSL "$site/downloads/$f" -o ".nexapi/$f" }
-npm install ".nexapi/nexapi-core-${VERSION}.tgz"
-npm install -D ".nexapi/nexapi-cli-${VERSION}.tgz" ".nexapi/nexapi-codegen-${VERSION}.tgz"`;
+$files = "core", "cli", "codegen" | ForEach-Object { "nyxapi-$_-${VERSION}.tgz" }
+New-Item -ItemType Directory -Force .nyxapi | Out-Null
+foreach ($f in $files) { curl.exe -fsSL "$site/downloads/$f" -o ".nyxapi/$f" }
+npm install ".nyxapi/nyxapi-core-${VERSION}.tgz"
+npm install -D ".nyxapi/nyxapi-cli-${VERSION}.tgz" ".nyxapi/nyxapi-codegen-${VERSION}.tgz"`;
 
 export default function Page() {
   return (
@@ -44,18 +44,18 @@ export default function Page() {
       <p>
         Run this inside your project folder (the one with a <code>package.json</code>). It downloads
         the packages from this site, checks their SHA-256 sums, saves them in{" "}
-        <code>./.nexapi/</code> and installs them with your package manager.
+        <code>./.nyxapi/</code> and installs them with your package manager.
       </p>
       <SiteCommand>{`curl -fsSL {{site}}/install.sh | sh -s -- {{site}}`}</SiteCommand>
       <p>
         It detects npm, pnpm, yarn or bun from your lockfile. To also install the React adapter and
         devtools:
       </p>
-      <SiteCommand>{`curl -fsSL {{site}}/install.sh | NEXAPI_PACKAGES="core react cli codegen devtools" sh -s -- {{site}}`}</SiteCommand>
+      <SiteCommand>{`curl -fsSL {{site}}/install.sh | NYXAPI_PACKAGES="core react cli codegen devtools" sh -s -- {{site}}`}</SiteCommand>
       <p className="hint">
         Prefer to read before you run? Open <a href="/install.sh">install.sh</a>. It is short, only
         downloads from the site you give it, and verifies checksums before installing anything. Set{" "}
-        <code>NEXAPI_PM</code> to force a package manager.
+        <code>NYXAPI_PM</code> to force a package manager.
       </p>
 
       <h2 id="windows" style={{ marginTop: 36 }}>
@@ -69,12 +69,12 @@ export default function Page() {
         From the npm registry (once published)
       </h2>
       <p>Runtime:</p>
-      <PackageInstall packages="@nexapi/core" />
+      <PackageInstall packages="@nyxapi/core" />
       <p>Command line tool:</p>
-      <PackageInstall packages="@nexapi/cli" dev />
+      <PackageInstall packages="@nyxapi/cli" dev />
       <p>React adapter and devtools:</p>
-      <PackageInstall packages="@nexapi/react" />
-      <PackageInstall packages="@nexapi/devtools" dev />
+      <PackageInstall packages="@nyxapi/react" />
+      <PackageInstall packages="@nyxapi/devtools" dev />
 
       <h2 id="downloads" style={{ marginTop: 36 }}>
         Downloads
@@ -91,7 +91,7 @@ export default function Page() {
             id: "curl",
             label: "curl",
             content: (
-              <SiteCommand>{`curl -fsSLO {{site}}/downloads/nexapi-core-${VERSION}.tgz
+              <SiteCommand>{`curl -fsSLO {{site}}/downloads/nyxapi-core-${VERSION}.tgz
 curl -fsSLO {{site}}/downloads/SHA256SUMS
 sha256sum --check --ignore-missing SHA256SUMS`}</SiteCommand>
             ),
@@ -100,7 +100,7 @@ sha256sum --check --ignore-missing SHA256SUMS`}</SiteCommand>
             id: "mac",
             label: "macOS",
             content: (
-              <SiteCommand>{`curl -fsSLO {{site}}/downloads/nexapi-core-${VERSION}.tgz
+              <SiteCommand>{`curl -fsSLO {{site}}/downloads/nyxapi-core-${VERSION}.tgz
 curl -fsSLO {{site}}/downloads/SHA256SUMS
 shasum -a 256 -c SHA256SUMS 2>&1 | grep core`}</SiteCommand>
             ),
@@ -112,22 +112,22 @@ shasum -a 256 -c SHA256SUMS 2>&1 | grep core`}</SiteCommand>
               <SiteCommand
                 lang="text"
                 title="PowerShell"
-              >{`curl.exe -fsSLO "{{site}}/downloads/nexapi-core-${VERSION}.tgz"
-(Get-FileHash nexapi-core-${VERSION}.tgz -Algorithm SHA256).Hash.ToLower()
+              >{`curl.exe -fsSLO "{{site}}/downloads/nyxapi-core-${VERSION}.tgz"
+(Get-FileHash nyxapi-core-${VERSION}.tgz -Algorithm SHA256).Hash.ToLower()
 # compare with the line for this file in SHA256SUMS`}</SiteCommand>
             ),
           },
         ]}
       />
       <p>Install tarballs by path. The CLI needs the codegen tarball next to it:</p>
-      <Code lang="bash" title="terminal">{`npm install ./nexapi-core-${VERSION}.tgz
-npm install -D ./nexapi-cli-${VERSION}.tgz ./nexapi-codegen-${VERSION}.tgz`}</Code>
+      <Code lang="bash" title="terminal">{`npm install ./nyxapi-core-${VERSION}.tgz
+npm install -D ./nyxapi-cli-${VERSION}.tgz ./nyxapi-codegen-${VERSION}.tgz`}</Code>
 
       <h2 id="source" style={{ marginTop: 36 }}>
         From source
       </h2>
-      <SiteCommand>{`curl -fsSLO {{site}}/downloads/nexapi-source-${VERSION}.zip
-unzip nexapi-source-${VERSION}.zip && cd nexapi
+      <SiteCommand>{`curl -fsSLO {{site}}/downloads/nyxapi-source-${VERSION}.zip
+unzip nyxapi-source-${VERSION}.zip && cd nyxapi
 pnpm install && pnpm check`}</SiteCommand>
       <p>
         <code>pnpm check</code> runs lint, type-checks, all tests, the build and the generated-code
@@ -137,7 +137,7 @@ pnpm install && pnpm check`}</SiteCommand>
       <h2 id="verify" style={{ marginTop: 36 }}>
         Check the install
       </h2>
-      <Code lang="bash" title="terminal">{`npx nexapi --help`}</Code>
+      <Code lang="bash" title="terminal">{`npx nyxapi --help`}</Code>
       <p>
         Then follow the <Link href="/docs/quick-start/">quick start</Link>, or the slower{" "}
         <Link href="/beginners/">beginners guide</Link>.

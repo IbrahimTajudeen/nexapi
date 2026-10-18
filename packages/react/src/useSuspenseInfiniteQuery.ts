@@ -3,7 +3,7 @@ import {
   type InfiniteData,
   type InfiniteQueryOptions,
   type InfiniteQueryResult,
-} from "@nexapi/core";
+} from "@nyxapi/core";
 import { useQueryClient } from "./context.js";
 import { useInfiniteQuery } from "./useInfiniteQuery.js";
 

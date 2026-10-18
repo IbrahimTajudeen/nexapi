@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { GenerationError, generate, type Diagnostic } from "@nexapi/codegen";
+import { GenerationError, generate, type Diagnostic } from "@nyxapi/codegen";
 import { SAMPLE_SCHEMA } from "@/lib/sample-schema";
 import { highlight } from "@/lib/highlight";
 import { CopyButton } from "./CopyButton";

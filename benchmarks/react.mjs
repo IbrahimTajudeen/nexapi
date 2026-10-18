@@ -1,5 +1,5 @@
-// React render benchmarks: NexAPI vs TanStack Query vs RTK Query, in jsdom with React production builds.
-// Run: pnpm build && pnpm --filter @nexapi/benchmarks bench:react
+// React render benchmarks: NyxAPI vs TanStack Query vs RTK Query, in jsdom with React production builds.
+// Run: pnpm build && pnpm --filter @nyxapi/benchmarks bench:react
 // jsdom has no layout/paint, so this measures React work + library overhead only, not browser rendering.
 process.env.NODE_ENV = "production";
 import { JSDOM } from "jsdom";
@@ -18,8 +18,8 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = false;
 const { createElement: h, Fragment } = await import("react");
 const { flushSync } = await import("react-dom");
 const { createRoot } = await import("react-dom/client");
-const nexCore = await import("@nexapi/core");
-const nexReact = await import("@nexapi/react");
+const nyxCore = await import("@nyxapi/core");
+const nyxReact = await import("@nyxapi/react");
 const tan = await import("@tanstack/react-query");
 const rtkq = await import("@reduxjs/toolkit/query/react");
 const { configureStore } = await import("@reduxjs/toolkit");
@@ -49,17 +49,17 @@ function counters() {
 function adapters() {
   const payload = (v) => ({ id: 1, v });
 
-  const nexapi = {
-    name: "nexapi",
+  const nyxapi = {
+    name: "nyxapi",
     setup(c, keyOf) {
       let calls = 0;
-      const client = new nexCore.QueryClient({
+      const client = new nyxCore.QueryClient({
         focusManager: { subscribe: () => () => {}, isFocused: () => true },
         onlineManager: { subscribe: () => () => {}, isOnline: () => true },
       });
       function Item({ i }) {
         c.renders++;
-        const q = nexReact.useQuery({
+        const q = nyxReact.useQuery({
           queryKey: keyOf(i),
           queryFn: () => (calls++, Promise.resolve(payload(0))),
           retry: false,
@@ -70,7 +70,7 @@ function adapters() {
       }
       return {
         Item,
-        wrap: (child) => h(nexReact.NexProvider, { client }, child),
+        wrap: (child) => h(nyxReact.NyxProvider, { client }, child),
         write: (i, v) => client.setData(keyOf(i), payload(v)),
         calls: () => calls,
       };
@@ -136,7 +136,7 @@ function adapters() {
       };
     },
   };
-  return [nexapi, tanstack, rtk];
+  return [nyxapi, tanstack, rtk];
 }
 
 const rootEl = document.getElementById("root");
@@ -209,7 +209,7 @@ const env = {
     "@tanstack/react-query": pkgVersion("@tanstack/react-query"),
     "@reduxjs/toolkit": pkgVersion("@reduxjs/toolkit"),
     "react-redux": pkgVersion("react-redux"),
-    "@nexapi/react": JSON.parse(
+    "@nyxapi/react": JSON.parse(
       readFileSync(new URL("../packages/react/package.json", import.meta.url), "utf8"),
     ).version,
   },

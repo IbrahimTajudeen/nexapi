@@ -1,14 +1,14 @@
 {
-  "name": "@nexapi/cli",
+  "name": "@nyxapi/cli",
   "version": "0.0.1",
-  "description": "Schema validation and client generation commands for NexAPI",
+  "description": "Schema validation and client generation commands for NyxAPI",
   "type": "module",
   "license": "MIT",
   "engines": {
     "node": ">=22.12"
   },
   "bin": {
-    "nexapi": "./dist/cli.js"
+    "nyxapi": "./dist/cli.js"
   },
   "files": [
     "dist"
@@ -22,6 +22,6 @@
     }
   },
   "dependencies": {
-    "@nexapi/codegen": "workspace:*"
+    "@nyxapi/codegen": "workspace:*"
   }
 }

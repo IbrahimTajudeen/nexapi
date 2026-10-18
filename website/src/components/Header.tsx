@@ -17,10 +17,10 @@ const LINKS = [
 
 export function Logo() {
   return (
-    <Link href="/" className="brand" aria-label="NexAPI home">
+    <Link href="/" className="brand" aria-label="NyxAPI home">
       <Image src="/brand/mark.png" alt="" width={34} height={34} priority />
       <span>
-        Nex<span className="api">API</span>
+        Nyx<span className="api">API</span>
       </span>
     </Link>
   );
@@ -55,7 +55,7 @@ export function Header() {
             <a
               className="icon-btn"
               href={REPO_URL}
-              aria-label="NexAPI on GitHub"
+              aria-label="NyxAPI on GitHub"
               title="GitHub"
               rel="noopener"
             >

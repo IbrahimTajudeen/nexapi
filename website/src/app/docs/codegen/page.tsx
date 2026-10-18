@@ -17,9 +17,9 @@ export default function Page() {
       <Code
         lang="bash"
         title="terminal"
-      >{`npx nexapi generate --input ./openapi.yaml --output ./src/api
-npx nexapi generate --input https://example.com/openapi.json --output ./src/api
-npx nexapi validate ./openapi.yaml`}</Code>
+      >{`npx nyxapi generate --input ./openapi.yaml --output ./src/api
+npx nyxapi generate --input https://example.com/openapi.json --output ./src/api
+npx nyxapi validate ./openapi.yaml`}</Code>
       <p>
         A remote schema is fetched only when you pass its URL explicitly with <code>--input</code>.
         A URL written in a config file is rejected, so a config you cloned from somewhere can never
@@ -37,7 +37,7 @@ npx nexapi validate ./openapi.yaml`}</Code>
           [
             <code key="b">client.ts</code>,
             <>
-              The <code>createApi(nex)</code> function that builds the resource tree.
+              The <code>createApi(nyx)</code> function that builds the resource tree.
             </>,
           ],
           [<code key="c">index.ts</code>, "Re-exports the two files above."],
@@ -58,10 +58,10 @@ npx nexapi validate ./openapi.yaml`}</Code>
 
       <H2>Configuration file</H2>
       <p>
-        Put a <code>nexapi.config.json</code> next to your <code>package.json</code> and the CLI
+        Put a <code>nyxapi.config.json</code> next to your <code>package.json</code> and the CLI
         picks it up. Paths inside are relative to the file.
       </p>
-      <Code lang="json" title="nexapi.config.json">{`{
+      <Code lang="json" title="nyxapi.config.json">{`{
   "input": "./openapi.yaml",
   "output": "./src/api",
   "validation": true,
@@ -120,7 +120,7 @@ npx nexapi validate ./openapi.yaml`}</Code>
       <p>
         Validation errors are never retried, because the same response would fail the same way. Turn
         validation off for one client with{" "}
-        <code>createNexClient({"{ validateResponses: false }"})</code>.
+        <code>createNyxClient({"{ validateResponses: false }"})</code>.
       </p>
 
       <H2>What is supported</H2>
@@ -145,16 +145,16 @@ npx nexapi validate ./openapi.yaml`}</Code>
       <Callout kind="warn" title="Cookie parameters">
         Browsers do not let scripts set a <code>Cookie</code> header, so cookie parameters are left
         out of request types and the generator warns. For cookie sessions use{" "}
-        <code>createNexClient({'{ credentials: "include" }'})</code>.
+        <code>createNyxClient({'{ credentials: "include" }'})</code>.
       </Callout>
       <p>
         Anything the generator cannot represent is reported as an error or a warning with a code,
         such as <code>UNSUPPORTED_BODY_SCHEMA</code>. It does not silently skip or guess. Run{" "}
-        <code>nexapi validate</code> to see them all without writing files.
+        <code>nyxapi validate</code> to see them all without writing files.
       </p>
 
       <H2>Use it in CI</H2>
-      <Code lang="bash" title="terminal">{`npx nexapi generate --check`}</Code>
+      <Code lang="bash" title="terminal">{`npx nyxapi generate --check`}</Code>
       <p>
         <code>--check</code> writes nothing and exits with status 1 when the files on disk are out
         of date. Add it next to your tests so a schema change cannot land without its regenerated
@@ -166,7 +166,7 @@ npx nexapi validate ./openapi.yaml`}</Code>
         The generator is also a library with no file access, which is how the{" "}
         <Link href="/playground/">playground</Link> runs it in your browser:
       </p>
-      <Code lang="ts">{`import { generate } from "@nexapi/codegen";
+      <Code lang="ts">{`import { generate } from "@nyxapi/codegen";
 
 const { files, diagnostics } = generate(schemaText, { validation: true });
 for (const file of files) console.log(file.path, file.content.length);`}</Code>

@@ -4,7 +4,7 @@ export {
   type QueryClientOptions,
   type OptimisticTransaction,
 } from "./client.js";
-export { NexClient, createNexClient, type NexClientOptions } from "./nex-client.js";
+export { NyxClient, createNyxClient, type NyxClientOptions } from "./nyx-client.js";
 export {
   createMutationEndpoint,
   createQueryEndpoint,
@@ -24,7 +24,7 @@ export {
   type ErrorCase,
   type HttpErrorOf,
   NetworkError,
-  NexError,
+  NyxError,
   ParseError,
   RequestError,
   ResponseValidationError,

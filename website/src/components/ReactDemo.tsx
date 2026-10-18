@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { HttpError } from "@nexapi/core";
-import { NexProvider, useMutation, useQuery } from "@nexapi/react";
-import { NexDevtools } from "@nexapi/devtools/react";
+import { HttpError } from "@nyxapi/core";
+import { NyxProvider, useMutation, useQuery } from "@nyxapi/react";
+import { NyxDevtools } from "@nyxapi/devtools/react";
 import { createEngine, type Engine } from "@/lib/engine";
 
 function refusal(error: unknown): string {
@@ -110,7 +110,7 @@ function Detail({ engine, id }: { engine: Engine; id: string }) {
   );
 }
 
-/** A real React app on @nexapi/react, talking to the in-browser mock API, with the devtools panel. */
+/** A real React app on @nyxapi/react, talking to the in-browser mock API, with the devtools panel. */
 export function ReactDemo() {
   const [engine, setEngine] = useState<Engine | null>(null);
   const [selected, setSelected] = useState("1");
@@ -122,7 +122,7 @@ export function ReactDemo() {
   }, []);
   if (!engine) return <p className="hint">Starting…</p>;
   return (
-    <NexProvider client={engine.nex.queryClient}>
+    <NyxProvider client={engine.nyx.queryClient}>
       <div className="demo-card">
         <div className="cta-row" style={{ marginBottom: 14 }}>
           <label className="check" style={{ color: "var(--muted)" }}>
@@ -139,7 +139,7 @@ export function ReactDemo() {
           <button
             type="button"
             className="btn small"
-            onClick={() => void engine.nex.queryClient.invalidateQueries()}
+            onClick={() => void engine.nyx.queryClient.invalidateQueries()}
           >
             Invalidate everything
           </button>
@@ -150,9 +150,9 @@ export function ReactDemo() {
         </div>
       </div>
       <p className="hint">
-        The panel in the corner is @nexapi/devtools, inspecting this demo&apos;s cache live.
+        The panel in the corner is @nyxapi/devtools, inspecting this demo&apos;s cache live.
       </p>
-      <NexDevtools client={engine.nex.queryClient} force />
-    </NexProvider>
+      <NyxDevtools client={engine.nyx.queryClient} force />
+    </NyxProvider>
   );
 }

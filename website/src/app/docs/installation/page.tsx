@@ -13,12 +13,12 @@ export default function Page() {
     <Doc
       href="/docs/installation/"
       title="Installation"
-      lede="NexAPI is a set of small packages. Install the runtime in your app and the command line tool as a development dependency."
+      lede="NyxAPI is a set of small packages. Install the runtime in your app and the command line tool as a development dependency."
     >
       <H2>Requirements</H2>
       <ul>
         <li>
-          Node.js {NODE_MIN} or newer. NexAPI is ESM only, so your project needs{" "}
+          Node.js {NODE_MIN} or newer. NyxAPI is ESM only, so your project needs{" "}
           <code>&quot;type&quot;: &quot;module&quot;</code> or an ESM-aware bundler.
         </li>
         <li>TypeScript 5.x for the best experience. The generated files are plain TypeScript.</li>
@@ -37,13 +37,13 @@ export default function Page() {
 
       <H2>From the npm registry</H2>
       <p>The runtime goes in your dependencies:</p>
-      <PackageInstall packages="@nexapi/core" />
+      <PackageInstall packages="@nyxapi/core" />
       <p>The command line tool generates your client, so it is a development dependency:</p>
-      <PackageInstall packages="@nexapi/cli" dev />
+      <PackageInstall packages="@nyxapi/cli" dev />
       <p>Add the React adapter only if you use React:</p>
-      <PackageInstall packages="@nexapi/react" />
+      <PackageInstall packages="@nyxapi/react" />
       <p>And the devtools while you develop:</p>
-      <PackageInstall packages="@nexapi/devtools" dev />
+      <PackageInstall packages="@nyxapi/devtools" dev />
 
       <H2>From tarballs</H2>
       <p>
@@ -53,16 +53,16 @@ export default function Page() {
       <Code
         lang="bash"
         title="terminal"
-      >{`npm install ./nexapi-core-${VERSION}.tgz ./nexapi-react-${VERSION}.tgz
-npm install -D ./nexapi-cli-${VERSION}.tgz ./nexapi-codegen-${VERSION}.tgz`}</Code>
+      >{`npm install ./nyxapi-core-${VERSION}.tgz ./nyxapi-react-${VERSION}.tgz
+npm install -D ./nyxapi-cli-${VERSION}.tgz ./nyxapi-codegen-${VERSION}.tgz`}</Code>
       <p>
-        The CLI depends on <code>@nexapi/codegen</code>, so install both tarballs together as shown.
+        The CLI depends on <code>@nyxapi/codegen</code>, so install both tarballs together as shown.
       </p>
 
       <H2>From source</H2>
       <p>Needs pnpm 10 and Git.</p>
-      <Code lang="bash" title="terminal">{`git clone <repository-url> nexapi
-cd nexapi
+      <Code lang="bash" title="terminal">{`git clone <repository-url> nyxapi
+cd nyxapi
 pnpm install
 pnpm check        # lint, type-check, tests, build, generated-code check`}</Code>
       <p>Then run the CLI straight from the build:</p>
@@ -72,7 +72,7 @@ pnpm check        # lint, type-check, tests, build, generated-code check`}</Code
       >{`node packages/cli/dist/cli.js generate --input ./openapi.yaml --output ./src/api`}</Code>
 
       <H2>Check that it works</H2>
-      <Code lang="bash" title="terminal">{`npx nexapi --help`}</Code>
+      <Code lang="bash" title="terminal">{`npx nyxapi --help`}</Code>
       <p>You should see the usage text for the generate and validate commands.</p>
 
       <H3>TypeScript settings</H3>

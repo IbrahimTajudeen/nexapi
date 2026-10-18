@@ -7,7 +7,7 @@
 - Fetch runtime (middleware, auth provider, timeouts, abort, typed errors, origin safety).
 - Query cache: keys, single flight, staleness, invalidation, GC, retries, cancel, focus/reconnect, subscriptions, selectors.
 - Mutations: lifecycle, scopes, patch-based optimistic updates, opt-in retries.
-- React: `useQuery`, `useMutation`, `NexProvider`; SSR-safe.
+- React: `useQuery`, `useMutation`, `NyxProvider`; SSR-safe.
 - Benchmarks (headless, vs `@tanstack/query-core`).
 
 ## Milestone 2: cache completeness
@@ -28,12 +28,12 @@
 
 ## Milestone 4: devtools & diagnostics
 
-- ✅ `@nexapi/devtools`: headless `createInspector` (query rows, bounded event log, refetch/invalidate/remove, `redact` hook) and a minimal React `NexDevtools` panel. Cached data is never in snapshots and is shown only on request; the panel renders nothing in production unless `force`d.
+- ✅ `@nyxapi/devtools`: headless `createInspector` (query rows, bounded event log, refetch/invalidate/remove, `redact` hook) and a minimal React `NyxDevtools` panel. Cached data is never in snapshots and is shown only on request; the panel renders nothing in production unless `force`d.
 - Open: per-request timeline (needs a transport-level hook), and a richer UI.
 
 ## Milestone 5: performance evidence
 
-- ✅ React render benchmarks (NexAPI vs TanStack Query vs RTK Query, jsdom), memory benchmark (fresh process per sample), bundle-size measurement with budgets for NexAPI entries (`benchmarks/README.md`). Results are machine specific and make no superiority claim.
+- ✅ React render benchmarks (NyxAPI vs TanStack Query vs RTK Query, jsdom), memory benchmark (fresh process per sample), bundle-size measurement with budgets for NyxAPI entries (`benchmarks/README.md`). Results are machine specific and make no superiority claim.
 - Open: real-browser rendering, hydration, long-session memory, mutation/rollback comparisons.
 - Profile real workloads before considering normalized entities (not planned until evidence exists).
 
@@ -41,3 +41,7 @@
 
 - ✅ LICENSE, package READMEs, `pnpm smoke:pack` (pack → empty-project install → CLI generate → strict type-check → run), CI step, `docs/RELEASING.md`.
 - Open: changesets, npm provenance, `repository` manifest field (needs the real URL), CHANGELOG, docs site, browser matrix tests. (Size budgets: done via `benchmarks/size.mjs`.)
+
+## Naming
+
+The project was renamed from NexAPI to NyxAPI before any public release. Packages are `@nyxapi/*`, the CLI is `nyxapi`, the config file is `nyxapi.config.json`, and environment variables use the `NYXAPI_` prefix. Nothing was published under the old name.

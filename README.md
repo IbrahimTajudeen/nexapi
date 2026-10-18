@@ -1,6 +1,11 @@
-# NexAPI
+# NyxAPI
 
-<p align="center"><img src="assets/logo.png" alt="NexAPI logo" width="96" /></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png" />
+    <img src="assets/logo-light.png" alt="NyxAPI logo" width="320" />
+  </picture>
+</p>
 
 Schema-generated, fluent, fully typed API client with a standalone query/mutation engine (no React required) and a React adapter.
 
@@ -36,17 +41,17 @@ node packages/cli/dist/cli.js generate --check     # CI: fail if generated files
 ```
 
 ```ts
-import { createNexClient } from "@nexapi/core";
+import { createNyxClient } from "@nyxapi/core";
 import { createApi } from "./api/index.js";
 
-const nex = createNexClient({
+const nyx = createNyxClient({
   baseUrl: "https://api.example.com/v1",
   getToken: () => session.token,
 });
-const api = createApi(nex); // one NexClient per user/request on the server
+const api = createApi(nyx); // one NyxClient per user/request on the server
 ```
 
-Without an OpenAPI schema nothing can be generated: a base URL alone does not reveal a server's routes. Hand-written endpoints are possible with `nex.query<…>()`/`nex.mutation<…>()`; adapters that produce the same normalized model from NestJS or ASP.NET Core are on the roadmap.
+Without an OpenAPI schema nothing can be generated: a base URL alone does not reveal a server's routes. Hand-written endpoints are possible with `nyx.query<…>()`/`nyx.mutation<…>()`; adapters that produce the same normalized model from NestJS or ASP.NET Core are on the roadmap.
 
 ## Layout
 

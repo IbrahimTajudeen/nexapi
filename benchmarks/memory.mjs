@@ -1,5 +1,5 @@
 // Retained heap for a populated cache. Each measurement runs in a fresh child process.
-// Run: pnpm build && pnpm --filter @nexapi/benchmarks bench:memory
+// Run: pnpm build && pnpm --filter @nyxapi/benchmarks bench:memory
 import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
@@ -19,8 +19,8 @@ if (process.argv[2] === "child") {
   let client;
   let observers = [];
   let keep;
-  if (lib === "nexapi") {
-    const core = await import("@nexapi/core");
+  if (lib === "nyxapi") {
+    const core = await import("@nyxapi/core");
     client = new core.QueryClient({
       focusManager: { subscribe: () => () => {}, isFocused: () => true },
       onlineManager: { subscribe: () => () => {}, isOnline: () => true },
@@ -81,7 +81,7 @@ if (process.argv[2] === "child") {
 
 const med = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 const rows = [];
-for (const lib of ["nexapi", "tanstack"]) {
+for (const lib of ["nyxapi", "tanstack"]) {
   const runs = [];
   for (let i = 0; i < RUNS; i++) {
     const r = spawnSync(
