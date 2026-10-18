@@ -1,4 +1,4 @@
-export interface syncapiConfig {
+export interface NexApiConfig {
   /** Local OpenAPI file (JSON or YAML), relative to the config file. Remote URLs go through `--input`. */
   input?: string;
   /** Output directory, relative to the config file. */
@@ -21,6 +21,13 @@ export interface syncapiConfig {
   naming?: {
     /** Prefix for path-parameter segments. Default `by` (`/users/{id}` → `users.byId(id)`). */
     paramPrefix?: string;
+    /**
+     * Leave a shared leading path out of the resource tree, e.g. `"/api"` or `"/api/v1"`:
+     * `GET /api/users` becomes `api.users.get()` instead of `api.api.users.get()`. Only the
+     * property names change; requests still go to the full path. Paths that do not start with it
+     * (or that would be left empty) are unchanged.
+     */
+    stripPathPrefix?: string;
   };
 }
 
@@ -28,10 +35,11 @@ export interface ResolvedConfig {
   overrides: Record<string, { path: string[] }>;
   exclude: ReadonlySet<string>;
   paramPrefix: string;
+  stripPathPrefix: string[];
   validation: boolean;
 }
 
-export function validateConfig(raw: unknown): { config: syncapiConfig; problems: string[] } {
+export function validateConfig(raw: unknown): { config: NexApiConfig; problems: string[] } {
   const problems: string[] = [];
   if (typeof raw !== "object" || raw === null || Array.isArray(raw))
     return { config: {}, problems: ["config must be a JSON object"] };
@@ -78,7 +86,14 @@ export function validateConfig(raw: unknown): { config: syncapiConfig; problems:
         }
     }
   }
-  const naming = c["naming"] as { paramPrefix?: unknown } | undefined;
+  const naming = c["naming"] as { paramPrefix?: unknown; stripPathPrefix?: unknown } | undefined;
+  if (
+    naming?.stripPathPrefix !== undefined &&
+    (typeof naming.stripPathPrefix !== "string" ||
+      !/^\/[^{}]*$/.test(naming.stripPathPrefix) ||
+      naming.stripPathPrefix.includes("//"))
+  )
+    problems.push('"naming.stripPathPrefix" must be a path like "/api" without parameters');
   if (
     naming !== undefined &&
     naming.paramPrefix !== undefined &&
@@ -88,11 +103,12 @@ export function validateConfig(raw: unknown): { config: syncapiConfig; problems:
   return { config: c, problems };
 }
 
-export function resolveConfig(config: syncapiConfig): ResolvedConfig {
+export function resolveConfig(config: NexApiConfig): ResolvedConfig {
   return {
     overrides: config.overrides?.operations ?? {},
     exclude: new Set(config.exclude ?? []),
     paramPrefix: config.naming?.paramPrefix ?? "by",
+    stripPathPrefix: (config.naming?.stripPathPrefix ?? "").split("/").filter(Boolean),
     validation: config.validation === true,
   };
 }

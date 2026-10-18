@@ -2,3 +2,4 @@ packages:
   - "packages/*"
   - "benchmarks"
   - "examples/*"
+  - "website"

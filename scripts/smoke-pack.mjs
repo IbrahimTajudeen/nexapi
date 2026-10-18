@@ -7,8 +7,8 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
-const packages = ["core", "codegen", "cli", "react"];
-const work = mkdtempSync(join(tmpdir(), "syncapi-smoke-"));
+const packages = ["core", "codegen", "cli", "react", "devtools"];
+const work = mkdtempSync(join(tmpdir(), "nexapi-smoke-"));
 const run = (cmd, args, cwd) =>
   execFileSync(cmd, args, { cwd, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" });
 const step = (name) => console.log(`- ${name}`);
@@ -26,7 +26,7 @@ try {
     run("pnpm", ["pack", "--pack-destination", packDir], join(root, "packages", name));
   }
   for (const file of readdirSync(packDir)) {
-    const name = /^syncapi-(\w+)-/.exec(file)?.[1];
+    const name = /^nexapi-(\w+)-/.exec(file)?.[1];
     if (name) tarballs[name] = join(packDir, file);
   }
   for (const name of packages) if (!tarballs[name]) throw new Error(`no tarball for ${name}`);
@@ -55,7 +55,7 @@ try {
   const app = join(work, "app");
   mkdirSync(app);
   const overrides = Object.fromEntries(
-    packages.map((n) => [`@syncapi/${n}`, `file:${tarballs[n]}`]),
+    packages.map((n) => [`@nexapi/${n}`, `file:${tarballs[n]}`]),
   );
   writeFileSync(
     join(app, "package.json"),
@@ -82,18 +82,19 @@ try {
   step("generate a client with the installed CLI");
   cpSync(join(root, "fixtures/openapi/basic.yaml"), join(app, "openapi.yaml"));
   writeFileSync(
-    join(app, "syncapi.config.json"),
+    join(app, "nexapi.config.json"),
     JSON.stringify({ input: "openapi.yaml", output: "src/api", validation: true }),
   );
-  run("npx", ["syncapi", "generate"], app);
-  run("npx", ["syncapi", "generate", "--check"], app);
+  run("npx", ["nexapi", "generate"], app);
+  run("npx", ["nexapi", "generate", "--check"], app);
 
   step("type-check and run a consumer (strict, NodeNext)");
   mkdirSync(join(app, "src"), { recursive: true });
   writeFileSync(
     join(app, "src/main.ts"),
-    `import { createNexClient, HttpError } from "@syncapi/core";
+    `import { createNexClient, HttpError } from "@nexapi/core";
 import { createApi } from "./api/index.js";
+import { createInspector } from "@nexapi/devtools";
 
 const nex = createNexClient({
   baseUrl: "https://api.test/v1",
@@ -105,21 +106,23 @@ const nex = createNexClient({
   },
 });
 const api = createApi(nex);
+const inspector = createInspector(nex.queryClient);
 const user = await api.users.byId("42").get();
 const name: string = user.name;
 const missing = await api.users.byId("1").get().catch((e: unknown) => e);
-if (name !== "Ada" || !(missing instanceof HttpError) || missing.status !== 404) process.exit(1);
+if (!Array.isArray(inspector.snapshot().queries) || name !== "Ada" || !(missing instanceof HttpError) || missing.status !== 404) process.exit(1);
 console.log("consumer ok");
 `,
   );
   writeFileSync(
     join(app, "src/hooks.tsx"),
-    `import { useQuery, useSuspenseQuery } from "@syncapi/react";
+    `import { useQuery, useSuspenseQuery } from "@nexapi/react";
+import { NexDevtools } from "@nexapi/devtools/react";
 import type { Api } from "./api/index.js";
 export function Name({ api }: { api: Api }) {
   const q = useQuery(api.users.byId("1").get.options());
   const s = useSuspenseQuery(api.users.byId("1").get.options());
-  return <p>{q.data?.name}{s.data.name}</p>;
+  return <p>{q.data?.name}{s.data.name}<NexDevtools /></p>;
 }
 `,
   );

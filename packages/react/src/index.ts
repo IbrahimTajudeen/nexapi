@@ -7,3 +7,8 @@ export {
   type SuspenseQueryResult,
   type UseSuspenseQueryOptions,
 } from "./useSuspenseQuery.js";
+export {
+  useSuspenseInfiniteQuery,
+  type SuspenseInfiniteQueryResult,
+  type UseSuspenseInfiniteQueryOptions,
+} from "./useSuspenseInfiniteQuery.js";

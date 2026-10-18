@@ -1,8 +1,7 @@
 {
-  "name": "@syncapi/devtools",
-  "private": true,
+  "name": "@nexapi/devtools",
   "version": "0.0.1",
-  "description": "Cache inspection and request diagnostics for syncapi (not implemented yet)",
+  "description": "Cache inspector and React panel for NexAPI",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -19,6 +18,22 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    }
+  },
+  "dependencies": {
+    "@nexapi/core": "workspace:*",
+    "@nexapi/react": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
     }
   }
 }

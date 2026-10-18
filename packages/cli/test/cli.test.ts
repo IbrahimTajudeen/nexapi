@@ -18,10 +18,10 @@ const io = (extra: Partial<CliIo> = {}): CliIo => ({
 beforeEach(async () => {
   out = "";
   err = "";
-  dir = await mkdtemp(join(tmpdir(), "syncapi-cli-"));
+  dir = await mkdtemp(join(tmpdir(), "nexapi-cli-"));
   await cp(new URL("basic.yaml", fixtureDir), join(dir, "api.yaml"));
   await writeFile(
-    join(dir, "syncapi.config.json"),
+    join(dir, "nexapi.config.json"),
     JSON.stringify({
       input: "api.yaml",
       output: "gen",
@@ -30,7 +30,7 @@ beforeEach(async () => {
   );
 });
 
-describe("syncapi generate", () => {
+describe("nexapi generate", () => {
   it("writes files, then a second run changes nothing (no irrelevant diffs)", async () => {
     expect(await run(["generate"], io())).toBe(0);
     expect(out).toContain("3 changed");
@@ -76,7 +76,7 @@ describe("syncapi generate", () => {
     await readFile(join(dir, "remote-gen/index.ts"), "utf8");
 
     await writeFile(
-      join(dir, "syncapi.config.json"),
+      join(dir, "nexapi.config.json"),
       JSON.stringify({ input: "https://example.test/openapi.yaml" }),
     );
     expect(await run(["generate"], io({ fetchText }))).toBe(2);
@@ -85,7 +85,7 @@ describe("syncapi generate", () => {
   });
 
   it("rejects an invalid config and unknown commands/flags", async () => {
-    await writeFile(join(dir, "syncapi.config.json"), JSON.stringify({ bogus: true }));
+    await writeFile(join(dir, "nexapi.config.json"), JSON.stringify({ bogus: true }));
     expect(await run(["generate"], io())).toBe(2);
     expect(err).toContain('unknown config key "bogus"');
     expect(await run(["frobnicate"], io())).toBe(2);
@@ -95,7 +95,7 @@ describe("syncapi generate", () => {
   });
 });
 
-describe("syncapi validate", () => {
+describe("nexapi validate", () => {
   it("accepts a good schema and rejects a bad one", async () => {
     expect(await run(["validate"], io())).toBe(0);
     expect(out).toContain("OK: 8 operation(s), 7 schema(s)");

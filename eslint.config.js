@@ -8,6 +8,13 @@ export default tseslint.config(
       "**/node_modules/**",
       "examples/*/generated/**",
       "benchmarks/results/**",
+      "website/.next/**",
+      "website/out/**",
+      "website/public/**",
+      "website/src/generated/**",
+      "website/src/demo/api/**",
+      "website/starter/**",
+      "website/next-env.d.ts",
     ],
   },
   js.configs.recommended,
@@ -23,6 +30,12 @@ export default tseslint.config(
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
+    },
+  },
+  {
+    files: ["website/**/*.ts", "website/**/*.tsx"],
+    languageOptions: {
+      parserOptions: { project: "./website/tsconfig.json", tsconfigRootDir: import.meta.dirname },
     },
   },
   {
@@ -42,7 +55,14 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
     languageOptions: {
       ...tseslint.configs.disableTypeChecked.languageOptions,
-      globals: { process: "readonly", console: "readonly", URL: "readonly" },
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        URL: "readonly",
+        setTimeout: "readonly",
+        document: "readonly",
+        Buffer: "readonly",
+      },
     },
   },
 );

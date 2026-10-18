@@ -1,6 +1,6 @@
-# @syncapi/react
+# @nexapi/react
 
-React hooks over `@syncapi/core`: `useQuery`, `useSuspenseQuery`, `useInfiniteQuery`, `useMutation`, and an optional `NexProvider`. The data lives only in the core cache; hooks are `useSyncExternalStore` subscriptions, safe under Strict Mode and server rendering (create one client per request).
+React hooks over `@nexapi/core`: `useQuery`, `useSuspenseQuery`, `useInfiniteQuery`, `useMutation`, and an optional `NexProvider`. The data lives only in the core cache; hooks are `useSyncExternalStore` subscriptions, safe under Strict Mode and server rendering (create one client per request).
 
 ```tsx
 const user = useQuery(api.users.byId(id).get.options());

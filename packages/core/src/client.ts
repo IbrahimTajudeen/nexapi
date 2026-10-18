@@ -42,6 +42,11 @@ export interface OptimisticTransaction {
   readonly commit: () => void;
 }
 
+export interface CacheEvent {
+  readonly type: "added" | "updated" | "removed";
+  readonly query: Query;
+}
+
 const DEFAULT_GC_TIME = 5 * 60 * 1000;
 
 function toFilter(target: QueryKey | QueryFilter | undefined): QueryFilter {
@@ -65,6 +70,7 @@ export class QueryClient implements QueryHost {
    * candidate is still checked with the real prefix match, and everything else falls back to a scan.
    */
   readonly #byRoot = new Map<string, Set<Query>>();
+  readonly #cacheListeners = new Set<(event: CacheEvent) => void>();
   readonly #observers = new Set<ObserverHandle>();
   readonly #defaults: QueryDefaults | undefined;
   readonly #focus: FocusManager;
@@ -101,6 +107,9 @@ export class QueryClient implements QueryHost {
     if ((stored as unknown) === query) {
       this.#queries.delete(query.hash);
       if (stored) this.#unindex(stored);
+      query.destroy();
+      if (stored) this.#emit("removed", stored);
+      return;
     }
     query.destroy();
   }
@@ -129,6 +138,7 @@ export class QueryClient implements QueryHost {
       query = new Query(this, options.queryKey, hash);
       this.#queries.set(hash, query);
       this.#index(query);
+      this.#emit("added", query);
       const seed = options.initialData;
       if (seed !== undefined) {
         const value = typeof seed === "function" ? (seed as () => unknown)() : seed;
@@ -165,6 +175,26 @@ export class QueryClient implements QueryHost {
       out.push(q);
     }
     return out;
+  }
+
+  /** @internal */
+  queryChanged(query: Query): void {
+    this.#emit("updated", query);
+  }
+
+  /**
+   * Observe the cache: an entry was added, changed (state, observers) or removed. Meant for
+   * devtools and logging; listeners must be cheap and must not mutate the cache. Entries are
+   * live objects: read what you need when the event arrives.
+   */
+  subscribeCache(listener: (event: CacheEvent) => void): () => void {
+    this.#cacheListeners.add(listener);
+    return () => void this.#cacheListeners.delete(listener);
+  }
+
+  #emit(type: CacheEvent["type"], query: Query): void {
+    if (this.#cacheListeners.size === 0) return;
+    for (const listener of [...this.#cacheListeners]) listener({ type, query });
   }
 
   #index(query: Query): void {

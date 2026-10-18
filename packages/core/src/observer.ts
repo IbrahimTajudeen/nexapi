@@ -139,14 +139,16 @@ export class QueryObserver<TData = unknown, TError = Error, TSelected = TData> {
     this.#query.addObserver(this);
     this.#query.setOptions(this.#options as never);
     this.#client.registerObserver(this);
-    this.#update(false); // the cache may have moved on since render; useSyncExternalStore re-checks
-    this.#scheduleInterval();
-    if (
+    const willFetch =
       this.#options.enabled !== false &&
       this.#options.refetchOnMount !== false &&
-      this.#wantsFetch()
-    )
-      this.#fetch(false);
+      this.#wantsFetch();
+    // The cache may have moved on since render; useSyncExternalStore re-checks. When the fetch
+    // starts right below, keep reporting `fetching` so the render-phase result stays equal and
+    // no redundant notification (and re-render) happens between idle and fetching.
+    this.#update(false, willFetch);
+    this.#scheduleInterval();
+    if (willFetch) this.#fetch(false);
   }
 
   #detach(): void {
@@ -173,8 +175,8 @@ export class QueryObserver<TData = unknown, TError = Error, TSelected = TData> {
     this.#query.fetch(this.#options as never, { observer: true, cancelRefetch }).catch(noop);
   }
 
-  #update(notify: boolean): void {
-    const next = this.#build(this.#query, this.#options, this.#result, false);
+  #update(notify: boolean, optimistic = false): void {
+    const next = this.#build(this.#query, this.#options, this.#result, optimistic);
     if (next !== this.#result) {
       this.#result = next;
       if (notify) for (const l of [...this.#listeners]) l();

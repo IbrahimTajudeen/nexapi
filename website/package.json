@@ -1,0 +1,31 @@
+{
+  "name": "@nexapi/website",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/prepare-downloads.mjs",
+    "dev": "next dev --webpack",
+    "prebuild": "node scripts/prepare-downloads.mjs",
+    "build": "next build --webpack",
+    "start": "npx serve out",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/schibsted-grotesk": "^5.3.0",
+    "@nexapi/codegen": "workspace:*",
+    "@nexapi/core": "workspace:*",
+    "@nexapi/devtools": "workspace:*",
+    "@nexapi/react": "workspace:*",
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "~5.9.3"
+  }
+}

@@ -13,29 +13,31 @@
 ## Milestone 2: cache completeness
 
 - ✅ `paused` fetch status when offline (`networkMode`). (`initialData` ✅, `placeholderData`/`keepPreviousData` ✅, `refetchInterval` ✅)
-- Dehydrate/hydrate ✅ (`dehydrate`, `hydrate`, `initialData`); `useSuspenseQuery` + streaming SSR (`renderToPipeableStream`) ✅; a suspense variant of `useInfiniteQuery` and Next.js/RSC integration still open.
+- Dehydrate/hydrate ✅ (`dehydrate`, `hydrate`, `initialData`); `useSuspenseQuery` + streaming SSR (`renderToPipeableStream`) ✅; `useSuspenseInfiniteQuery` ✅; Next.js/RSC integration still open.
 - ✅ Key-prefix index (first element): prefix filters that start with a primitive look only at their bucket; object-rooted or empty prefixes still scan.
 - Infinite queries in core + `useInfiniteQuery` ✅ (refetch re-requests all loaded pages; `getPreviousPageParam`/`fetchPreviousPage` and `maxPages` ✅).
 - `useIsFetching`, `useQueries`.
 
 ## Milestone 3: codegen breadth
 
-- ✅ Multipart/urlencoded/binary/text request bodies and text/binary responses. Cookies still open. (`deepObject`, comma/space/pipe-delimited query styles ✅)
+- ✅ Multipart/urlencoded/binary/text request bodies and text/binary responses. Cookies: `credentials` client option ✅ (cookie _parameters_ are deliberately not generated; see API-DESIGN). (`deepObject`, comma/space/pipe-delimited query styles ✅)
 - ✅ Response status discrimination (`HttpError<X, 401> | HttpError<Y, 404>` via `ErrorCase`).
 - ✅ Optional runtime response validation (`"validation": true` in the codegen config). Error bodies and request bodies are not validated.
 - Remote-schema caching, watch mode, split output per tag.
-- Additional sources producing `ApiModel`: NestJS (decorators/Swagger), ASP.NET Core (ApiExplorer / OpenAPI document).
+- ✅ NestJS and ASP.NET Core via their OpenAPI output (`docs/ADAPTERS.md`; NestJS verified on real `@nestjs/swagger` output, the ASP.NET fixture is hand-written, see the note there). Direct source-level adapters were considered and rejected.
 
 ## Milestone 4: devtools & diagnostics
 
-- `@syncapi/devtools`: cache inspector, request timeline, redacted by default.
+- ✅ `@nexapi/devtools`: headless `createInspector` (query rows, bounded event log, refetch/invalidate/remove, `redact` hook) and a minimal React `NexDevtools` panel. Cached data is never in snapshots and is shown only on request; the panel renders nothing in production unless `force`d.
+- Open: per-request timeline (needs a transport-level hook), and a richer UI.
 
 ## Milestone 5: performance evidence
 
-- React render/commit benchmarks, Redux Toolkit Query comparison, memory/allocation methodology.
+- ✅ React render benchmarks (NexAPI vs TanStack Query vs RTK Query, jsdom), memory benchmark (fresh process per sample), bundle-size measurement with budgets for NexAPI entries (`benchmarks/README.md`). Results are machine specific and make no superiority claim.
+- Open: real-browser rendering, hydration, long-session memory, mutation/rollback comparisons.
 - Profile real workloads before considering normalized entities (not planned until evidence exists).
 
 ## Milestone 6: release
 
 - ✅ LICENSE, package READMEs, `pnpm smoke:pack` (pack → empty-project install → CLI generate → strict type-check → run), CI step, `docs/RELEASING.md`.
-- Open: changesets, npm provenance, `repository` manifest field (needs the real URL), CHANGELOG, docs site, browser matrix tests, size-limit budgets.
+- Open: changesets, npm provenance, `repository` manifest field (needs the real URL), CHANGELOG, docs site, browser matrix tests. (Size budgets: done via `benchmarks/size.mjs`.)

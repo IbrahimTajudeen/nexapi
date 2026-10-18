@@ -610,3 +610,42 @@ describe("invalidation of failed entries", () => {
     expect(withData.state).toMatchObject({ isInvalidated: true, data: 1, status: "error" });
   });
 });
+
+describe("subscribeCache", () => {
+  it("emits added, updated and removed events and stops after unsubscribe", async () => {
+    const { client } = makeClient();
+    const seen: string[] = [];
+    const off = client.subscribeCache((e) => seen.push(e.type));
+    await client.fetchQuery(opts(["c"], () => Promise.resolve(1)));
+    expect(seen[0]).toBe("added");
+    expect(seen).toContain("updated");
+    const query = client.findAll()[0];
+    if (!query) throw new Error("missing query");
+    client.removeQuery(query);
+    expect(seen.at(-1)).toBe("removed");
+    off();
+    const n = seen.length;
+    await client.fetchQuery(opts(["d"], () => Promise.resolve(2)));
+    expect(seen).toHaveLength(n);
+  });
+});
+
+describe("observer notifications", () => {
+  it("does not notify between the optimistic fetching result and the real fetching state", async () => {
+    const { client } = makeClient();
+    const d = deferred<number>();
+    const observer = new QueryObserver<number, Error, number>(
+      client,
+      opts(["n"], () => d.promise),
+    );
+    const first = observer.getResult();
+    const seen: string[] = [];
+    const stop = observer.subscribe(() => seen.push(observer.getResult().fetchStatus));
+    expect(observer.getResult()).toBe(first); // same identity: nothing to re-render
+    expect(first.fetchStatus).toBe("fetching");
+    d.resolve(1);
+    await flush();
+    expect(seen).toEqual(["idle"]); // exactly one notification: the data arriving
+    stop();
+  });
+});

@@ -1,4 +1,4 @@
-// Reproducible micro/meso benchmarks: syncapi core vs @tanstack/query-core.
+// Reproducible micro/meso benchmarks: NexAPI core vs @tanstack/query-core.
 // Run from the repo root:  pnpm build && pnpm bench
 // Everything is headless (no React, no network). See README.md for what this does NOT measure.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import {
   QueryClient as TanstackClient,
   QueryObserver as TanstackObserver,
 } from "@tanstack/query-core";
-import { QueryClient as NexClient, QueryObserver as NexObserver } from "@syncapi/core";
+import { QueryClient as NexClient, QueryObserver as NexObserver } from "@nexapi/core";
 
 const SAMPLES = Number(process.env.BENCH_SAMPLES ?? 200);
 const WARMUP = Number(process.env.BENCH_WARMUP ?? 30);
@@ -72,7 +72,7 @@ const record = (scenario, library, r) => results.push({ scenario, library, ...r 
   await tan.fetchQuery(tanOpts(["user", 1], () => Promise.resolve(payload)));
   record(
     "warm read: getData / getQueryData (sync, key hashed each call)",
-    "syncapi",
+    "nexapi",
     await measure(
       "",
       OPS,
@@ -97,7 +97,7 @@ const record = (scenario, library, r) => results.push({ scenario, library, ...r 
   const OPS2 = 5_000;
   record(
     "warm read: fetchQuery on fresh data (async, staleTime=Infinity)",
-    "syncapi",
+    "nexapi",
     await measure(
       "",
       OPS2,
@@ -137,7 +137,7 @@ for (const N of [1, 1000]) {
   let tanCalls = 0;
   record(
     label,
-    "syncapi",
+    "nexapi",
     await measure("", N, mkNex, async (c) => {
       const fn = () => (nexCalls++, Promise.resolve({ ok: true }));
       await Promise.all(Array.from({ length: N }, () => c.fetchQuery(nexOpts(["k"], fn))));
@@ -155,7 +155,7 @@ for (const N of [1, 1000]) {
   const expected = WARMUP + SAMPLES;
   if (nexCalls !== expected || tanCalls !== expected)
     throw new Error(
-      `dedup check failed for "${label}": syncapi=${nexCalls} tanstack=${tanCalls} expected=${expected}`,
+      `dedup check failed for "${label}": nexapi=${nexCalls} tanstack=${tanCalls} expected=${expected}`,
     );
 }
 
@@ -172,7 +172,7 @@ for (const N of [1, 1000]) {
   const picks = Array.from({ length: OPS }, (_, i) => (i * 7919) % SIZE);
   record(
     `large cache: ${SIZE} entries, point lookup`,
-    "syncapi",
+    "nexapi",
     await measure(
       "",
       OPS,
@@ -225,19 +225,19 @@ for (const N of [1, 1000]) {
     unsubs.forEach((u) => u());
     return ms;
   };
-  const samples = { syncapi: [], tanstack: [] };
+  const samples = { nexapi: [], tanstack: [] };
   for (let i = 0; i < Math.max(10, WARMUP / 3) + Math.min(SAMPLES, 40); i++) {
     const a = await run(mkNex, NexObserver, nexOpts, (c) => c.setData(["shared"], { v: i }));
     const b = await run(mkTan, TanstackObserver, tanOpts, (c) =>
       c.setQueryData(["shared"], { v: i }),
     );
     if (i >= Math.max(10, WARMUP / 3)) {
-      samples.syncapi.push((a * 1e6) / OBSERVERS);
+      samples.nexapi.push((a * 1e6) / OBSERVERS);
       samples.tanstack.push((b * 1e6) / OBSERVERS);
     }
   }
   const label = `${OBSERVERS} observers on one key: setData → last listener called`;
-  record(label, "syncapi", { name: "", opsPerSample: OBSERVERS, ...stats(samples.syncapi) });
+  record(label, "nexapi", { name: "", opsPerSample: OBSERVERS, ...stats(samples.nexapi) });
   record(label, "tanstack", { name: "", opsPerSample: OBSERVERS, ...stats(samples.tanstack) });
 }
 
@@ -253,7 +253,7 @@ const env = {
   warmup: WARMUP,
   versions: {
     "@tanstack/query-core": version("@tanstack/query-core"),
-    "@syncapi/core": JSON.parse(
+    "@nexapi/core": JSON.parse(
       readFileSync(new URL("../packages/core/package.json", import.meta.url), "utf8"),
     ).version,
   },

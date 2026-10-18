@@ -91,7 +91,7 @@ export class InfiniteQueryObserver<
     validateMaxPages(options.maxPages);
     this.#client = client;
     this.#options = options;
-    this.#inner = new QueryObserver(client, this.#toQueryOptions(options));
+    this.#inner = new QueryObserver(client, toQueryOptions(this.#client, options));
     this.#result = this.#extend(this.#inner.getResult());
   }
 
@@ -102,7 +102,10 @@ export class InfiniteQueryObserver<
   getOptimisticResult(
     options: InfiniteQueryOptions<TPage, TError, TParam, TSelected>,
   ): InfiniteQueryResult<TSelected, TError> {
-    return this.#extend(this.#inner.getOptimisticResult(this.#toQueryOptions(options)), options);
+    return this.#extend(
+      this.#inner.getOptimisticResult(toQueryOptions(this.#client, options)),
+      options,
+    );
   }
 
   subscribe(listener: () => void): () => void {
@@ -120,7 +123,7 @@ export class InfiniteQueryObserver<
   setOptions(options: InfiniteQueryOptions<TPage, TError, TParam, TSelected>): void {
     validateMaxPages(options.maxPages);
     this.#options = options;
-    this.#inner.setOptions(this.#toQueryOptions(options));
+    this.#inner.setOptions(toQueryOptions(this.#client, options));
     this.#refresh();
   }
 
@@ -158,7 +161,7 @@ export class InfiniteQueryObserver<
     this.#refresh();
     try {
       await query
-        .fetch(this.#toQueryOptions(o) as never, {
+        .fetch(toQueryOptions(this.#client, o) as never, {
           observer: true,
           queryFn: async (ctx) => {
             const page = await o.queryFn({
@@ -247,48 +250,6 @@ export class InfiniteQueryObserver<
       fetchPreviousPage: this.#fetchPreviousPage,
     };
   }
-
-  #toQueryOptions(
-    o: InfiniteQueryOptions<TPage, TError, TParam, TSelected>,
-  ): QueryOptions<InfiniteData<TPage, TParam>, TError, TSelected> {
-    const {
-      queryFn: _q,
-      getNextPageParam: _g,
-      getPreviousPageParam: _p,
-      initialPageParam: _i,
-      maxPages: _m,
-      ...config
-    } = o;
-    return {
-      ...config,
-      queryKey: o.queryKey,
-      queryClient: o.queryClient ?? this.#client,
-      // Used for the first load and every refetch: re-request all loaded pages, in order.
-      queryFn: async (ctx) => {
-        // Re-request exactly the pages held, from the first one held (which is not the initial
-        // page after `fetchPreviousPage` or `maxPages` trimming). Confirmed data, not the optimistic view.
-        const held = this.#client.getQuery<InfiniteData<TPage, TParam>>(o.queryKey)?.confirmedData;
-        const loaded = Math.max(held?.pages.length ?? 1, 1);
-        const pages: TPage[] = [];
-        const pageParams: TParam[] = [];
-        let param: TParam = held?.pageParams[0] ?? o.initialPageParam;
-        for (let i = 0; i < loaded; i++) {
-          const page = await o.queryFn({
-            queryKey: ctx.queryKey,
-            signal: ctx.signal,
-            pageParam: param,
-          });
-          pages.push(page);
-          pageParams.push(param);
-          if (i === loaded - 1) break;
-          const next = o.getNextPageParam(page, pages, param, pageParams);
-          if (next === undefined || next === null) break;
-          param = next;
-        }
-        return { pages, pageParams };
-      },
-    };
-  }
 }
 
 function validateMaxPages(maxPages: number | undefined): void {
@@ -306,4 +267,60 @@ function trim<TPage, TParam>(
   return from === "start"
     ? { pages: data.pages.slice(-max), pageParams: data.pageParams.slice(-max) }
     : { pages: data.pages.slice(0, max), pageParams: data.pageParams.slice(0, max) };
+}
+
+/** Plain query options for an infinite query: first load and refetch re-request every page held. */
+export function toQueryOptions<TPage, TError, TParam, TSelected>(
+  client: QueryClient,
+  o: InfiniteQueryOptions<TPage, TError, TParam, TSelected>,
+): QueryOptions<InfiniteData<TPage, TParam>, TError, TSelected> {
+  const {
+    queryFn: _q,
+    getNextPageParam: _g,
+    getPreviousPageParam: _p,
+    initialPageParam: _i,
+    maxPages: _m,
+    ...config
+  } = o;
+  return {
+    ...config,
+    queryKey: o.queryKey,
+    queryClient: o.queryClient ?? client,
+    // Used for the first load and every refetch: re-request all loaded pages, in order.
+    queryFn: async (ctx) => {
+      // Re-request exactly the pages held, from the first one held (which is not the initial
+      // page after `fetchPreviousPage` or `maxPages` trimming). Confirmed data, not the optimistic view.
+      const held = client.getQuery<InfiniteData<TPage, TParam>>(o.queryKey)?.confirmedData;
+      const loaded = Math.max(held?.pages.length ?? 1, 1);
+      const pages: TPage[] = [];
+      const pageParams: TParam[] = [];
+      let param: TParam = held?.pageParams[0] ?? o.initialPageParam;
+      for (let i = 0; i < loaded; i++) {
+        const page = await o.queryFn({
+          queryKey: ctx.queryKey,
+          signal: ctx.signal,
+          pageParam: param,
+        });
+        pages.push(page);
+        pageParams.push(param);
+        if (i === loaded - 1) break;
+        const next = o.getNextPageParam(page, pages, param, pageParams);
+        if (next === undefined || next === null) break;
+        param = next;
+      }
+      return { pages, pageParams };
+    },
+  };
+}
+
+/**
+ * Load an infinite query's first page (or reuse data already cached) without an observer. One
+ * shared request however many callers; used by suspense, prefetching and SSR.
+ */
+export function fetchInfiniteQuery<TPage, TError, TParam, TSelected>(
+  client: QueryClient,
+  options: InfiniteQueryOptions<TPage, TError, TParam, TSelected>,
+): Promise<InfiniteData<TPage, TParam>> {
+  const resolved = client.resolveOptions(toQueryOptions(client, options));
+  return client.fetchQuery<InfiniteData<TPage, TParam>, TError>(resolved);
 }

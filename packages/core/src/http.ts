@@ -41,6 +41,15 @@ export interface HttpClientOptions {
    * Default false; generated clients never need this.
    */
   allowAbsoluteUrls?: boolean;
+  /**
+   * Fetch `credentials` mode, i.e. whether the browser sends and stores cookies (and TLS client
+   * certificates). Browsers do not let scripts set a `Cookie` header, so this is the only way to
+   * use cookie sessions from a web page: `"include"` for a cross-origin API (which must answer
+   * with CORS credentials headers), `"same-origin"` otherwise. Applied only to requests to the
+   * configured origin: a request that leaves it (see `allowAbsoluteUrls`) always uses `"omit"`.
+   * Default: the runtime's (`"same-origin"` in browsers; Node's fetch has no cookie jar).
+   */
+  credentials?: RequestCredentials;
 }
 
 export interface RequestSpec {
@@ -349,6 +358,8 @@ export class HttpClient {
 
     try {
       const init: RequestInit = { method, headers, signal: controller.signal };
+      if (this.#options.credentials !== undefined)
+        init.credentials = url.origin === this.#base.origin ? this.#options.credentials : "omit";
       if (body !== undefined) init.body = body;
       const request = new Request(url, init);
 

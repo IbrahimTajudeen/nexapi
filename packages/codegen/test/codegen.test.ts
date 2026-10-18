@@ -9,14 +9,14 @@ import {
   toPascal,
   typeName,
   validateSchema,
-  type syncapiConfig,
+  type NexApiConfig,
 } from "../src/index.js";
 
 const fixture = readFileSync(
   new URL("../../../fixtures/openapi/basic.yaml", import.meta.url),
   "utf8",
 );
-const config: syncapiConfig = {
+const config: NexApiConfig = {
   overrides: { operations: { listUsers: { path: ["users", "list"] } } },
 };
 
@@ -26,7 +26,7 @@ const doc = (paths: string, schemas = ""): string =>
 const op = (extra = ""): string =>
   `      responses:\n        "200":\n          description: ok\n          content:\n            application/json:\n              schema: { type: string }\n${extra}`;
 
-function errorsOf(text: string, cfg: syncapiConfig = {}): string[] {
+function errorsOf(text: string, cfg: NexApiConfig = {}): string[] {
   try {
     generate(text, cfg);
     return [];
@@ -107,7 +107,7 @@ describe("generate: the basic fixture", () => {
     expect(types).toContain("role: Role;"); // required
     expect(types).toContain("export type DeleteUserData = void;");
     expect(types).toContain("export type LoginErrorBody = ErrorCase<401, ApiError>;");
-    expect(types).toContain('import type { ErrorCase } from "@syncapi/core";');
+    expect(types).toContain('import type { ErrorCase } from "@nexapi/core";');
     expect(types).toContain("export type GetUserErrorBody = ErrorCase<404, ApiError>;");
     expect(types).toMatch(
       /export interface ListUsersRequest \{\n {2}query\?: \{\n[\s\S]*role\?: Role\[\];/,
@@ -521,5 +521,89 @@ describe("generate: response shapes", () => {
 
   it("rejects a non-boolean validation setting", () => {
     expect(() => generate(fixture, { validation: "yes" as never })).toThrow();
+  });
+});
+
+describe("generate: cookie parameters", () => {
+  it("warns (does not fail) and leaves the parameter out of the request type", () => {
+    const text = doc(
+      `  /a:\n    get:\n      operationId: a\n      parameters: [{ name: sid, in: cookie, schema: { type: string } }]\n${op()}`,
+    );
+    const result = validateSchema(text);
+    expect(result.diagnostics.map((d) => [d.level, d.code])).toEqual([
+      ["warning", "UNSUPPORTED_PARAMETER"],
+    ]);
+    expect(result.diagnostics[0]?.message).toContain("credentials");
+    expect(generate(text).files[0]?.content).not.toContain("sid");
+  });
+});
+
+describe("generate: framework-produced specs", () => {
+  const read = (name: string): string =>
+    readFileSync(new URL(`../../../fixtures/openapi/${name}`, import.meta.url), "utf8");
+
+  it("NestJS (@nestjs/swagger 11, real output): tree, nullable fields, enum and 404 body", () => {
+    const out = generate(read("nestjs-swagger.json"));
+    const client = out.files[1]?.content as string;
+    const types = out.files[0]?.content as string;
+    for (const call of [
+      "users: {",
+      "get: client.query<UsersControllerFindAllRequest",
+      "post: client.mutation<NoRequest, UsersControllerCreateBody",
+      "byId: (id: string) =>",
+      "patch: client.mutation",
+      'delete: client.mutation<NoRequest, void, UsersControllerRemoveData, UsersControllerRemoveErrorBody>({ operationId: "UsersController_remove"',
+    ])
+      expect(client).toContain(call);
+    expect(client).toContain('response: "none"'); // @HttpCode(204)
+    expect(types).toContain('export type Role = "admin" | "member";');
+    expect(types).toContain("zip?: string | null;");
+    expect(types).toContain("UsersControllerFindOneErrorBody = ErrorCase<404, ErrorDto>;");
+    expect(out.diagnostics).toEqual([]);
+  });
+
+  it("ASP.NET Core / Swashbuckle-style spec: 201 bodies, problem+json errors, numeric enums, nullable allOf", () => {
+    const out = generate(read("aspnet-swashbuckle.json"), { naming: { stripPathPrefix: "/api" } });
+    const client = out.files[1]?.content as string;
+    const types = out.files[0]?.content as string;
+    expect(client).toContain("users: {");
+    expect(client).not.toContain("api: {"); // stripPathPrefix
+    expect(client).toContain('path: "/api/Users"'); // requests still use the full path
+    expect(client).toContain('bodyKind: "form-data"');
+    expect(client).toContain('response: "text"');
+    expect(types).toContain("export type Role = 0 | 1 | 2;");
+    expect(types).toContain("manager?: UserDto | null;");
+    expect(types).toContain("CreateUserErrorBody = ErrorCase<400, ValidationProblemDetails>;");
+    expect(types).toContain("GetUsersData = UserDto[];");
+    expect(out.diagnostics).toEqual([]);
+  });
+
+  it("without stripPathPrefix the shared prefix is an ordinary resource", () => {
+    const client = generate(read("aspnet-swashbuckle.json")).files[1]?.content as string;
+    expect(client).toContain("api: {");
+  });
+});
+
+describe("generate: naming.stripPathPrefix", () => {
+  const two = doc(
+    `  /v1/a:\n    get:\n      operationId: a\n${op()}  /v1/b/{id}:\n    get:\n      operationId: b\n      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]\n${op()}  /v1:\n    get:\n      operationId: root\n${op()}  /other/c:\n    get:\n      operationId: c\n${op()}`,
+  );
+  it("drops a leading prefix only where something remains, and leaves other paths alone", () => {
+    const client = generate(two, { naming: { stripPathPrefix: "/v1" } }).files[1]
+      ?.content as string;
+    expect(client).toContain("a: {");
+    expect(client).toContain("b: {");
+    expect(client).toContain("other: {"); // not under the prefix
+    expect(client).toContain("v1: {"); // "/v1" alone would be empty, so it is kept
+    expect(client).toContain('path: "/v1/a"');
+  });
+
+  it("rejects malformed values and reports collisions created by stripping", () => {
+    for (const bad of ["api", "/api/{id}", "//x", 5])
+      expect(() => generate(two, { naming: { stripPathPrefix: bad as never } })).toThrow();
+    const clash = doc(
+      `  /x/a:\n    get:\n      operationId: one\n${op()}  /a:\n    get:\n      operationId: two\n${op()}`,
+    );
+    expect(() => generate(clash, { naming: { stripPathPrefix: "/x" } })).toThrow();
   });
 });

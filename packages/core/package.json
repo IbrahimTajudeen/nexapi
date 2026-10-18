@@ -1,13 +1,10 @@
 {
-  "name": "@syncapi/core",
+  "name": "@nexapi/core",
   "version": "0.0.1",
-  "description": "Framework-independent query cache, mutation engine and Fetch runtime for syncapi",
+  "description": "Framework-independent query cache, mutation engine and Fetch runtime for NexAPI",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
-  "publishConfig": {
-    "access": "public"
-  },
   "engines": {
     "node": ">=22.12"
   },

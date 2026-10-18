@@ -1,13 +1,10 @@
 {
-  "name": "@syncapi/react",
+  "name": "@nexapi/react",
   "version": "0.0.1",
-  "description": "React hooks for syncapi built on @syncapi/core",
+  "description": "React hooks for NexAPI built on @nexapi/core",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
-  "publishConfig": {
-    "access": "public"
-  },
   "engines": {
     "node": ">=22.12"
   },
@@ -24,7 +21,7 @@
     }
   },
   "dependencies": {
-    "@syncapi/core": "workspace:*"
+    "@nexapi/core": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

@@ -1,6 +1,6 @@
 /** Compile-time tests of the types produced by the code generator for the example schema. */
 import { expectTypeOf } from "vitest";
-import { HttpError, createNexClient, type EndpointError } from "@syncapi/core";
+import { HttpError, createNexClient, type EndpointError } from "@nexapi/core";
 import {
   createApi,
   type ApiError,

@@ -1,4 +1,6 @@
-# syncapi
+# NexAPI
+
+<p align="center"><img src="assets/logo.png" alt="NexAPI logo" width="96" /></p>
 
 Schema-generated, fluent, fully typed API client with a standalone query/mutation engine (no React required) and a React adapter.
 
@@ -34,7 +36,7 @@ node packages/cli/dist/cli.js generate --check     # CI: fail if generated files
 ```
 
 ```ts
-import { createNexClient } from "@syncapi/core";
+import { createNexClient } from "@nexapi/core";
 import { createApi } from "./api/index.js";
 
 const nex = createNexClient({

@@ -1,4 +1,4 @@
-import type { QueryClient } from "@syncapi/core";
+import type { QueryClient } from "@nexapi/core";
 import { createContext, createElement, useContext, type ReactElement, type ReactNode } from "react";
 
 const QueryClientContext = createContext<QueryClient | undefined>(undefined);

@@ -1,4 +1,9 @@
-export { QueryClient, type QueryClientOptions, type OptimisticTransaction } from "./client.js";
+export {
+  QueryClient,
+  type CacheEvent,
+  type QueryClientOptions,
+  type OptimisticTransaction,
+} from "./client.js";
 export { NexClient, createNexClient, type NexClientOptions } from "./nex-client.js";
 export {
   createMutationEndpoint,
@@ -83,6 +88,7 @@ export type {
 export { replaceEqualDeep } from "./util.js";
 export {
   InfiniteQueryObserver,
+  fetchInfiniteQuery,
   type InfiniteData,
   type InfiniteQueryOptions,
   type InfiniteQueryResult,

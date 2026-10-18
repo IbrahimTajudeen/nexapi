@@ -1,4 +1,4 @@
-import { resolveConfig, type syncapiConfig } from "./config.js";
+import { resolveConfig, type NexApiConfig } from "./config.js";
 import type {
   ApiModel,
   BodyKind,
@@ -26,7 +26,7 @@ const VOID: TypeNode = { kind: "primitive", type: "void" };
 /** Parse an OpenAPI 3.x document into the normalized model. Collects all problems. */
 export function buildApiModel(
   document: unknown,
-  config: syncapiConfig = {},
+  config: NexApiConfig = {},
 ): { model: ApiModel; diagnostics: Diagnostic[] } {
   const cfg = resolveConfig(config);
   const diagnostics: Diagnostic[] = [];
@@ -381,7 +381,11 @@ export function buildApiModel(
           if (!SKIPPED_HEADERS.has(name.toLowerCase())) headerParams.push(model);
         } else if (where !== "cookie")
           error("INVALID_PARAMETER", `${label}: unknown parameter location "${where}"`);
-        else warn("UNSUPPORTED_PARAMETER", `${label}: cookie parameter "${name}" is ignored`);
+        else
+          warn(
+            "UNSUPPORTED_PARAMETER",
+            `${label}: cookie parameter "${name}" is not part of the generated request (browsers cannot set Cookie from scripts; use the client's "credentials" option for cookie sessions, or "headers" outside a browser)`,
+          );
       }
       for (const name of templateParams) {
         const p = declaredPath.get(name);

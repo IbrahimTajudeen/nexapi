@@ -147,7 +147,15 @@ function segmentsFor(
     return out;
   }
   const out: Segment[] = [];
-  for (const raw of op.path.split("/").filter(Boolean)) {
+  let rawSegments = op.path.split("/").filter(Boolean);
+  const prefix = cfg.stripPathPrefix;
+  if (
+    prefix.length > 0 &&
+    rawSegments.length > prefix.length &&
+    prefix.every((p, i) => rawSegments[i] === p)
+  )
+    rawSegments = rawSegments.slice(prefix.length);
+  for (const raw of rawSegments) {
     const m = /^\{(.+)\}$/.exec(raw);
     if (m) {
       const seg = param(m[1] as string);

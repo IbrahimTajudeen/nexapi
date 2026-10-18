@@ -1,0 +1,73 @@
+import "reflect-metadata";
+import { Body, Controller, Delete, Get, HttpCode, Injectable, Module, Param, Patch, Post, Query } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiProperty, ApiPropertyOptional, ApiTags, ApiQuery, DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { IsEmail, IsEnum, IsOptional, IsString, Min } from "class-validator";
+import { writeFileSync } from "node:fs";
+
+export enum Role { Admin = "admin", Member = "member" }
+
+export class AddressDto {
+  @ApiProperty() street: string;
+  @ApiPropertyOptional({ nullable: true }) zip?: string | null;
+}
+export class UserDto {
+  @ApiProperty() id: string;
+  @ApiProperty() name: string;
+  @ApiPropertyOptional({ nullable: true }) email?: string | null;
+  @ApiProperty({ enum: Role, enumName: "Role" }) role: Role;
+  @ApiProperty({ type: AddressDto }) address: AddressDto;
+  @ApiProperty({ type: [String] }) tags: string[];
+  @ApiProperty({ format: "date-time" }) createdAt: string;
+}
+export class CreateUserDto {
+  @ApiProperty() @IsString() name: string;
+  @ApiProperty() @IsEmail() email: string;
+  @ApiProperty({ enum: Role, enumName: "Role" }) @IsEnum(Role) role: Role;
+}
+export class UpdateUserDto {
+  @ApiPropertyOptional() @IsOptional() @IsString() name?: string;
+  @ApiPropertyOptional({ enum: Role, enumName: "Role" }) @IsOptional() role?: Role;
+}
+export class PageDto {
+  @ApiProperty({ type: [UserDto] }) items: UserDto[];
+  @ApiProperty() total: number;
+}
+export class ErrorDto {
+  @ApiProperty() statusCode: number;
+  @ApiProperty() message: string;
+}
+
+@Injectable() class UsersService {}
+
+@ApiTags("users")
+@ApiBearerAuth()
+@Controller("users")
+export class UsersController {
+  @Get() @ApiQuery({ name: "role", required: false, enum: Role, isArray: true }) @ApiQuery({ name: "page", required: false, type: Number })
+  @ApiOkResponse({ type: PageDto })
+  findAll(@Query("page") page?: number, @Query("role") role?: Role[]): PageDto { return null as never; }
+
+  @Get(":id") @ApiOkResponse({ type: UserDto }) @ApiNotFoundResponse({ type: ErrorDto })
+  findOne(@Param("id") id: string): UserDto { return null as never; }
+
+  @Post() @ApiCreatedResponse({ type: UserDto })
+  create(@Body() dto: CreateUserDto): UserDto { return null as never; }
+
+  @Patch(":id") @ApiOkResponse({ type: UserDto })
+  update(@Param("id") id: string, @Body() dto: UpdateUserDto): UserDto { return null as never; }
+
+  @Delete(":id") @HttpCode(204)
+  remove(@Param("id") id: string): void {}
+}
+
+@Module({ controllers: [UsersController], providers: [UsersService] })
+class AppModule {}
+
+async function main() {
+  const app = await NestFactory.create(AppModule, { logger: false });
+  const doc = SwaggerModule.createDocument(app, new DocumentBuilder().setTitle("Nest Users").setVersion("1.0").addBearerAuth().build());
+  writeFileSync("openapi.json", JSON.stringify(doc, null, 2));
+  await app.close();
+}
+main();

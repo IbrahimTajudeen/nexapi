@@ -38,9 +38,13 @@ Types: `QueryEndpoint<TReq, TData, TErrBody>`, `MutationEndpoint<TReq, TBody, TD
 
 `getPreviousPageParam` enables `fetchPreviousPage`/`hasPreviousPage`/`isFetchingPreviousPage`; without it the previous-page API is inert (`hasPreviousPage: false`, no request). `maxPages` (integer ≥ 1, otherwise `RangeError`) drops the page at the opposite end when one is loaded, so memory stays bounded. A refetch re-requests only the pages held, starting from the first one held (not `initialPageParam`), and reads the confirmed data so optimistic patches cannot change which pages are requested. Directional loads never race: while one is in flight, a second call in either direction joins it and issues no request of its own, so call again after it settles.
 
+### Cookies
+
+Browsers forbid scripts from setting a `Cookie` header, so a generated `in: cookie` parameter could never work from a web page and would only work in non-browser runtimes with different semantics. Codegen therefore leaves cookie parameters out of the request type and warns. Cookie _sessions_ are supported the way the platform does it: `createNexClient({ credentials: "include" })` (cross-origin API with CORS credentials) or `"same-origin"`. The mode applies only to requests to the pinned origin; a request that leaves it (the opt-in `allowAbsoluteUrls`) always uses `"omit"`. Outside a browser, send a cookie explicitly with the client's `headers` option. Server-side Node `fetch` keeps no cookie jar.
+
 ### Optional response validation
 
-With `"validation": true` in `syncapi.config.json`, codegen also emits `shapes.ts` (plain data, no code, no dependency) and attaches the shape of every JSON success response to its endpoint. The runtime then checks each response and rejects with `ResponseValidationError` (`issues: { path, expected, received }[]`, at most 10) when it differs; turn it off per client with `createNexClient({ validateResponses: false })`. Reports contain positions and types, never values, because responses may carry personal data. A mismatch is deterministic, so it is never retried, and it lands in query state like any error.
+With `"validation": true` in `nexapi.config.json`, codegen also emits `shapes.ts` (plain data, no code, no dependency) and attaches the shape of every JSON success response to its endpoint. The runtime then checks each response and rejects with `ResponseValidationError` (`issues: { path, expected, received }[]`, at most 10) when it differs; turn it off per client with `createNexClient({ validateResponses: false })`. Reports contain positions and types, never values, because responses may carry personal data. A mismatch is deterministic, so it is never retried, and it lands in query state like any error.
 
 What is checked: types, required properties, literals/enums, arrays, unions (one member must match), intersections, declared `additionalProperties` types. What is not: undeclared extra properties are accepted (servers add fields without breaking clients), and `integer`, `format`, length, pattern and range constraints are not represented, so they are not enforced. Validation runs once per fetch on the parsed body (cost is linear in its size; benchmark before enabling on very large payloads). Turning the option off later leaves `shapes.ts` on disk, unreferenced; delete it.
 
@@ -48,7 +52,7 @@ What is checked: types, required properties, literals/enums, arrays, unions (one
 
 `data` is never `undefined`: the component suspends until the entry has data, and a failed first load is thrown to the nearest error boundary. Suspending reads the cache entry (not component state, which React discards when a component suspends on mount), so sibling components share one request, and `renderToPipeableStream` waits for the data inside the request's own client. `renderToString` cannot wait and emits the fallback. Stale data renders at once and refetches in the background; a failed background refetch keeps the data and does not throw. `staleTime` is raised to at least 1000 ms so the freshly resolved data is not immediately refetched on mount. `enabled` and `placeholderData` are not accepted.
 
-Retry after an error boundary resets: the same error is rethrown on every render (React retries a render once before showing the boundary), so call `invalidate()` on the endpoint in the reset handler; the next render fetches again. To support this, a first load that fails now clears `isInvalidated` (the flag is meaningless without data). Edge: no `useSuspenseInfiniteQuery` yet.
+Retry after an error boundary resets: the same error is rethrown on every render (React retries a render once before showing the boundary), so call `invalidate()` on the endpoint in the reset handler; the next render fetches again. To support this, a first load that fails now clears `isInvalidated` (the flag is meaningless without data). `useSuspenseInfiniteQuery` follows the same rules: it suspends only for the first page (`fetchInfiniteQuery` in core shares one request across callers), while `fetchNextPage`/`fetchPreviousPage` never fall back to Suspense; watch `isFetchingNextPage` instead.
 
 ### Non-JSON bodies and responses
 
@@ -82,4 +86,4 @@ No logging anywhere. Errors never include headers, bodies or query strings. Base
 
 ## Breaking-change policy (from 0.1)
 
-Public = everything exported from package entry points plus the _shape_ of generated code. Generated-code shape changes require a major version of `@syncapi/codegen` and a note in the changelog; `syncapi generate --check` in CI makes drift visible.
+Public = everything exported from package entry points plus the _shape_ of generated code. Generated-code shape changes require a major version of `@nexapi/codegen` and a note in the changelog; `nexapi generate --check` in CI makes drift visible.

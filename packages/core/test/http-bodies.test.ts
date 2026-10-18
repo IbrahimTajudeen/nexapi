@@ -183,3 +183,38 @@ describe("response kinds", () => {
     expect(seen().headers.get("accept")).toBe("text/csv");
   });
 });
+
+describe("credentials (cookies)", () => {
+  const seenCredentials = async (
+    options: ConstructorParameters<typeof HttpClient>[0],
+    path = "/x",
+  ): Promise<string> => {
+    let credentials = "";
+    const http = new HttpClient({
+      ...options,
+      transport: (req) => {
+        credentials = req.credentials;
+        return Promise.resolve(new Response("ok"));
+      },
+    });
+    await http.request({ method: "get", path, response: "text" });
+    return credentials;
+  };
+
+  it("passes the configured mode to the transport for requests to the pinned origin", async () => {
+    expect(await seenCredentials({ baseUrl: BASE, credentials: "include" })).toBe("include");
+    expect(await seenCredentials({ baseUrl: BASE, credentials: "same-origin" })).toBe(
+      "same-origin",
+    );
+    expect(await seenCredentials({ baseUrl: BASE })).toBe("same-origin"); // the runtime default
+  });
+
+  it("never sends credentials to another origin, even when absolute URLs are allowed", async () => {
+    expect(
+      await seenCredentials(
+        { baseUrl: BASE, credentials: "include", allowAbsoluteUrls: true },
+        "https://other.test/x",
+      ),
+    ).toBe("omit");
+  });
+});

@@ -12,13 +12,14 @@ import {
   type NexClient,
   type QueryOptions,
   type Transport,
-} from "@syncapi/core";
+} from "@nexapi/core";
 import { createApi } from "../../../examples/basic/generated/index.js";
 import {
   NexProvider,
   useInfiniteQuery,
   useMutation,
   useQuery,
+  useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "../src/index.js";
 
@@ -572,5 +573,86 @@ describe("useSuspenseQuery", () => {
     expect(html).toContain("<p>Ada</p>");
     expect(html).not.toContain("loading");
     expect(rig.requests).toHaveLength(1);
+  });
+});
+
+describe("useSuspenseInfiniteQuery", () => {
+  type FeedPage = { n: number; next: number | null };
+  const feedOptions = (
+    rig: Rig,
+    calls: number[],
+    fail = { on: false },
+  ): Parameters<typeof useSuspenseInfiniteQuery<FeedPage, Error, number>>[0] => ({
+    queryKey: ["suspense-feed"],
+    queryFn: async ({ pageParam }) => {
+      calls.push(pageParam);
+      await new Promise((r) => setTimeout(r, 10));
+      if (fail.on) throw new Error("down");
+      return { n: pageParam, next: pageParam < 2 ? pageParam + 1 : null };
+    },
+    initialPageParam: 0,
+    getNextPageParam: (last) => last.next,
+    queryClient: rig.nex.queryClient,
+    retry: false,
+  });
+
+  it("suspends for the first page (one request for siblings), then pages load without suspending", async () => {
+    const rig = makeRig();
+    const calls: number[] = [];
+    const options = feedOptions(rig, calls);
+    function Feed(): ReactElement {
+      const q = useSuspenseInfiniteQuery(options);
+      return (
+        <div>
+          <p id="items">{q.data.pages.map((p) => p.n).join(",")}</p>
+          <button disabled={!q.hasNextPage} onClick={() => void q.fetchNextPage()}>
+            more
+          </button>
+        </div>
+      );
+    }
+    await render(
+      <Suspense fallback={<i>loading</i>}>
+        <Feed />
+        <Feed />
+      </Suspense>,
+    );
+    expect(host.textContent).toBe("loading");
+    await settle(60);
+    expect(host.querySelector("#items")?.textContent).toBe("0");
+    expect(calls).toEqual([0]);
+    await act(async () => host.querySelector("button")?.click());
+    expect(host.textContent).not.toContain("loading"); // loading more never falls back
+    await settle(60);
+    expect(host.querySelector("#items")?.textContent).toBe("0,1");
+  });
+
+  it("throws a failed first page to the error boundary; invalidate then reset retries", async () => {
+    const rig = makeRig();
+    const calls: number[] = [];
+    const fail = { on: true };
+    const options = feedOptions(rig, calls, fail);
+    function Feed(): ReactElement {
+      const q = useSuspenseInfiniteQuery(options);
+      return <p>{q.data.pages.length} page(s)</p>;
+    }
+    await render(
+      <Boundary>
+        <Suspense fallback={<i>loading</i>}>
+          <Feed />
+        </Suspense>
+      </Boundary>,
+    );
+    await settle(60);
+    expect(host.textContent).toBe("failed: Error");
+    expect(calls).toEqual([0]);
+    fail.on = false;
+    await act(async () => {
+      void rig.nex.queryClient.invalidateQueries({ queryKey: ["suspense-feed"] });
+      host.querySelector("button")?.click();
+    });
+    await settle(60);
+    expect(host.textContent).toBe("1 page(s)");
+    expect(calls).toEqual([0, 0]);
   });
 });

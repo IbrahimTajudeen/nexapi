@@ -1,5 +1,5 @@
-import { createNexClient } from "@syncapi/core";
-import { useMutation, useQuery } from "@syncapi/react";
+import { createNexClient } from "@nexapi/core";
+import { useMutation, useQuery } from "@nexapi/react";
 import { createApi } from "../generated/index.js";
 
 // One NexClient per user/request: it owns the HTTP credentials *and* the cache.

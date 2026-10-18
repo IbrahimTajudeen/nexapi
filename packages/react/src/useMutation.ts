@@ -3,7 +3,7 @@ import {
   type MutationOptions,
   type MutationResult,
   type QueryClient,
-} from "@syncapi/core";
+} from "@nexapi/core";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { useQueryClient } from "./context.js";
 

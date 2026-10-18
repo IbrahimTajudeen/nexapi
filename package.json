@@ -1,5 +1,5 @@
 {
-  "name": "syncapi-monorepo",
+  "name": "nexapi-monorepo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -16,9 +16,11 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "generate:example": "pnpm build && node packages/cli/dist/cli.js generate --config examples/basic/syncapi.config.json",
-    "generate:check": "pnpm build && node packages/cli/dist/cli.js generate --config examples/basic/syncapi.config.json --check",
-    "bench": "pnpm --filter @syncapi/benchmarks bench",
+    "generate:example": "pnpm build && node scripts/generate-examples.mjs",
+    "generate:check": "pnpm build && node scripts/generate-examples.mjs --check",
+    "bench": "pnpm --filter @nexapi/benchmarks bench",
+    "website:dev": "pnpm --filter @nexapi/website dev",
+    "website:build": "pnpm --filter @nexapi/website build",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm generate:check",
     "smoke:pack": "pnpm build && node scripts/smoke-pack.mjs"
   },

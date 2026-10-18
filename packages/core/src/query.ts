@@ -19,6 +19,8 @@ export interface QueryHost {
   readonly defaultGcTime: number;
   removeQuery(query: { readonly hash: string; destroy(): void }): void;
   reportUpdaterError(error: unknown): void;
+  /** The entry's state or observer set changed (feeds `QueryClient.subscribeCache`). */
+  queryChanged(query: Query): void;
 }
 
 /** The slice of an observer that the cache and client talk to (keeps generics out of registries). */
@@ -142,10 +144,12 @@ export class Query<TData = unknown, TError = unknown> {
   addObserver(observer: ObserverHandle): void {
     this.observers.add(observer);
     this.#clearGc();
+    this.#host.queryChanged(this as unknown as Query);
   }
 
   removeObserver(observer: ObserverHandle): void {
     if (!this.observers.delete(observer)) return;
+    this.#host.queryChanged(this as unknown as Query);
     if (this.observers.size === 0) {
       // Deferred a microtask so React Strict Mode's unmount→remount (same tick) doesn't abort.
       queueMicrotask(() => this.#abortIfUnwanted());
@@ -186,6 +190,7 @@ export class Query<TData = unknown, TError = unknown> {
   #set(patch: Partial<QueryState<TData, TError>>): void {
     this.state = { ...this.state, ...patch };
     for (const observer of [...this.observers]) observer.onQueryUpdate();
+    this.#host.queryChanged(this as unknown as Query);
   }
 
   #visible(): TData | undefined {
