@@ -6,55 +6,61 @@ import type { Shape } from "@nyxapi/core";
 
 /** Named schemas, referenced by `{ k: "ref" }`. */
 export const shapes: Readonly<Record<string, Shape>> = {
-  "ApiError": {
+  ApiError: {
     k: "obj",
     props: {
-      "code": { shape: { k: "string" }, required: true },
-      "message": { shape: { k: "string" }, required: true },
+      code: { shape: { k: "string" }, required: true },
+      message: { shape: { k: "string" }, required: true },
     },
     extra: null,
   },
-  "LoginRequest": {
+  LoginRequest: {
     k: "obj",
     props: {
-      "email": { shape: { k: "string" }, required: true },
-      "password": { shape: { k: "string" }, required: true },
+      email: { shape: { k: "string" }, required: true },
+      password: { shape: { k: "string" }, required: true },
     },
     extra: null,
   },
-  "Role": { k: "or", of: [{ k: "lit", v: "admin" }, { k: "lit", v: "member" }] },
-  "Session": {
+  Role: {
+    k: "or",
+    of: [
+      { k: "lit", v: "admin" },
+      { k: "lit", v: "member" },
+    ],
+  },
+  Session: {
     k: "obj",
     props: {
-      "token": { shape: { k: "string" }, required: true },
-      "user": { shape: { k: "ref", name: "User" }, required: true },
+      token: { shape: { k: "string" }, required: true },
+      user: { shape: { k: "ref", name: "User" }, required: true },
     },
     extra: null,
   },
-  "User": {
+  User: {
     k: "obj",
     props: {
-      "id": { shape: { k: "string" }, required: true },
-      "name": { shape: { k: "string" }, required: true },
-      "email": { shape: { k: "or", of: [{ k: "string" }, { k: "null" }] }, required: false },
-      "role": { shape: { k: "ref", name: "Role" }, required: true },
+      id: { shape: { k: "string" }, required: true },
+      name: { shape: { k: "string" }, required: true },
+      email: { shape: { k: "or", of: [{ k: "string" }, { k: "null" }] }, required: false },
+      role: { shape: { k: "ref", name: "Role" }, required: true },
     },
     extra: null,
   },
-  "UserList": {
+  UserList: {
     k: "obj",
     props: {
-      "items": { shape: { k: "arr", of: { k: "ref", name: "User" } }, required: true },
-      "total": { shape: { k: "number" }, required: true },
+      items: { shape: { k: "arr", of: { k: "ref", name: "User" } }, required: true },
+      total: { shape: { k: "number" }, required: true },
     },
     extra: null,
   },
-  "UserPatch": {
+  UserPatch: {
     k: "obj",
     props: {
-      "name": { shape: { k: "string" }, required: false },
-      "email": { shape: { k: "or", of: [{ k: "string" }, { k: "null" }] }, required: false },
-      "role": { shape: { k: "ref", name: "Role" }, required: false },
+      name: { shape: { k: "string" }, required: false },
+      email: { shape: { k: "or", of: [{ k: "string" }, { k: "null" }] }, required: false },
+      role: { shape: { k: "ref", name: "Role" }, required: false },
     },
     extra: null,
   },
@@ -73,9 +79,9 @@ export const UpdateUserResponse: Shape = { k: "ref", name: "User" };
 export const UploadAvatarResponse: Shape = {
   k: "obj",
   props: {
-    "bytes": { shape: { k: "number" }, required: true },
-    "caption": { shape: { k: "string" }, required: false },
-    "tags": { shape: { k: "arr", of: { k: "string" } }, required: false },
+    bytes: { shape: { k: "number" }, required: true },
+    caption: { shape: { k: "string" }, required: false },
+    tags: { shape: { k: "arr", of: { k: "string" } }, required: false },
   },
   extra: null,
 };

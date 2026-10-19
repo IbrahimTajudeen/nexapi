@@ -9,7 +9,7 @@
 
 Schema-generated, fluent, fully typed API client with a standalone query/mutation engine (no React required) and a React adapter.
 
-> **Status: 0.1.x, pre-1.0.** The API can change between minor versions; the website has a release history. See [ROADMAP.md](ROADMAP.md) (also on the website as the Roadmap page, with known limitations and open tasks) for what is and isn't done, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) / [docs/API-DESIGN.md](docs/API-DESIGN.md) for the design and public contracts.
+> **Status: 0.1.x, pre-1.0.** The API can change between minor versions; the website has a release history. See [ROADMAP.md](ROADMAP.md) (also on the website as the Roadmap page, with known limitations and open tasks) for what is and isn't done, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) / [docs/API-DESIGN.md](docs/API-DESIGN.md) for the design and public contracts. Guides for schema-less (manual) endpoints, HTTP, techniques, best practices and integrations, plus a 30-episode tutorial playlist plan ([docs/TUTORIALS.md](docs/TUTORIALS.md)), are on the website.
 
 ```ts
 const user = await api.users.byId("42").get();

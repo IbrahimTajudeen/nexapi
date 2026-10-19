@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/docs/", label: "Docs" },
   { href: "/playground/", label: "Playground" },
   { href: "/beginners/", label: "Beginners" },
+  { href: "/tutorials/", label: "Tutorials" },
   { href: "/install/", label: "Install" },
   { href: "/releases/", label: "Releases" },
   { href: "/roadmap/", label: "Roadmap" },

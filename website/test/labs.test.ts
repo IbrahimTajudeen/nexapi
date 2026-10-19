@@ -98,3 +98,33 @@ describe("option labs show the documented effect", () => {
     expect(text).toContain("pages held: 2");
   });
 });
+
+describe("the HTTP and manual-endpoint labs show the documented effect", () => {
+  it("http: a JSON body reaches the server as JSON", async () => {
+    const text = await run(composeLab(LABS.http, { method: 1, body: 1 }));
+    expect(text).toContain("server saw: POST /echo");
+    expect(text).toContain('"content-type":"application/json"');
+    expect(text).toContain('body: {"name":"Ada","tags":["math","code"]}');
+  });
+  it("http: urlencoded changes the content type and the body", async () => {
+    const text = await run(composeLab(LABS.http, { method: 1, body: 1, bodyKind: 1 }));
+    expect(text).toContain("application/x-www-form-urlencoded");
+    expect(text).toContain("name=Ada");
+  });
+  it("http: a GET cannot carry a body", async () => {
+    const text = await run(composeLab(LABS.http, { body: 1 }));
+    expect(text).toContain("failed:");
+  });
+  it("http: a short timeout raises TimeoutError", async () => {
+    const text = await run(composeLab(LABS.http, { timeoutMs: 1 }), 200);
+    expect(text).toContain("failed: TimeoutError");
+  });
+  it("manual: each endpoint definition runs", async () => {
+    const created = await run(composeLab(LABS.manual, { endpoint: 2 }));
+    expect(created).toContain("created 101 Alan Turing");
+    const removed = await run(composeLab(LABS.manual, { endpoint: 5 }));
+    expect(removed).toContain("deleted, returned: undefined");
+    const replaced = await run(composeLab(LABS.manual, { endpoint: 3 }));
+    expect(replaced).toContain('"name":"Linus T."');
+  });
+});

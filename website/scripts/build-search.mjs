@@ -73,6 +73,23 @@ const extra = [
   },
 ];
 entries.push(...extra);
+const tut = readFileSync(join(root, "src/tutorials.ts"), "utf8");
+for (const m of tut.matchAll(
+  /number: (\d+), slug: "([^"]+)"[\s\S]*?title: "([^"]+)",\s*summary: "([^"]+)"/g,
+)) {
+  entries.push({
+    title: `Episode ${m[1]}: ${m[3]}`,
+    page: "Tutorials",
+    href: `/tutorials/${m[2]}/`,
+    text: m[4],
+  });
+}
+entries.push({
+  title: "Tutorials",
+  page: "Learn",
+  href: "/tutorials/",
+  text: "video playlist episodes beginner advanced tutor record contribute",
+});
 mkdirSync(join(root, "src/generated"), { recursive: true });
 writeFileSync(
   join(root, "src/generated/search-index.json"),

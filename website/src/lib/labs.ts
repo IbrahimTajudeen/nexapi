@@ -10,6 +10,8 @@ export interface LabChoice {
   code: string;
   /** What this choice does, shown under the code. */
   note: string;
+  /** Fills other slots of the program too, so one choice can change several places at once. */
+  also?: { readonly [slot: string]: string | undefined };
 }
 
 export interface LabOption {
@@ -580,7 +582,8 @@ try {
         name: "headers",
         type: "Record<string, string | number | boolean | undefined>",
         default: "none",
-        summary: "Per-request headers. An undefined value removes a client-level header.",
+        summary:
+          "Per-request headers, applied over the client headers. Undefined values are skipped.",
         choices: [
           def("Only the client's headers."),
           {
@@ -794,6 +797,228 @@ try {
       },
     ],
   },
+  http: {
+    id: "http",
+    title: "HTTP request builder",
+    intro:
+      "Send one request with nyx.http.request and read back what the server actually received. Try a method, then add a body, headers or a token.",
+    program: `
+try {
+  const echo = await nyx.http.request({
+    method: "{{method}}",
+    path: "/echo",
+{{options}}
+  });
+  log("server saw:", echo.method, echo.path);
+  log("query:", JSON.stringify(echo.query));
+  log("headers:", JSON.stringify(echo.headers));
+  log("body:", JSON.stringify(echo.body));
+} catch (error) {
+  log("failed:", error.name + ":", error.message);
+}
+`,
+    expectDefault: ["server saw: GET /echo", "body: null"],
+    options: [
+      {
+        name: "method",
+        slot: "method",
+        type: "HttpMethod",
+        default: "get",
+        summary:
+          "The HTTP method. Reads use GET; writes use POST, PUT, PATCH or DELETE. OPTIONS asks what a resource allows.",
+        choices: [
+          { label: "get", code: "get", note: "Read. Must not carry a body." },
+          { label: "post", code: "post", note: "Create, or any action that is not idempotent." },
+          { label: "put", code: "put", note: "Replace a resource. Safe to repeat." },
+          { label: "patch", code: "patch", note: "Change part of a resource." },
+          { label: "delete", code: "delete", note: "Remove a resource. Safe to repeat." },
+          { label: "options", code: "options", note: "Ask which methods a resource allows." },
+        ],
+      },
+      {
+        name: "body",
+        type: "unknown",
+        default: "none",
+        summary:
+          "The payload. Pick one, then change bodyKind to see it encoded differently. GET and OPTIONS cannot carry a body: fetch refuses, and the error is shown.",
+        choices: [
+          def("No body."),
+          {
+            label: "object",
+            code: '    body: { name: "Ada", tags: ["math", "code"] },',
+            note: "A plain object, sent as JSON by default.",
+          },
+          {
+            label: "string",
+            code: '    body: "plain words",\n    bodyKind: "text",',
+            note: "Sent as text/plain.",
+          },
+        ],
+      },
+      {
+        name: "bodyKind",
+        type: '"json" | "form-data" | "urlencoded" | "binary" | "text"',
+        default: "json",
+        summary:
+          "How the body is encoded. It also sets Content-Type. Needs a body above (pick “object”).",
+        choices: [
+          def("JSON: application/json."),
+          {
+            label: "urlencoded",
+            code: '    bodyKind: "urlencoded",',
+            note: "HTML-form style: name=Ada&tags=math&tags=code. Values must be primitives or arrays of them.",
+          },
+          {
+            label: "form-data",
+            code: '    bodyKind: "form-data",',
+            note: "Multipart form data with a generated boundary. The server reports only that it was multipart.",
+          },
+        ],
+      },
+      {
+        name: "query",
+        type: "Record<string, unknown>",
+        default: "none",
+        summary:
+          "Query-string parameters. Arrays repeat the parameter. undefined and null are skipped.",
+        choices: [
+          def("No query string."),
+          {
+            label: "search and page",
+            code: '    query: { q: "ada lovelace", page: 2, archived: false },',
+            note: "Values are encoded for you: spaces, numbers and booleans become strings.",
+          },
+          {
+            label: "array",
+            code: '    query: { tag: ["math", "code"] },',
+            note: "Sent as tag=math&tag=code unless a queryStyle says otherwise.",
+          },
+        ],
+      },
+      {
+        name: "headers",
+        type: "Record<string, string | number | boolean | undefined>",
+        default: "none",
+        summary: "Per-request headers, applied over the client headers.",
+        choices: [
+          def("Only the headers NyxAPI sets itself (accept, content-type)."),
+          {
+            label: "custom headers",
+            code: '    headers: { "x-request-id": "req-42", "x-tenant": "acme" },',
+            note: "Sent on this request only.",
+          },
+        ],
+      },
+      {
+        name: "timeoutMs",
+        type: "number",
+        default: "client timeout",
+        summary: "Abort a request that takes longer than this. The mock API takes about 300 ms.",
+        choices: [
+          def("No timeout."),
+          {
+            label: "50 ms",
+            code: "    timeoutMs: 50,",
+            note: "Too short for this server, so a TimeoutError is raised.",
+          },
+        ],
+      },
+    ],
+  },
+
+  manual: {
+    id: "manual",
+    title: "Define an endpoint by hand",
+    intro:
+      "No schema, no generator. Pick an endpoint and see the exact definition NyxAPI needs, then run it.",
+    program: `
+const endpoint = nyx.{{kind}}({
+  method: "{{method}}",
+  path: "{{path}}",
+{{options}}
+});
+
+{{call}}
+`,
+    expectDefault: ["Ada Lovelace", '["GET","/users/{id}",{"id":"1"}]'],
+    options: [
+      {
+        name: "endpoint",
+        slot: "kind",
+        type: "EndpointDef",
+        default: "n/a",
+        summary:
+          "GET becomes a query (cacheable). Every other method becomes a mutation (run once, with a lifecycle). Path values go in params; a request body needs hasBody: true.",
+        choices: [
+          {
+            label: "GET one user",
+            code: "query",
+            note: "A query with a path parameter bound in params.",
+            also: {
+              method: "get",
+              path: "/users/{id}",
+              options: '  params: { id: "1" },',
+              call: 'const user = await endpoint();\nlog(user.name, "|", JSON.stringify(endpoint.key()));',
+            },
+          },
+          {
+            label: "GET a list",
+            code: "query",
+            note: "No params. The query string goes in the request object when you call it.",
+            also: {
+              method: "get",
+              path: "/users",
+              call: 'const page = await endpoint({ query: { limit: 2 } });\nlog(page.items.length, "of", page.total, "|", JSON.stringify(endpoint.key()));',
+            },
+          },
+          {
+            label: "POST create",
+            code: "mutation",
+            note: "hasBody: true makes the body the first argument.",
+            also: {
+              method: "post",
+              path: "/users",
+              options: "  hasBody: true,",
+              call: 'const created = await endpoint({ name: "Alan Turing" });\nlog("created", created.id, created.name);',
+            },
+          },
+          {
+            label: "PUT replace",
+            code: "mutation",
+            note: "Replaces the whole resource; fields you leave out are reset by this server.",
+            also: {
+              method: "put",
+              path: "/users/{id}",
+              options: '  params: { id: "2" },\n  hasBody: true,',
+              call: 'const replaced = await endpoint({ name: "Linus T." });\nlog("replaced:", JSON.stringify(replaced));',
+            },
+          },
+          {
+            label: "PATCH change",
+            code: "mutation",
+            note: "Sends only the fields to change.",
+            also: {
+              method: "patch",
+              path: "/users/{id}",
+              options: '  params: { id: "1" },\n  hasBody: true,',
+              call: 'const updated = await endpoint({ name: "Ada, Countess of Lovelace" });\nlog("updated:", updated.name);',
+            },
+          },
+          {
+            label: "DELETE remove",
+            code: "mutation",
+            note: 'response: "none" because the server answers 204 with no body.',
+            also: {
+              method: "delete",
+              path: "/users/{id}",
+              options: '  params: { id: "4" },\n  response: "none",',
+              call: 'const nothing = await endpoint();\nlog("deleted, returned:", nothing);',
+            },
+          },
+        ],
+      },
+    ],
+  },
 } satisfies Record<string, Lab>;
 
 export type LabId = keyof typeof LABS;
@@ -810,6 +1035,12 @@ export function composeLab(lab: Lab, selection: Selection = {}): string {
     const list = slots.get(slot) ?? [];
     if (choice.code !== "") list.push(choice.code);
     slots.set(slot, list);
+    for (const [other, text] of Object.entries(choice.also ?? {})) {
+      if (text === undefined) continue;
+      const otherList = slots.get(other) ?? [];
+      otherList.push(text);
+      slots.set(other, otherList);
+    }
   }
   let out = lab.program.replace(/^\n/, "");
   for (const [slot, lines] of slots) {

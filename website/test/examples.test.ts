@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createEngine } from "../src/lib/engine";
 import { EXAMPLES } from "../src/lib/examples";
+import { GUIDE_EXAMPLES } from "../src/lib/guide-examples";
 import { formatValue, runSnippet } from "../src/lib/run";
 
 describe("site examples run against the real engine and say what the docs say", () => {
-  for (const [id, example] of Object.entries(EXAMPLES)) {
+  for (const [id, example] of Object.entries({ ...EXAMPLES, ...GUIDE_EXAMPLES })) {
     it(id, async () => {
       const engine = createEngine();
       engine.server.latency = 120;

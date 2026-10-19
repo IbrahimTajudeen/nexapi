@@ -230,7 +230,7 @@ export default function Page() {
           [
             c("headers"),
             c("Record<string, string | number | boolean | undefined>"),
-            "Per-request headers; an undefined value removes a client-level header.",
+            "Per-request headers, applied over the client headers. Entries whose value is undefined are skipped.",
           ],
           [c("body"), c("unknown"), "The payload. Its encoding is set by bodyKind."],
           [

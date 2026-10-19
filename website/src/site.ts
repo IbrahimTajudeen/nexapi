@@ -96,6 +96,76 @@ export const DOCS_NAV: NavSection[] = [
     ],
   },
   {
+    title: "No schema",
+    items: [
+      {
+        title: "Manual queries",
+        href: "/docs/manual/",
+        summary: "Define endpoints by hand when there is no schema to generate from.",
+      },
+      {
+        title: "HTTP requests and methods",
+        href: "/docs/http/",
+        summary: "Methods, paths, query strings, headers, bodies, responses and errors.",
+      },
+    ],
+  },
+  {
+    title: "Practice",
+    items: [
+      {
+        title: "Techniques and recipes",
+        href: "/docs/techniques/",
+        summary: "Fourteen runnable solutions to problems every app meets.",
+      },
+      {
+        title: "Best practices",
+        href: "/docs/best-practices/",
+        summary: "Defaults, do and avoid lists, and a production checklist.",
+      },
+    ],
+  },
+  {
+    title: "Integrations",
+    items: [
+      {
+        title: "Integration guides",
+        href: "/docs/integrations/",
+        summary: "How NyxAPI fits into Vite, Next.js, Node, tests and CI.",
+      },
+      {
+        title: "React with Vite",
+        href: "/docs/integrations/react-vite/",
+        summary: "A single-page app: client module, hooks, Suspense, proxy and devtools.",
+      },
+      {
+        title: "Next.js",
+        href: "/docs/integrations/nextjs/",
+        summary: "Per-request server clients, dehydrate and hydrate, one browser client.",
+      },
+      {
+        title: "Node servers and scripts",
+        href: "/docs/integrations/node-server/",
+        summary: "Express handlers, jobs and server rendering without a shared cache.",
+      },
+      {
+        title: "Authentication",
+        href: "/docs/integrations/auth/",
+        summary: "Bearer tokens, refresh on 401, cookies and per-user clients.",
+      },
+      {
+        title: "Testing",
+        href: "/docs/integrations/testing/",
+        summary: "A function transport, fake routes and rollback tests.",
+      },
+      {
+        title: "CI and teams",
+        href: "/docs/integrations/ci/",
+        summary: "Keep generated code in step with the schema; conventions for teams.",
+      },
+    ],
+  },
+  {
     title: "Reference",
     items: [
       {

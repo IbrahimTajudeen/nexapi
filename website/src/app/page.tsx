@@ -273,6 +273,33 @@ const session = await api.auth.login.post({ email, password });`}</Code>
         </div>
       </section>
 
+      <section className="section alt" id="learn">
+        <div className="wrap">
+          <h2>Learn NyxAPI your way</h2>
+          <p className="sub">
+            Read the guides, run live examples, or follow a 30-episode video playlist plan from
+            first install to production.
+          </p>
+          <div className="grid cols-3">
+            <Link className="card link" href="/docs/manual/">
+              <h3>No schema? Start here</h3>
+              <p>Define endpoints by hand and cover every HTTP method, body and response.</p>
+            </Link>
+            <Link className="card link" href="/docs/techniques/">
+              <h3>Techniques and best practices</h3>
+              <p>
+                Retries, token refresh, polling, optimistic updates, testing and a production
+                checklist.
+              </p>
+            </Link>
+            <Link className="card link" href="/tutorials/">
+              <h3>Tutorials and playlist</h3>
+              <p>Beginner to professional episodes. Tutors can claim one and record it.</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="section" id="contribute">
         <div className="wrap">
           <div className="contrib">
