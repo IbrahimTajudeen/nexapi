@@ -43,6 +43,11 @@ export function Console({
     setEngine(createEngine());
   }, []);
 
+  // A parent that controls `code` (the option labs) replaces what is in the editor.
+  useEffect(() => {
+    setSource(code);
+  }, [code]);
+
   const log = useSyncExternalStore(
     useCallback((cb: () => void) => engine?.server.subscribe(cb) ?? (() => undefined), [engine]),
     () => engine?.server.log().length ?? 0,

@@ -98,6 +98,11 @@ export const DOCS_NAV: NavSection[] = [
   {
     title: "Reference",
     items: [
+      {
+        title: "API reference",
+        href: "/docs/api/",
+        summary: "Every public member of the core engine.",
+      },
       { title: "CLI", href: "/docs/cli/", summary: "Every command and flag." },
       { title: "Configuration", href: "/docs/config/", summary: "nyx.config.json options." },
       {

@@ -51,6 +51,9 @@ export default function Page() {
         use it, break it, and make it better.
       </p>
       <div className="cta-row">
+        <Link className="btn" href="/roadmap/#tasks">
+          See open tasks
+        </Link>
         {REPO_URL ? (
           <>
             <a className="btn primary" href={REPO_URL} rel="noopener">

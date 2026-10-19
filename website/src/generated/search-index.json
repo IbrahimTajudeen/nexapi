@@ -264,6 +264,12 @@
   "text": ""
  },
  {
+  "title": "Try every query option",
+  "page": "Queries and caching",
+  "href": "/docs/queries/#try-every-query-option",
+  "text": ""
+ },
+ {
   "title": "Mutations and optimistic updates",
   "page": "Documentation",
   "href": "/docs/mutations/",
@@ -294,6 +300,12 @@
   "text": ""
  },
  {
+  "title": "Every mutation option",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#every-mutation-option",
+  "text": ""
+ },
+ {
   "title": "Keeping writes in order",
   "page": "Mutations and optimistic updates",
   "href": "/docs/mutations/#keeping-writes-in-order",
@@ -309,6 +321,12 @@
   "title": "Related",
   "page": "Mutations and optimistic updates",
   "href": "/docs/mutations/#related",
+  "text": ""
+ },
+ {
+  "title": "Try every mutation option",
+  "page": "Mutations and optimistic updates",
+  "href": "/docs/mutations/#try-every-mutation-option",
   "text": ""
  },
  {
@@ -339,6 +357,12 @@
   "title": "Errors never leak secrets",
   "page": "Errors",
   "href": "/docs/errors/#errors-never-leak-secrets",
+  "text": ""
+ },
+ {
+  "title": "Try every failure",
+  "page": "Errors",
+  "href": "/docs/errors/#try-every-failure",
   "text": ""
  },
  {
@@ -381,6 +405,12 @@
   "title": "In React",
   "page": "Pagination",
   "href": "/docs/pagination/#in-react",
+  "text": ""
+ },
+ {
+  "title": "Try every infinite query option",
+  "page": "Pagination",
+  "href": "/docs/pagination/#try-every-infinite-query-option",
   "text": ""
  },
  {
@@ -654,6 +684,72 @@
   "text": ""
  },
  {
+  "title": "API reference",
+  "page": "Documentation",
+  "href": "/docs/api/",
+  "text": "Every public member of the core engine."
+ },
+ {
+  "title": "The query client",
+  "page": "API reference",
+  "href": "/docs/api/#the-query-client",
+  "text": ""
+ },
+ {
+  "title": "Constructor options",
+  "page": "API reference",
+  "href": "/docs/api/#constructor-options",
+  "text": ""
+ },
+ {
+  "title": "Methods",
+  "page": "API reference",
+  "href": "/docs/api/#methods",
+  "text": ""
+ },
+ {
+  "title": "Filters",
+  "page": "API reference",
+  "href": "/docs/api/#filters",
+  "text": ""
+ },
+ {
+  "title": "Endpoint objects",
+  "page": "API reference",
+  "href": "/docs/api/#endpoint-objects",
+  "text": ""
+ },
+ {
+  "title": "Query endpoints (GET)",
+  "page": "API reference",
+  "href": "/docs/api/#query-endpoints-get",
+  "text": ""
+ },
+ {
+  "title": "Mutation endpoints (POST, PUT, PATCH, DELETE)",
+  "page": "API reference",
+  "href": "/docs/api/#mutation-endpoints-post-put-patch-delete",
+  "text": ""
+ },
+ {
+  "title": "Request settings",
+  "page": "API reference",
+  "href": "/docs/api/#request-settings",
+  "text": ""
+ },
+ {
+  "title": "Errors",
+  "page": "API reference",
+  "href": "/docs/api/#errors",
+  "text": ""
+ },
+ {
+  "title": "Hydration",
+  "page": "API reference",
+  "href": "/docs/api/#hydration",
+  "text": ""
+ },
+ {
   "title": "CLI",
   "page": "Documentation",
   "href": "/docs/cli/",
@@ -744,6 +840,18 @@
   "text": ""
  },
  {
+  "title": "Try every client option",
+  "page": "Client options",
+  "href": "/docs/client-options/#try-every-client-option",
+  "text": ""
+ },
+ {
+  "title": "Try every request option",
+  "page": "Client options",
+  "href": "/docs/client-options/#try-every-request-option",
+  "text": ""
+ },
+ {
   "title": "Benchmarks",
   "page": "Documentation",
   "href": "/docs/benchmarks/",
@@ -820,5 +928,11 @@
   "page": "Project",
   "href": "/releases/",
   "text": "versions changelog what is new 0.1.0 0.0.1 release notes graphql trpc swagger nyx npm published"
+ },
+ {
+  "title": "Roadmap",
+  "page": "Project",
+  "href": "/roadmap/",
+  "text": "roadmap milestones planned releases known limitations open tasks issues future vue persister useQueries subscriptions"
  }
 ]

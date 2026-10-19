@@ -1,6 +1,6 @@
 # API design and compatibility
 
-Status: **0.0.x, pre-release.** Anything here may change; every change must update this file and the compile-time tests.
+Status: **0.1.x, pre-1.0.** Anything here may change; every change must update this file and the compile-time tests.
 
 ## Resource tree (generated)
 

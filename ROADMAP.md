@@ -17,6 +17,7 @@
 - ✅ Key-prefix index (first element): prefix filters that start with a primitive look only at their bucket; object-rooted or empty prefixes still scan.
 - Infinite queries in core + `useInfiniteQuery` ✅ (refetch re-requests all loaded pages; `getPreviousPageParam`/`fetchPreviousPage` and `maxPages` ✅).
 - `useIsFetching`, `useQueries`.
+- Persisters (save the cache to storage) and an offline mutation queue.
 
 ## Milestone 3: codegen breadth
 
@@ -34,14 +35,15 @@
 ## Milestone 5: performance evidence
 
 - ✅ React render benchmarks (NyxAPI vs TanStack Query vs RTK Query, jsdom), memory benchmark (fresh process per sample), bundle-size measurement with budgets for NyxAPI entries (`benchmarks/README.md`). Results are machine specific and make no superiority claim.
-- Open: real-browser rendering, hydration, long-session memory, mutation/rollback comparisons.
+- Open: real-browser rendering, hydration, long-session memory, mutation/rollback comparisons; re-run the engine benchmark against 0.1.0 (the last run used 0.0.1); reduce memory per cache entry (about 1206 bytes against 992 for TanStack in the last run).
 - Profile real workloads before considering normalized entities (not planned until evidence exists).
 
 ## Milestone 6: release
 
 - ✅ LICENSE, package READMEs, `pnpm smoke:pack` (pack → empty-project install → CLI generate → strict type-check → run), CI step, `docs/RELEASING.md`.
 - Done: changesets with a fixed-version group, npm provenance in the release workflow, `repository` fields written from the GitHub repository by `scripts/set-repository.mjs`, publish metadata and LICENSE in every package, docs site, size budgets (`benchmarks/size.mjs`). See `docs/RELEASING.md`.
-- Open: first publish (needs the `@nyxapi` npm scope and an `NPM_TOKEN` secret), browser matrix tests.
+- ✅ First publish: 0.1.0 is on npm (all seven packages).
+- Open: browser matrix tests.
 
 ## Milestone 7: more than OpenAPI ✅ (0.1.0)
 
@@ -49,6 +51,52 @@
 - ✅ `nyx` command (global install, `init`, `generate --watch`, `--version`), kind detection, `nyx.config.json` with an editor JSON schema.
 - ✅ Hardening: `maxResponseBytes`, bounded CLI downloads and redirects, `__proto__` property keys, alias cycles.
 - Open: GraphQL subscriptions, uploads and persisted queries; tRPC subscriptions; a live GraphQL demo in the playground.
+
+## Milestone 8: more frameworks
+
+- Exploring: a Vue adapter, then Svelte and Solid adapters. The core is already framework independent; adapters are what is missing.
+
+## Open items, in full
+
+This list mirrors the Roadmap page on the website (`website/src/roadmap.ts`); a test keeps the two in step.
+
+### Milestone 2: Cache completeness
+
+- useIsFetching and useQueries hooks (planned)
+- Next.js and React Server Components integration (planned)
+- Persisters (save the cache to storage) and an offline mutation queue (planned)
+
+### Milestone 3: Codegen breadth
+
+- Remote-schema caching (planned)
+- Split output per tag (planned)
+
+### Milestone 4: Devtools and diagnostics
+
+- Per-request timeline (needs a transport-level hook) (planned)
+- Richer devtools UI (planned)
+
+### Milestone 5: Performance evidence
+
+- Re-run the engine benchmark against 0.1.0 (the last run used 0.0.1) (planned)
+- Real-browser rendering, hydration, long-session memory, mutation and rollback comparisons (planned)
+- Reduce memory per cache entry (about 1206 bytes against 992 for TanStack in the last run) (planned)
+- Normalized entities (not-planned)
+
+### Milestone 6: Release
+
+- Browser matrix tests (planned)
+
+### Milestone 7: More than OpenAPI
+
+- GraphQL subscriptions, uploads and persisted queries (planned)
+- tRPC subscriptions (planned)
+- A live GraphQL demo in the playground (planned)
+
+### Milestone 8: More frameworks
+
+- Vue adapter (exploring)
+- Svelte and Solid adapters (exploring)
 
 ## Naming
 

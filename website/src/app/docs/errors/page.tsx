@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Callout } from "@/components/Callout";
 import { Code } from "@/components/Code";
+import { OptionLab } from "@/components/OptionLab";
 import { Doc, H2, Table } from "@/components/Doc";
 import { Runnable } from "@/components/Runnable";
 
@@ -92,6 +93,13 @@ export default function Page() {
         request headers or bodies. A query string can contain tokens, so it is stripped before
         anything is put in an error. You can log an error safely.
       </p>
+
+      <H2>Try every failure</H2>
+      <p>
+        Pick a failure mode and run it. The output shows the class that was raised and the fields
+        you can branch on.
+      </p>
+      <OptionLab id="errors" />
     </Doc>
   );
 }

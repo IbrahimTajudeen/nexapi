@@ -65,6 +65,12 @@ const extra = [
     href: "/releases/",
     text: "versions changelog what is new 0.1.0 0.0.1 release notes graphql trpc swagger nyx npm published",
   },
+  {
+    title: "Roadmap",
+    page: "Project",
+    href: "/roadmap/",
+    text: "roadmap milestones planned releases known limitations open tasks issues future vue persister useQueries subscriptions",
+  },
 ];
 entries.push(...extra);
 mkdirSync(join(root, "src/generated"), { recursive: true });

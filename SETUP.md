@@ -78,11 +78,11 @@ See [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Troubleshooting
 
-| Problem                                                      | Fix                                                                                                                        |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `Can't resolve '@/generated/search-index.json'`              | The generated files are missing. Run `pnpm website:dev` (it creates them) or `node website/scripts/prepare-downloads.mjs`. |
-| `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND` with `%20` in the path | Old scripts; use the current zip. Spaces in folder names are supported.                                                    |
-| `Cannot find module @nyxapi/core`                            | Run `pnpm install` at the repo root, not inside `website/` only.                                                           |
-| Port 3000 busy                                               | `PORT=3001 pnpm website:dev` (Windows PowerShell: `$env:PORT=3001; pnpm website:dev`)                                      |
-| Build fails on `./types.js` imports                          | Use the provided scripts: they call `next ... --webpack`, which maps `.js` imports to `.ts`.                               |
-| Packages not found on npm                                    | They are not published yet. Use the tarballs, the starter zip or the workspace.                                            |
+| Problem                                                      | Fix                                                                                                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `Can't resolve '@/generated/search-index.json'`              | The generated files are missing. Run `pnpm website:dev` (it creates them) or `node website/scripts/prepare-downloads.mjs`.            |
+| `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND` with `%20` in the path | Old scripts; use the current zip. Spaces in folder names are supported.                                                               |
+| `Cannot find module @nyxapi/core`                            | Run `pnpm install` at the repo root, not inside `website/` only.                                                                      |
+| Port 3000 busy                                               | `PORT=3001 pnpm website:dev` (Windows PowerShell: `$env:PORT=3001; pnpm website:dev`)                                                 |
+| Build fails on `./types.js` imports                          | Use the provided scripts: they call `next ... --webpack`, which maps `.js` imports to `.ts`.                                          |
+| Packages not found on npm                                    | Install by exact version (`npm install @nyxapi/core@0.1.0`) and check the scope is `@nyxapi`. Tarballs and the starter zip also work. |

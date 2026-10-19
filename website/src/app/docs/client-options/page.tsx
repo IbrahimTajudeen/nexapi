@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Callout } from "@/components/Callout";
 import { Code } from "@/components/Code";
+import { OptionLab } from "@/components/OptionLab";
 import { Doc, H2, Table } from "@/components/Doc";
 
 export const metadata: Metadata = { title: "Client options" };
@@ -123,6 +124,14 @@ const nyx = createNyxClient({
 const cache = new QueryClient();
 const a = createNyxClient({ baseUrl: "https://a.example.com", queryClient: cache });
 const b = createNyxClient({ baseUrl: "https://b.example.com", queryClient: cache });`}</Code>
+
+      <H2>Try every client option</H2>
+      <p>Each run builds a new client, so options never leak between runs.</p>
+      <OptionLab id="client" />
+
+      <H2>Try every request option</H2>
+      <p>Per-request settings, shown as the URL and body that actually go on the wire.</p>
+      <OptionLab id="request" />
     </Doc>
   );
 }

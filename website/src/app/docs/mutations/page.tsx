@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Callout } from "@/components/Callout";
 import { Code } from "@/components/Code";
+import { OptionLab } from "@/components/OptionLab";
 import { Doc, H2, H3, Table } from "@/components/Doc";
 import { Runnable } from "@/components/Runnable";
 
@@ -78,6 +79,38 @@ const updated = await nyx.queryClient.mutate(rename, { name: "Ada Lovelace" });`
           ],
         ]}
       />
+      <H3>Every mutation option</H3>
+      <Table
+        head={["Option", "Default", "Meaning"]}
+        rows={[
+          [
+            <code key="a">mutationKey</code>,
+            "none",
+            "A key that identifies this kind of mutation, usable as a filter prefix.",
+          ],
+          [
+            <code key="b">scope</code>,
+            "none",
+            "{ id }. Mutations sharing a scope id send their requests one after another, in submit order.",
+          ],
+          [
+            <code key="c">invalidates</code>,
+            "none",
+            "Keys or filters (or a function returning them) invalidated after success. Active queries refetch and the mutation waits for them.",
+          ],
+          [
+            <code key="d">retry</code>,
+            "no retries",
+            "{ idempotent: true, attempts, delay?, when? }. You must state that the request is safe to repeat. Default condition: network, timeout, 408, 429 and 5xx.",
+          ],
+          [<code key="e">meta</code>, "none", "Free-form data for your own logging or middleware."],
+          [
+            <code key="f">onMutate / onSuccess / onError / onSettled</code>,
+            "none",
+            "The lifecycle callbacks above.",
+          ],
+        ]}
+      />
       <p>
         The transaction returned by <code>optimistic()</code> is managed for you: rolled back on
         failure, committed on success. You can also call <code>rollback()</code> or{" "}
@@ -115,6 +148,13 @@ const updated = await nyx.queryClient.mutate(rename, { name: "Ada Lovelace" });`
           <Link href="/docs/react/">React</Link>: <code>useMutation</code> wraps all of this.
         </li>
       </ul>
+
+      <H2>Try every mutation option</H2>
+      <p>
+        Each choice fills one option of the mutation. Pick the empty name to watch rollback and the
+        error callbacks.
+      </p>
+      <OptionLab id="mutation" />
     </Doc>
   );
 }

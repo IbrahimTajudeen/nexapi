@@ -37,7 +37,7 @@ Start with `docs/ARCHITECTURE.md` and `docs/API-DESIGN.md`.
 
 ## Where help is most useful
 
-See `ROADMAP.md`. Open areas include: real-world schema reports (especially large or unusual documents), Next.js and server components integration, browser test matrices, more framework guides, a request timeline for devtools, mutation and rollback benchmarks, and translations of the docs.
+See `ROADMAP.md`; the website's Roadmap page lists known limitations and open tasks with their size. Open areas include: real-world schema reports (especially large or unusual documents), Next.js and server components integration, browser test matrices, more framework guides, a request timeline for devtools, mutation and rollback benchmarks, and translations of the docs.
 
 ## Security
 

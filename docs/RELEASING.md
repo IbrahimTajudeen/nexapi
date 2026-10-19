@@ -27,11 +27,10 @@ Seven packages are published together under the `@nyxapi` scope, always at the s
 
 ### Publishing 0.1.0
 
-The repository is already at `0.1.0` (the changeset was applied and the changelogs written), and the
-two new packages, `@nyxapi/graphql` and `@nyxapi/trpc`, are in the fixed group. `0.1.0` is not on npm,
-so pushing to `main` (or running `pnpm release`) publishes it: `changeset publish` publishes every
-package whose version is not on the registry yet. No new changeset is needed. After that, the
-website's Releases page shows "latest on npm" for 0.1.0 by itself, because it reads the registry.
+`0.1.0` is published to npm for all seven packages (`core`, `codegen`, `cli`, `react`, `devtools`,
+`graphql`, `trpc`). The website's Releases page reads the registry, so its "on npm" badge is live.
+Later releases follow the normal flow above: add a changeset, merge the release pull request, and
+`changeset publish` publishes every package whose version is not on the registry yet.
 
 Install a specific version with `npm install @nyxapi/core@0.1.0`. If an old broken `0.0.0-stage`
 version is on the registry, an unpinned install can pick it up; unpublish or deprecate it

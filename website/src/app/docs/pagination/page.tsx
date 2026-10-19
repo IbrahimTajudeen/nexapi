@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Callout } from "@/components/Callout";
 import { Code } from "@/components/Code";
+import { OptionLab } from "@/components/OptionLab";
 import { Doc, H2 } from "@/components/Doc";
 import { Runnable } from "@/components/Runnable";
 
@@ -67,6 +68,10 @@ export default function Page() {
 
 pages.data?.pages.flatMap((p) => p.items);
 pages.hasNextPage && <button onClick={() => pages.fetchNextPage()}>More</button>;`}</Code>
+
+      <H2>Try every infinite query option</H2>
+      <p>Load the next page twice and see what each option kept or dropped.</p>
+      <OptionLab id="infinite" />
     </Doc>
   );
 }

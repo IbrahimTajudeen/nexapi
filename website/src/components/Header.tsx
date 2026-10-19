@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/beginners/", label: "Beginners" },
   { href: "/install/", label: "Install" },
   { href: "/releases/", label: "Releases" },
+  { href: "/roadmap/", label: "Roadmap" },
   { href: "/contribute/", label: "Contribute" },
 ];
 

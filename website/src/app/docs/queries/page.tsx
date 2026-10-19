@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Callout } from "@/components/Callout";
 import { Code } from "@/components/Code";
+import { OptionLab } from "@/components/OptionLab";
 import { Doc, H2, H3, Table } from "@/components/Doc";
 import { Runnable } from "@/components/Runnable";
 
@@ -87,7 +88,42 @@ const user = await nyx.queryClient.fetchQuery(options);`}</Code>
           [
             <code key="j">placeholderData</code>,
             "none",
-            "Show this while there is no data yet. It is never written to the cache.",
+            "Show this while there is no data yet. It is never written to the cache. A function receives the previous query's data, so keepPreviousData keeps the old page on screen while a new key loads.",
+          ],
+          [
+            <code key="k">initialData</code>,
+            "none",
+            "Seeds the cache entry when it is first created (a value or a function). Ignored if the entry already exists.",
+          ],
+          [
+            <code key="l">initialDataUpdatedAt</code>,
+            "now",
+            "When the seed was produced, in ms since the epoch. An older time makes it go stale sooner.",
+          ],
+          [
+            <code key="m">refetchOnMount</code>,
+            "true",
+            "Whether a newly mounted observer refetches stale data. false uses whatever is cached.",
+          ],
+          [
+            <code key="n">networkMode</code>,
+            '"online"',
+            '"online": while offline a fetch waits with fetchStatus "paused" and resumes on reconnect. "always": never waits.',
+          ],
+          [
+            <code key="o">structuralSharing</code>,
+            "false",
+            "Reuse unchanged parts of refetched data so object identities stay stable.",
+          ],
+          [
+            <code key="p">notifyOn</code>,
+            "all fields",
+            "Only notify listeners when one of these result fields changes.",
+          ],
+          [
+            <code key="q">meta</code>,
+            "none",
+            "Free-form data passed to the query function context, for your own middleware or logging.",
           ],
         ]}
       />
@@ -166,6 +202,13 @@ nyx.queryClient.clear();                      // delete everything`}</Code>
         still as one shared request. Set <code>networkMode: &quot;always&quot;</code> to opt out.
         Mutations are never paused, because quietly queueing a write for later is unsafe.
       </p>
+
+      <H2>Try every query option</H2>
+      <p>
+        Switch one option at a time and run it. The output and the network panel show exactly what
+        changes.
+      </p>
+      <OptionLab id="query" />
     </Doc>
   );
 }

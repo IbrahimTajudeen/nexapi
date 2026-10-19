@@ -25,6 +25,6 @@ pnpm test                              # includes website/test (every doc exampl
 project and `install.sh` (with SHA-256 checksums) into `public/`. Those outputs are git-ignored.
 
 The playground runs the real `@nyxapi/core`, `@nyxapi/codegen`, `@nyxapi/react` and devtools in the
-browser against an in-memory mock API. Packages are not on npm yet; downloads are tarballs.
+browser against an in-memory mock API. The packages are on npm (see the Releases page for live status); the downloads page also offers tarballs and a starter zip.
 
 Next must build with `--webpack` because generated sources import `./x.js` that resolve to `.ts`.
