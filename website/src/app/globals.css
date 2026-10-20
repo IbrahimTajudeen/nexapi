@@ -2605,3 +2605,171 @@ main h1:not(.sr-only) {
   width: fit-content;
   max-width: 100%;
 }
+
+/* ---- playground fixes ---- */
+.ide-toolbar {
+  position: relative;
+  z-index: 60; /* its dropdowns must sit above the editor and panels below it */
+}
+.ide-main {
+  position: relative;
+  z-index: 1;
+}
+@media (hover: none) {
+  .ide-row .ide-row-actions {
+    display: inline-flex;
+  }
+}
+
+/* =====================================================================
+   Glass, second pass: deeper blur, a lit top edge, a faint sheen, and coloured light behind the
+   glass so the frosting is visible. Not applied to the playground, which stays plain.
+   ===================================================================== */
+:root {
+  --glass: rgba(255, 255, 255, 0.46);
+  --glass-hi: rgba(255, 255, 255, 0.72);
+  --glass-strong: rgba(255, 255, 255, 0.74);
+  --glass-edge: rgba(255, 255, 255, 0.85);
+  --glass-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 -1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 10px 30px -8px rgba(10, 70, 120, 0.22), 0 2px 6px rgba(10, 70, 120, 0.06);
+  --blur: 22px;
+  --orb-a: rgba(10, 138, 224, 0.5);
+  --orb-b: rgba(34, 197, 94, 0.38);
+  --orb-c: rgba(80, 120, 255, 0.28);
+}
+:root[data-theme="dark"] {
+  --glass: rgba(20, 40, 56, 0.42);
+  --glass-hi: rgba(40, 70, 95, 0.5);
+  --glass-strong: rgba(20, 40, 56, 0.72);
+  --glass-edge: rgba(255, 255, 255, 0.14);
+  --glass-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.16) inset, 0 -1px 0 rgba(255, 255, 255, 0.03) inset,
+    0 14px 36px -10px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.25);
+  --orb-a: rgba(61, 182, 255, 0.34);
+  --orb-b: rgba(74, 222, 128, 0.22);
+  --orb-c: rgba(110, 100, 255, 0.2);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --glass: rgba(20, 40, 56, 0.42);
+    --glass-hi: rgba(40, 70, 95, 0.5);
+    --glass-strong: rgba(20, 40, 56, 0.72);
+    --glass-edge: rgba(255, 255, 255, 0.14);
+    --glass-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.16) inset, 0 -1px 0 rgba(255, 255, 255, 0.03) inset,
+      0 14px 36px -10px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.25);
+    --orb-a: rgba(61, 182, 255, 0.34);
+    --orb-b: rgba(74, 222, 128, 0.22);
+    --orb-c: rgba(110, 100, 255, 0.2);
+  }
+}
+
+/* soft coloured light that the glass blurs and refracts */
+body {
+  position: relative;
+  isolation: isolate;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(420px 420px at 12% 18%, var(--orb-a), transparent 70%),
+    radial-gradient(380px 380px at 88% 30%, var(--orb-b), transparent 70%),
+    radial-gradient(460px 460px at 55% 92%, var(--orb-c), transparent 70%);
+  filter: blur(30px);
+}
+body:has(.ide-page)::before {
+  display: none;
+}
+
+.card,
+.callout,
+.table-wrap,
+.contrib,
+.pager a,
+.demo-card,
+.release,
+.lab,
+.rm-summary,
+.rm-milestone,
+.rm-card,
+.diagram,
+.do-dont > div,
+.console,
+.mobile-docs-nav select {
+  background: linear-gradient(150deg, var(--glass-hi) 0%, var(--glass) 55%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+}
+.card.link:hover,
+.cards a.card:hover {
+  background: linear-gradient(150deg, var(--glass-strong), var(--glass-hi));
+  border-color: rgba(10, 138, 224, 0.45);
+  box-shadow:
+    var(--glass-shadow),
+    0 0 0 3px rgba(10, 138, 224, 0.1);
+}
+.site-header {
+  background: linear-gradient(180deg, var(--glass-strong), var(--glass));
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
+  backdrop-filter: blur(26px) saturate(190%);
+  box-shadow:
+    0 1px 0 var(--glass-line),
+    0 8px 24px -12px rgba(10, 70, 120, 0.25);
+}
+.btn,
+.icon-btn,
+.chip,
+.pill {
+  background: linear-gradient(180deg, var(--glass-hi), var(--glass));
+  border-color: var(--glass-edge);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 1px 3px rgba(10, 70, 120, 0.12);
+  -webkit-backdrop-filter: blur(12px) saturate(170%);
+  backdrop-filter: blur(12px) saturate(170%);
+}
+.search-box,
+.ide-dropdown {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 24px 60px -12px rgba(0, 0, 0, 0.5);
+}
+.ide-dropdown {
+  background: linear-gradient(160deg, rgba(40, 66, 88, 0.88), rgba(18, 34, 47, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+.ide-toolbar,
+.ide-status,
+.ide-panel-tabs,
+.ide-tabs {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+}
+.ide-explorer {
+  background: rgba(255, 255, 255, 0.025);
+}
+.ide-tab.active {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+}
+.ide-btn {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+/* a backdrop-filter inside another one blurs nothing, so the toolbar must not have its own */
+.ide-toolbar,
+.ide-status {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.ide-dropdown {
+  background: linear-gradient(160deg, rgba(38, 64, 86, 0.95), rgba(16, 31, 43, 0.97));
+}

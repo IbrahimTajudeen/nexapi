@@ -55,6 +55,13 @@ function NameInput({
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const [v, setV] = useState(initial);
+  // Enter, Escape and blur can all fire for one edit; only the first one counts.
+  const settled = useRef(false);
+  const settle = (fn: () => void): void => {
+    if (settled.current) return;
+    settled.current = true;
+    fn();
+  };
   useEffect(() => {
     ref.current?.focus();
     ref.current?.select();
@@ -66,11 +73,13 @@ function NameInput({
       value={v}
       aria-label="Name"
       spellCheck={false}
+      onClick={(e) => e.stopPropagation()}
       onChange={(e) => setV(e.target.value)}
-      onBlur={() => (v.trim() ? onDone(v.trim()) : onCancel())}
+      onBlur={() => settle(() => (v.trim() ? onDone(v.trim()) : onCancel()))}
       onKeyDown={(e) => {
-        if (e.key === "Enter") onDone(v.trim());
-        if (e.key === "Escape") onCancel();
+        e.stopPropagation();
+        if (e.key === "Enter") settle(() => (v.trim() ? onDone(v.trim()) : onCancel()));
+        if (e.key === "Escape") settle(onCancel);
       }}
     />
   );

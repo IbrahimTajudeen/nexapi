@@ -80,6 +80,7 @@ export function Ide() {
   const iframe = useRef<HTMLIFrameElement>(null);
   const session = useRef<Session | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
+  const runningRef = useRef(false);
   const openRef = useRef(open);
   openRef.current = open;
   const settings = useRef({ latency, failing });
@@ -169,7 +170,9 @@ export function Ide() {
           setOpen([]);
           setActive(null);
           setSelectedDir("/");
-          pushTerm("info", "Workspace cleared. Try: new basics");
+          vfs.write("/README.md", WELCOME_README);
+          scaffold("basics");
+          pushTerm("info", "Workspace reset to a fresh starter project.");
         },
         scaffold,
         templates: () => TEMPLATES.map((t) => ({ id: t.id, title: t.title })),
@@ -189,12 +192,13 @@ export function Ide() {
 
   const runActive = useCallback(async (): Promise<void> => {
     const file = active;
-    if (!file) return;
+    if (!file || runningRef.current) return;
     if (!RUNNABLE.has(extname(file))) {
       setNotice(`${basename(file)} is not a runnable file. Open a .js, .ts, .jsx or .tsx file.`);
       return;
     }
     setNotice(null);
+    runningRef.current = true;
     setRunning(true);
     setPanel((p) => (p === "terminal" || p === "network" ? "output" : p));
     setOutLines([]);
@@ -204,6 +208,7 @@ export function Ide() {
       pushOut("error", formatArg(e));
       setPanel("output");
     } finally {
+      runningRef.current = false;
       setRunning(false);
     }
   }, [active, runFile, pushOut]);
@@ -277,6 +282,12 @@ export function Ide() {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
   }, [ready, version, open, active, cwdLabel, persist]);
+
+  // move focus into a menu when it opens, so the arrow keys work straight away
+  useEffect(() => {
+    if (!menu) return;
+    document.querySelector<HTMLButtonElement>(".ide-dropdown button:not(:disabled)")?.focus();
+  }, [menu]);
 
   // ----- keyboard -----
   useEffect(() => {
@@ -366,6 +377,16 @@ export function Ide() {
     });
   };
 
+  const menuKeys = (e: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const items = Array.from(
+      e.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"),
+    );
+    const i = items.indexOf(document.activeElement as HTMLButtonElement);
+    items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length]?.focus();
+  };
+
   const startDrag = (e: React.PointerEvent): void => {
     e.preventDefault();
     const startY = e.clientY;
@@ -428,7 +449,7 @@ export function Ide() {
             New project ▾
           </button>
           {menu === "new" && (
-            <div className="ide-dropdown" role="menu">
+            <div className="ide-dropdown" role="menu" onKeyDown={menuKeys}>
               {TEMPLATES.map((t) => (
                 <button
                   key={t.id}
@@ -467,7 +488,7 @@ export function Ide() {
             Docs examples ▾
           </button>
           {menu === "examples" && (
-            <div className="ide-dropdown tall" role="menu">
+            <div className="ide-dropdown tall" role="menu" onKeyDown={menuKeys}>
               {EXAMPLE_IDS.map((id) => (
                 <button
                   key={id}
@@ -502,7 +523,7 @@ export function Ide() {
             Workspace ▾
           </button>
           {menu === "more" && (
-            <div className="ide-dropdown" role="menu">
+            <div className="ide-dropdown" role="menu" onKeyDown={menuKeys}>
               <button
                 type="button"
                 role="menuitem"
@@ -565,6 +586,9 @@ export function Ide() {
                 vfs.load(parsed.snapshot);
                 setOpen(parsed.open.filter((p) => vfs.isFile(p)));
                 setActive(parsed.active && vfs.isFile(parsed.active) ? parsed.active : null);
+                shell.cwd = vfs.isDir(parsed.cwd) ? parsed.cwd : "/";
+                setCwdLabel(shell.cwd);
+                setSelectedDir(shell.cwd);
                 setNotice("Workspace imported.");
               } catch (err) {
                 setNotice(`Import failed: ${err instanceof Error ? err.message : "invalid file"}`);
