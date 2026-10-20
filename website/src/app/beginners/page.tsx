@@ -70,8 +70,9 @@ export default function Page() {
       </p>
       <Console code={EXAMPLES.firstCall.code} title="my-first-call.js" rows={5} />
       <p>
-        There are more examples, a React demo and a generator you can feed your own schema in the{" "}
-        <Link href="/playground/">playground</Link>.
+        The <Link href="/playground/">playground</Link> is a full editor with a terminal: create
+        files, run React apps, and generate a client from your own schema. Everything is saved in
+        your browser.
       </p>
 
       <h2 style={{ marginTop: 36 }} id="local">

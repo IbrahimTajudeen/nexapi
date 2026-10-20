@@ -16,6 +16,9 @@ export function Runnable({
   return (
     <div className="runnable">
       <Console code={example.code} title={title ?? `${id}.js`} rows={rows} />
+      <p className="runnable-link">
+        <a href={`/playground/?example=${id}`}>Open in the playground</a>
+      </p>
     </div>
   );
 }

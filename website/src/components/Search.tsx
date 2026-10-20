@@ -27,9 +27,10 @@ export function SearchButton() {
     <>
       <button
         type="button"
-        className="search-btn"
+        className="icon-btn search-btn"
         onClick={() => setOpen(true)}
-        aria-label="Search the documentation"
+        aria-label="Search the site (Ctrl K)"
+        title="Search (Ctrl K)"
       >
         <svg
           width="16"
@@ -44,8 +45,6 @@ export function SearchButton() {
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" />
         </svg>
-        <span>Search docs</span>
-        <kbd>Ctrl K</kbd>
       </button>
       {open && <Dialog onClose={() => setOpen(false)} />}
     </>

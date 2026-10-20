@@ -268,12 +268,13 @@ const M1: Episode[] = [
     module: "start",
     level: "beginner",
     minutes: 6,
-    title: "A tour of the playground and the live examples",
-    summary: "Use the in-browser engine to experiment safely, with a mock API and a network log.",
+    title: "A tour of the playground IDE",
+    summary:
+      "Use the in-browser editor, terminal and mock API to experiment safely. Your files stay in your browser.",
     goals: [
       "Run and edit a live example",
-      "Read the Output and Network panels",
-      "Use the latency slider and the Server returns 500 switch",
+      "Create files and run commands in the terminal",
+      "Read the Output, Preview and Mock API panels, and use the latency and Server returns 500 controls",
     ],
     prerequisites: ["Episode 1"],
     outline: [
@@ -292,8 +293,8 @@ const M1: Episode[] = [
       },
       {
         at: "5:00",
-        title: "The generator tab",
-        notes: "Paste a schema and see the generated files.",
+        title: "The terminal and new projects",
+        notes: "Run new generate, then nyx generate, and read the files it writes.",
       },
     ],
     samples: [{ kind: "example", id: "singleFlight" }],
@@ -305,12 +306,16 @@ const M1: Episode[] = [
         "Latency and failure are controls, not luck.",
       ],
       demo: [
-        "Open the playground.",
+        "Open the playground and show the explorer, editor and panels.",
         "Run singleFlight and read Requests sent: 1.",
         "Change [1,2,3,4,5] to ten ids.",
-        "Toggle failure and run the retries example.",
+        "Toggle failure in the Mock API panel and run the retries example from Docs examples.",
+        "Reload the page to show that your files are still there.",
       ],
-      pitfalls: ["Remember Reset cache and server between experiments."],
+      pitfalls: [
+        "Each run starts a fresh mock server, so state never carries over between runs.",
+        "The playground transpiles TypeScript but does not type-check it.",
+      ],
       exercise:
         "Predict how many requests the singleFlight example sends if you add a second, different user id. Then run it.",
       outro: "Next: how to read the code NyxAPI generates for you.",

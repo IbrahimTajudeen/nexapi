@@ -123,6 +123,12 @@ export const DOCS_NAV: NavSection[] = [
         href: "/docs/best-practices/",
         summary: "Defaults, do and avoid lists, and a production checklist.",
       },
+      {
+        title: "Using the playground",
+        href: "/docs/playground/",
+        summary:
+          "The in-browser editor and terminal: files, commands, shortcuts, storage and limits.",
+      },
     ],
   },
   {
