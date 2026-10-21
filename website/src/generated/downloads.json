@@ -16,8 +16,8 @@
     {
       "file": "nyxapi-core-0.1.0.tgz",
       "kind": "package",
-      "bytes": 67886,
-      "sha256": "0039993b95abc469850337b4553490923baecd9fb2e0c0616352ac2372b02dfc"
+      "bytes": 68169,
+      "sha256": "0d30ef39346a983ce9d80c405ef8012c30f25b3298db12d6eb7f3e361d54194b"
     },
     {
       "file": "nyxapi-devtools-0.1.0.tgz",
@@ -46,14 +46,14 @@
     {
       "file": "nyxapi-source-0.1.0.zip",
       "kind": "source",
-      "bytes": 1295481,
-      "sha256": "22262bac67db716a4542473168d57c7d93deea01d74b15fc790b745e47392bc8"
+      "bytes": 6301214,
+      "sha256": "d0d8318c984fa726b3dd3a23fc2b806135c83822db92164f289b630dc11ed76b"
     },
     {
       "file": "nyxapi-starter-0.1.0.zip",
       "kind": "starter",
-      "bytes": 133489,
-      "sha256": "34cecab01184a3ce4aa679fb0d5ad25b8f1d16590059f6f17cf58b47f2430954"
+      "bytes": 134190,
+      "sha256": "4ac8287737d4a9c7a491674aac113c8dd0e16b79b10d18c06906925dae504fb9"
     }
   ]
 }
