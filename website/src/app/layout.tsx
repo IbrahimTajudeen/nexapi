@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SITE_URL } from "@/site";
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a href="#main" className="sr-only">
           Skip to content
         </a>
+        <AnnouncementBanner />
         <Header />
         <main id="main">{children}</main>
         <Footer />

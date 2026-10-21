@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { EPISODES, MODULES, type Level } from "@/tutorials";
+import { episodeHref, usePlaylist } from "@/lib/content";
+import type { Level } from "@/tutorials";
 
 const FILTERS: { id: "all" | Level; label: string }[] = [
   { id: "all", label: "All levels" },
@@ -17,6 +18,7 @@ const STATUS = {
 } as const;
 
 export function TutorialsView() {
+  const { episodes: EPISODES, modules: MODULES } = usePlaylist();
   const [level, setLevel] = useState<"all" | Level>("all");
   const [onlyOpen, setOnlyOpen] = useState(false);
   const shown = EPISODES.filter(
@@ -59,7 +61,7 @@ export function TutorialsView() {
             </p>
             <div className="cards">
               {eps.map((e) => (
-                <Link key={e.slug} href={`/tutorials/${e.slug}/`} className="card">
+                <Link key={e.slug} href={episodeHref(e.slug)} className="card">
                   <span className="meta">
                     Episode {e.number} · {e.minutes} min ·{" "}
                     <span className={`level ${e.level}`}>{e.level}</span>

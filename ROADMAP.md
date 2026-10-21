@@ -56,6 +56,14 @@
 
 - Exploring: a Vue adapter, then Svelte and Solid adapters. The core is already framework independent; adapters are what is missing.
 
+## Milestone 9: website, playground and community ✅ (site only, not a package release)
+
+- ✅ In-browser playground: code editor, terminal, virtual file system saved in the browser, React preview and NyxAPI templates.
+- ✅ Video tutorial playlist with tutor briefs, and a contributor guide.
+- ✅ Backend for the website on Supabase (Postgres, row-level security, email sign-in) with Cloudinary for images: an admin panel for people, tutorials, releases, roadmap, issues, guides, announcements, media and settings, invites with admin, editor and contributor roles, an activity log, and a public Community page (Hall of Fame and tutors).
+- Open: Signed Cloudinary uploads and deletes through an Edge Function. Today the browser uses an unsigned upload preset and removing a library entry does not delete the file in Cloudinary.
+- Open: Invite emails sent automatically. Today an invite is recorded and the admin tells the person to sign in.
+
 ## Open items, in full
 
 This list mirrors the Roadmap page on the website (`website/src/roadmap.ts`); a test keeps the two in step.
@@ -97,6 +105,11 @@ This list mirrors the Roadmap page on the website (`website/src/roadmap.ts`); a 
 
 - Vue adapter (exploring)
 - Svelte and Solid adapters (exploring)
+
+### Milestone 9: Website, playground and community
+
+- Signed Cloudinary uploads and deletes through an Edge Function (planned)
+- Invite emails sent automatically (planned)
 
 ## Naming
 

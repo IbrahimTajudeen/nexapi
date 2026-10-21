@@ -249,6 +249,30 @@ export const MILESTONES: Milestone[] = [
       { text: "Svelte and Solid adapters", status: "exploring", area: "react" },
     ],
   },
+  {
+    id: 9,
+    title: "Website, playground and community",
+    summary: "The site around the library: learn, try it, and meet the people behind it.",
+    items: [
+      {
+        text: "In-browser playground with editor, terminal, saved files and React preview",
+        status: "shipped",
+        area: "docs",
+      },
+      { text: "Video tutorial playlist and contributor guide", status: "shipped", area: "docs" },
+      {
+        text: "Supabase and Cloudinary backend with an admin panel, invites, roles, activity log and a public Community page",
+        status: "shipped",
+        area: "docs",
+      },
+      {
+        text: "Signed Cloudinary uploads and deletes through an Edge Function",
+        status: "planned",
+        area: "docs",
+      },
+      { text: "Invite emails sent automatically", status: "planned", area: "docs" },
+    ],
+  },
 ];
 
 export interface PlannedRelease {
@@ -394,6 +418,9 @@ export interface Task {
   detail: string;
   area: Area;
   size: "small" | "medium" | "large";
+  /** Only set for tasks managed in the admin panel. */
+  status?: "open" | "claimed" | "closed";
+  url?: string;
 }
 
 /** Contributions that would move the project forward, roughly smallest first. */

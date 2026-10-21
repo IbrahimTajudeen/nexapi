@@ -15,6 +15,7 @@ const LINKS = [
   { href: "/install/", label: "Install" },
   { href: "/releases/", label: "Releases" },
   { href: "/roadmap/", label: "Roadmap" },
+  { href: "/community/", label: "Community" },
   { href: "/contribute/", label: "Contribute" },
 ];
 

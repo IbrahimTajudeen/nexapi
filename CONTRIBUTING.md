@@ -11,7 +11,7 @@ pnpm install
 pnpm check          # lint, type-check, tests, build, generated-code check
 ```
 
-Other useful commands: `pnpm test`, `pnpm lint`, `pnpm format`, `pnpm smoke:pack` (pack, install into an empty project, generate, run), `pnpm --filter @nyxapi/website dev` (the documentation site).
+Other useful commands: `pnpm test`, `pnpm lint`, `pnpm format`, `pnpm smoke:pack` (pack, install into an empty project, generate, run), `pnpm --filter @nyxapi/website dev` (the documentation site). Backend changes: edit `supabase/migrations/`, then run `supabase/tests/run.sh` (needs a local Postgres) and `node website/scripts/generate-seed.mjs` if the built-in content changed; see `docs/BACKEND.md`.
 
 ## Layout
 

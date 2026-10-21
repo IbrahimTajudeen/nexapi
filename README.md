@@ -24,7 +24,7 @@ update.mutate({ name: "New name" });
 
 ## Documentation
 
-The website has the full docs (every option of the client, queries, mutations, pagination and errors can be run in the page), a playground, the release history and the roadmap. Run it locally with `pnpm website:dev`, or see [website/README.md](website/README.md).
+The website has a Community page (maintainers, contributors and tutors) and an admin panel for managing its content, backed by Supabase and Cloudinary; see [docs/BACKEND.md](docs/BACKEND.md). It also has the full docs (every option of the client, queries, mutations, pagination and errors can be run in the page), a playground, the release history and the roadmap. Run it locally with `pnpm website:dev`, or see [website/README.md](website/README.md).
 
 ## Try it
 

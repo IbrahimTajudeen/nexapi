@@ -30,6 +30,8 @@ export function Footer() {
         <div>
           <h4>Project</h4>
           <Link href="/contribute/">Contribute</Link>
+          <Link href="/community/">Community</Link>
+          <Link href="/guides/">Guides</Link>
           {REPO_URL && (
             <a href={REPO_URL} rel="noopener">
               Source code

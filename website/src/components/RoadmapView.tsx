@@ -1,20 +1,9 @@
 "use client";
 import { useMemo, useState } from "react";
-import {
-  AREA_LABEL,
-  LIMITATIONS,
-  MILESTONES,
-  OPEN_TASKS,
-  PLANNED_RELEASES,
-  STATUS_LABEL,
-  type Area,
-  type Status,
-} from "@/roadmap";
+import { useRoadmap } from "@/lib/content";
+import { AREA_LABEL, STATUS_LABEL, type Area, type Status } from "@/roadmap";
 import { VERSION } from "@/site";
 
-const STATUSES = (Object.keys(STATUS_LABEL) as Status[]).filter((s) =>
-  MILESTONES.some((m) => m.items.some((i) => i.status === s)),
-);
 const AREAS = Object.keys(AREA_LABEL) as Area[];
 
 function Chips<T extends string>({
@@ -49,6 +38,15 @@ function Chips<T extends string>({
 }
 
 export function RoadmapView() {
+  const {
+    milestones: MILESTONES,
+    planned: PLANNED_RELEASES,
+    limitations: LIMITATIONS,
+    tasks: OPEN_TASKS,
+  } = useRoadmap();
+  const STATUSES = (Object.keys(STATUS_LABEL) as Status[]).filter((s) =>
+    MILESTONES.some((m) => m.items.some((i) => i.status === s)),
+  );
   const [status, setStatus] = useState<Status | "all">("all");
   const [area, setArea] = useState<Area | "all">("all");
 
@@ -60,7 +58,7 @@ export function RoadmapView() {
           (i) => (status === "all" || i.status === status) && (area === "all" || i.area === area),
         ),
       })).filter((m) => m.items.length > 0),
-    [status, area],
+    [MILESTONES, status, area],
   );
   const limitations = LIMITATIONS.filter((l) => area === "all" || l.area === area);
   const tasks = OPEN_TASKS.filter((t) => area === "all" || t.area === area);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Code } from "@/components/Code";
 import { Console } from "@/components/Console";
+import { ContributorsStrip } from "@/components/ContributorsStrip";
 import { EXAMPLES } from "@/lib/examples";
 import { NODE_MIN, REPO_URL, VERSION } from "@/site";
 
@@ -299,6 +300,8 @@ const session = await api.auth.login.post({ email, password });`}</Code>
           </div>
         </div>
       </section>
+
+      <ContributorsStrip />
 
       <section className="section" id="contribute">
         <div className="wrap">

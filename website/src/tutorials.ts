@@ -61,6 +61,9 @@ export interface Episode {
   status: EpisodeStatus;
   tutorName?: string;
   videoUrl?: string;
+  /** Set when the episode comes from the database and has a linked tutor profile. */
+  tutorProfile?: { name: string; slug: string; avatarUrl: string | null };
+  thumbnailUrl?: string;
 }
 
 export const MODULES: Module[] = [

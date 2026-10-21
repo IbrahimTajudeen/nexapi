@@ -60,6 +60,18 @@ const extra = [
     text: "open source contributors issues pull requests development setup",
   },
   {
+    title: "Community",
+    page: "Project",
+    href: "/community/",
+    text: "hall of fame contributors tutors maintainers people team photos social",
+  },
+  {
+    title: "Guides",
+    page: "Project",
+    href: "/guides/",
+    text: "guides articles written by the team",
+  },
+  {
     title: "Releases",
     page: "Project",
     href: "/releases/",
