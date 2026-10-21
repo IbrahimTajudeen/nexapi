@@ -13,6 +13,7 @@ website/public/downloads/
 website/public/install.sh
 website/next-env.d.ts
 website/*.tsbuildinfo
+website/test/seed.test.ts
 
 supabase
 
