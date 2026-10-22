@@ -287,10 +287,13 @@ export interface Backend {
   upsert<T extends TableName>(table: T, row: Partial<Tables[T]>): Promise<Tables[T]>;
   auth: {
     me(): Promise<Me | null>;
+    /** The token the API expects as `Authorization: Bearer`, or null when signed out. */
+    accessToken(): Promise<string | null>;
     onChange(listener: () => void): () => void;
     /** Email a one-time sign-in link. */
     sendLink(email: string): Promise<void>;
     signOut(): Promise<void>;
   };
-  uploadImage(file: File, folder: string, alt: string): Promise<MediaRow>;
+  /** Demo store only: keeps a small copy in the browser. Real uploads are signed by the API. */
+  uploadImage?(file: File, folder: string, alt: string): Promise<MediaRow>;
 }

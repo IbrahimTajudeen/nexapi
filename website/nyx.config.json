@@ -1,0 +1,5 @@
+{
+  "input": "openapi/site-api.json",
+  "output": "src/api",
+  "validation": true
+}

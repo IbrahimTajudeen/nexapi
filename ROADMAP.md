@@ -55,14 +55,15 @@
 ## Milestone 8: more frameworks
 
 - Exploring: a Vue adapter, then Svelte and Solid adapters. The core is already framework independent; adapters are what is missing.
+- Exploring: C# and .NET package on NuGet. Start narrow with a generator that produces typed C# calls from an OpenAPI document, and add a cache engine only if people want it. It would be a second implementation, so it needs its own tests and benchmarks, and it is not planned until the React parity work (0.2.0) is done and there is demand.
 
 ## Milestone 9: website, playground and community ✅ (site only, not a package release)
 
 - ✅ In-browser playground: code editor, terminal, virtual file system saved in the browser, React preview and NyxAPI templates.
 - ✅ Video tutorial playlist with tutor briefs, and a contributor guide.
 - ✅ Backend for the website on Supabase (Postgres, row-level security, email sign-in) with Cloudinary for images: an admin panel for people, tutorials, releases, roadmap, issues, guides, announcements, media and settings, invites with admin, editor and contributor roles, an activity log, and a public Community page (Hall of Fame and tutors).
-- Open: Signed Cloudinary uploads and deletes through an Edge Function. Today the browser uses an unsigned upload preset and removing a library entry does not delete the file in Cloudinary.
-- Open: Invite emails sent automatically. Today an invite is recorded and the admin tells the person to sign in.
+- ✅ Site API: Next.js route handlers (`/api`) on Supabase, described by an OpenAPI document, with a generated NyxAPI client (queries, mutations, caching, optimistic updates) used by every public page and the admin panel.
+- ✅ Signed Cloudinary uploads and deletes are done by the server, and invite emails are sent automatically.
 
 ## Open items, in full
 
@@ -105,11 +106,7 @@ This list mirrors the Roadmap page on the website (`website/src/roadmap.ts`); a 
 
 - Vue adapter (exploring)
 - Svelte and Solid adapters (exploring)
-
-### Milestone 9: Website, playground and community
-
-- Signed Cloudinary uploads and deletes through an Edge Function (planned)
-- Invite emails sent automatically (planned)
+- C# and .NET package on NuGet (exploring)
 
 ## Naming
 

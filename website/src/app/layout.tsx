@@ -4,6 +4,7 @@ import "./globals.css";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Providers } from "@/components/Providers";
 import { SITE_URL } from "@/site";
 
 export const metadata: Metadata = {
@@ -43,10 +44,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a href="#main" className="sr-only">
           Skip to content
         </a>
-        <AnnouncementBanner />
-        <Header />
-        <main id="main">{children}</main>
-        <Footer />
+        <Providers>
+          <AnnouncementBanner />
+          <Header />
+          <main id="main">{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

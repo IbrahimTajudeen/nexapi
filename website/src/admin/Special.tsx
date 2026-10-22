@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { errorMessage, useResourceMutations, useSettingMutation } from "../lib/api/resources";
+import { useUploadImage } from "../lib/api/upload";
+import { useRows } from "../lib/content";
 import { imageUrl } from "../lib/backend/cloudinary";
 import type {
   AuditRow,
@@ -27,49 +30,26 @@ const ROLE_HELP: Record<StaffRole, string> = {
   contributor: "Only their own profile on the Community page.",
 };
 
-function useLoad<T>(
-  fn: () => Promise<T>,
-  deps: unknown[],
-): { data: T | null; error: string; reload: () => void } {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState("");
-  const [tick, setTick] = useState(0);
-  const run = useCallback(fn, deps);
-  useEffect(() => {
-    let live = true;
-    run().then(
-      (d) => {
-        if (live) {
-          setData(d);
-          setError("");
-        }
-      },
-      (e: unknown) => {
-        if (live) setError(e instanceof Error ? e.message : "Could not load.");
-      },
-    );
-    return () => {
-      live = false;
-    };
-  }, [run, tick]);
-  return { data, error, reload: () => setTick((t) => t + 1) };
-}
-
 /* ------------------------------------------------------------------ dashboard */
 
+function Stat({ resource }: { resource: (typeof RESOURCES)[number] }) {
+  // Shares the cached list with the screen the tile links to, so opening it later is instant.
+  const { rows } = useRows(resource.table, { publishedOnly: false, fresh: true });
+  const flag = resource.table === "announcements" ? "active" : "published";
+  const hidden =
+    (rows as Record<string, unknown>[] | null)?.filter((x) => x[flag] === false).length ?? 0;
+  return (
+    <Link href={`/admin/${resource.id}/`} className="adm-stat">
+      <span className="adm-stat-n">{rows?.length ?? "–"}</span>
+      <span className="adm-stat-l">{resource.title}</span>
+      {hidden > 0 && <span className="adm-stat-d">{hidden} hidden</span>}
+    </Link>
+  );
+}
+
 export function Dashboard() {
-  const { backend, role, email } = useAdmin();
+  const { role, email } = useAdmin();
   const visible = RESOURCES.filter((r) => atLeast(role, r.minRole));
-  const { data } = useLoad(async () => {
-    const out: Record<string, { total: number; draft: number }> = {};
-    for (const r of visible) {
-      if (r.ownRowOnly && role === "contributor") continue;
-      const rows = (await backend.list(r.table)) as unknown as Record<string, unknown>[];
-      const flag = r.table === "announcements" ? "active" : "published";
-      out[r.id] = { total: rows.length, draft: rows.filter((x) => x[flag] === false).length };
-    }
-    return out;
-  }, [backend, role]);
 
   return (
     <section>
@@ -95,13 +75,7 @@ export function Dashboard() {
       ) : (
         <div className="adm-stats">
           {visible.map((r) => (
-            <Link key={r.id} href={`/admin/${r.id}/`} className="adm-stat">
-              <span className="adm-stat-n">{data?.[r.id]?.total ?? "–"}</span>
-              <span className="adm-stat-l">{r.title}</span>
-              {(data?.[r.id]?.draft ?? 0) > 0 && (
-                <span className="adm-stat-d">{data?.[r.id]?.draft} hidden</span>
-              )}
-            </Link>
+            <Stat key={r.id} resource={r} />
           ))}
         </div>
       )}
@@ -148,30 +122,27 @@ const SETTINGS: { key: string; label: string; help: string }[] = [
 ];
 
 export function SettingsPage() {
-  const { backend, toast } = useAdmin();
-  const { data, error, reload } = useLoad(() => backend.list("site_settings"), [backend]);
+  const { toast } = useAdmin();
+  const { rows, error } = useRows("site_settings", { publishedOnly: false, fresh: true });
+  const save = useSettingMutation();
   const [draft, setDraft] = useState<Record<string, string>>({});
-  const [busy, setBusy] = useState("");
+  const busy = save.isPending ? (save.variables?.key ?? "") : "";
 
   useEffect(() => {
-    if (!data) return;
+    if (!rows) return;
     setDraft(
       Object.fromEntries(
-        SETTINGS.map((s) => [s.key, text(data.find((r: SettingRow) => r.key === s.key)?.value)]),
+        SETTINGS.map((s) => [s.key, text(rows.find((r: SettingRow) => r.key === s.key)?.value)]),
       ),
     );
-  }, [data]);
+  }, [rows]);
 
-  async function save(key: string): Promise<void> {
-    setBusy(key);
+  async function saveKey(key: string): Promise<void> {
     try {
-      await backend.upsert("site_settings", { key, value: draft[key] ?? "" });
+      await save.mutateAsync({ key, value: draft[key] ?? "" });
       toast("Saved.");
-      reload();
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Could not save.", "error");
-    } finally {
-      setBusy("");
+      toast(errorMessage(e), "error");
     }
   }
 
@@ -206,7 +177,7 @@ export function SettingsPage() {
           <button
             className="btn primary"
             disabled={busy === s.key}
-            onClick={() => void save(s.key)}
+            onClick={() => void saveKey(s.key)}
           >
             {busy === s.key ? "Saving…" : "Save"}
           </button>
@@ -219,26 +190,30 @@ export function SettingsPage() {
 /* ------------------------------------------------------------------ media */
 
 export function MediaPage() {
-  const { backend, toast, role } = useAdmin();
-  const { data, error, reload } = useLoad(
-    () => backend.list("media", { orderBy: [{ column: "created_at", ascending: false }] }),
-    [backend],
-  );
+  const { toast, role, mode } = useAdmin();
+  const { rows: data, error } = useRows("media", {
+    orderBy: [{ column: "created_at", ascending: false }],
+    publishedOnly: false,
+    fresh: true,
+  });
+  const upload = useUploadImage();
+  const { update, remove } = useResourceMutations("media");
   const input = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
+  const busy = upload.isPending;
 
-  async function upload(files: FileList | null): Promise<void> {
+  async function addFiles(files: FileList | null): Promise<void> {
     if (!files || files.length === 0) return;
-    setBusy(true);
     try {
       for (const f of Array.from(files))
-        await backend.uploadImage(f, "nyxapi/library", f.name.replace(/\.[^.]+$/, ""));
+        await upload.mutateAsync({
+          file: f,
+          folder: "nyxapi/library",
+          alt: f.name.replace(/\.[^.]+$/, ""),
+        });
       toast(files.length === 1 ? "Image uploaded." : `${String(files.length)} images uploaded.`);
-      reload();
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Upload failed.", "error");
+      toast(errorMessage(e), "error");
     } finally {
-      setBusy(false);
       if (input.current) input.current.value = "";
     }
   }
@@ -256,25 +231,29 @@ export function MediaPage() {
     const alt = window.prompt("Description of the image (for screen readers)", m.alt);
     if (alt === null) return;
     try {
-      await backend.update("media", m.id, { alt });
-      reload();
+      await update.mutateAsync({ id: m.id, patch: { alt } });
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Could not save.", "error");
+      toast(errorMessage(e), "error");
     }
   }
 
-  async function remove(m: MediaRow): Promise<void> {
+  async function removeImage(m: MediaRow): Promise<void> {
     if (
       !window.confirm(
-        "Remove this image from the library? Pages that already use it keep working; the file stays in Cloudinary until you delete it there.",
+        "Remove this image from the library? Pages that already use it keep working, but the image link may stop loading if the file is deleted from Cloudinary.",
       )
     )
       return;
     try {
-      await backend.remove("media", m.id);
-      reload();
+      const result = (await remove.mutateAsync(m.id)) as { assetDeleted?: boolean };
+      toast(
+        result.assetDeleted || mode === "demo"
+          ? "Image removed."
+          : "Removed from the library, but the file could not be deleted from Cloudinary.",
+        result.assetDeleted || mode === "demo" ? "ok" : "error",
+      );
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Could not remove.", "error");
+      toast(errorMessage(e), "error");
     }
   }
 
@@ -284,8 +263,8 @@ export function MediaPage() {
         <div>
           <h1>Media library</h1>
           <p className="muted">
-            Images uploaded to Cloudinary. Use them in profiles, tutorials and anywhere that takes
-            an image link.
+            Images uploaded to Cloudinary (signed by the server). Use them in profiles, tutorials
+            and anywhere that takes an image link.
           </p>
         </div>
         <div>
@@ -295,7 +274,7 @@ export function MediaPage() {
             multiple
             accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
             hidden
-            onChange={(e) => void upload(e.target.files)}
+            onChange={(e) => void addFiles(e.target.files)}
           />
           <button className="btn primary" disabled={busy} onClick={() => input.current?.click()}>
             {busy ? "Uploading…" : "Upload images"}
@@ -330,7 +309,7 @@ export function MediaPage() {
                   Describe
                 </button>
                 {atLeast(role, "editor") && (
-                  <button className="btn small danger" onClick={() => void remove(m)}>
+                  <button className="btn small danger" onClick={() => void removeImage(m)}>
                     Remove
                   </button>
                 )}
@@ -346,29 +325,30 @@ export function MediaPage() {
 /* ------------------------------------------------------------------ team */
 
 export function TeamPage() {
-  const { backend, toast, userId, email: myEmail } = useAdmin();
-  const staff = useLoad(
-    () => backend.list("staff", { orderBy: [{ column: "created_at" }] }),
-    [backend],
-  );
-  const invites = useLoad(
-    () => backend.list("staff_invites", { orderBy: [{ column: "created_at", ascending: false }] }),
-    [backend],
-  );
-  const people = useLoad(
-    () => backend.list("people", { orderBy: [{ column: "name" }] }),
-    [backend],
-  );
+  const { toast, userId, email: myEmail, mode } = useAdmin();
+  const staff = useRows("staff", {
+    orderBy: [{ column: "created_at" }],
+    publishedOnly: false,
+    fresh: true,
+  });
+  const invites = useRows("staff_invites", {
+    orderBy: [{ column: "created_at", ascending: false }],
+    publishedOnly: false,
+    fresh: true,
+  });
+  const people = useRows("people", { orderBy: [{ column: "name" }], publishedOnly: false });
+  const staffMut = useResourceMutations("staff");
+  const inviteMut = useResourceMutations("staff_invites");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<StaffRole>("contributor");
   const [person, setPerson] = useState("");
   const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
+  const busy = inviteMut.create.isPending;
 
   const origin = typeof window === "undefined" ? "" : window.location.origin;
   const peopleById = useMemo(
-    () => new Map((people.data ?? []).map((p: Person) => [p.id, p.name])),
-    [people.data],
+    () => new Map((people.rows ?? []).map((p: Person) => [p.id, p.name])),
+    [people.rows],
   );
 
   async function invite(e: React.FormEvent): Promise<void> {
@@ -378,59 +358,61 @@ export function TeamPage() {
       toast("Enter a valid email address.", "error");
       return;
     }
-    setBusy(true);
     try {
-      await backend.insert("staff_invites", {
+      // The server records who invited them and sends the sign-in email.
+      const result = (await inviteMut.create.mutateAsync({
         email: addr,
         role,
         person_id: role === "contributor" && person !== "" ? person : null,
         note: note.trim() || null,
-        invited_by: userId,
-      });
-      toast(`Invited ${addr}. Ask them to sign in at ${origin}/admin/ with this address.`);
+      })) as { emailSent?: boolean; emailError?: string };
+      if (result.emailSent === false && mode === "demo")
+        toast(
+          `Invited ${addr}. Demo mode sends no email; sign in with this address to try the role.`,
+        );
+      else if (result.emailSent === false)
+        toast(
+          `Invited ${addr}, but the email could not be sent${result.emailError ? ` (${result.emailError})` : ""}. Ask them to sign in at ${origin}/admin/ with this address.`,
+          "error",
+        );
+      else toast(`Invited ${addr}. A sign-in link is on its way.`);
       setEmail("");
       setNote("");
       setPerson("");
-      invites.reload();
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Could not invite.", "error");
-    } finally {
-      setBusy(false);
+      toast(errorMessage(err), "error");
     }
   }
 
   async function changeRole(s: StaffRow, next: StaffRole): Promise<void> {
     try {
-      await backend.update("staff", s.user_id, { role: next });
+      await staffMut.update.mutateAsync({ id: s.user_id, patch: { role: next } });
       toast(`${s.email} is now ${ROLE_LABEL[next].toLowerCase()}.`);
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Could not change the role.", "error");
+      toast(errorMessage(err), "error");
     }
-    staff.reload();
   }
 
   async function removeStaff(s: StaffRow): Promise<void> {
     if (!window.confirm(`Remove ${s.email}? They lose access to this panel straight away.`)) return;
     try {
-      await backend.remove("staff", s.user_id);
+      await staffMut.remove.mutateAsync(s.user_id);
       toast(`Removed ${s.email}.`);
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Could not remove.", "error");
+      toast(errorMessage(err), "error");
     }
-    staff.reload();
   }
 
   async function revoke(i: InviteRow): Promise<void> {
     if (!window.confirm(`Withdraw the invite for ${i.email}?`)) return;
     try {
-      await backend.remove("staff_invites", i.email);
+      await inviteMut.remove.mutateAsync(i.email);
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Could not withdraw.", "error");
+      toast(errorMessage(err), "error");
     }
-    invites.reload();
   }
 
-  const pending = (invites.data ?? []).filter((i) => !i.accepted_at);
+  const pending = (invites.rows ?? []).filter((i: InviteRow) => !i.accepted_at);
 
   return (
     <section>
@@ -477,7 +459,7 @@ export function TeamPage() {
               <label htmlFor="inv-person">Their profile</label>
               <select id="inv-person" value={person} onChange={(e) => setPerson(e.target.value)}>
                 <option value="">Not linked yet</option>
-                {(people.data ?? []).map((p: Person) => (
+                {(people.rows ?? []).map((p: Person) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
@@ -502,7 +484,7 @@ export function TeamPage() {
           {busy ? "Inviting…" : "Send invite"}
         </button>
         <p className="muted adm-fine">
-          This records the invite. It does not send an email by itself; tell them to open{" "}
+          They get a sign-in link by email. If it does not arrive, tell them to open{" "}
           <code>{origin}/admin/</code> and sign in with the invited address.
         </p>
       </form>
@@ -525,7 +507,7 @@ export function TeamPage() {
             </tr>
           </thead>
           <tbody>
-            {(staff.data ?? []).map((s) => (
+            {(staff.rows ?? []).map((s: StaffRow) => (
               <tr key={s.user_id}>
                 <td data-label="Email">
                   {s.email}
@@ -603,11 +585,12 @@ export function TeamPage() {
 /* ------------------------------------------------------------------ audit */
 
 export function AuditPage() {
-  const { backend } = useAdmin();
-  const { data, error } = useLoad(
-    () => backend.list("audit_log", { orderBy: [{ column: "at", ascending: false }], limit: 200 }),
-    [backend],
-  );
+  const { rows: data, error } = useRows("audit_log", {
+    orderBy: [{ column: "at", ascending: false }],
+    limit: 200,
+    publishedOnly: false,
+    fresh: true,
+  });
   const [q, setQ] = useState("");
   const rows = useMemo(() => {
     const s = q.trim().toLowerCase();

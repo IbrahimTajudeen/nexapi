@@ -101,6 +101,8 @@ describe("demo backend", () => {
   });
   it("signs in with a role taken from the address and signs out", async () => {
     const be = createDemoBackend();
+    expect(await be.auth.me()).toBeNull(); // the demo asks you to sign in too
+    await be.auth.sendLink("boss@example.com");
     expect((await be.auth.me())?.role).toBe("admin");
     await be.auth.signOut();
     expect(await be.auth.me()).toBeNull();

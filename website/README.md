@@ -1,6 +1,6 @@
 # NyxAPI website
 
-Official documentation site, playground and downloads for NyxAPI. Next.js 16, static export.
+Official documentation site, playground and downloads for NyxAPI. Next.js 16 with a route-handler API on Supabase and Cloudinary; the front end uses a NyxAPI client generated from that API (see [docs/BACKEND.md](../docs/BACKEND.md)).
 
 See [SETUP.md](../SETUP.md) for the full guide. Run from the repository root (needs Node 22.12+ and pnpm). No separate setup step: `dev` and `build`
 first run `scripts/prepare-downloads.mjs`, which builds the packages and creates the generated files
@@ -9,7 +9,7 @@ first run `scripts/prepare-downloads.mjs`, which builds the packages and creates
 ```bash
 pnpm install
 pnpm --filter @nyxapi/website dev      # http://localhost:3000 (first start takes ~1 min)
-pnpm --filter @nyxapi/website build    # writes website/out (static)
+pnpm --filter @nyxapi/website build    # production build (needs a Node runtime to serve /api)
 pnpm --filter @nyxapi/website typecheck
 pnpm test                              # includes website/test (every doc example is executed)
 ```

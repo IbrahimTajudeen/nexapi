@@ -9,8 +9,10 @@
     "dev": "next dev --webpack",
     "prebuild": "node scripts/prepare-downloads.mjs",
     "build": "next build --webpack",
-    "start": "npx serve out",
-    "typecheck": "tsc --noEmit"
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "generate:api": "node scripts/generate-openapi.mjs && node ../packages/cli/dist/cli.js generate",
+    "generate:api:check": "node scripts/generate-openapi.mjs --check && node ../packages/cli/dist/cli.js generate --check"
   },
   "dependencies": {
     "@codemirror/commands": "^6.11.1",

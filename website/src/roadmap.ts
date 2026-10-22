@@ -247,6 +247,7 @@ export const MILESTONES: Milestone[] = [
     items: [
       { text: "Vue adapter", status: "exploring", area: "react" },
       { text: "Svelte and Solid adapters", status: "exploring", area: "react" },
+      { text: "C# and .NET package on NuGet", status: "exploring", area: "codegen" },
     ],
   },
   {
@@ -266,11 +267,15 @@ export const MILESTONES: Milestone[] = [
         area: "docs",
       },
       {
-        text: "Signed Cloudinary uploads and deletes through an Edge Function",
-        status: "planned",
+        text: "Site API: Next.js route handlers on Supabase, an OpenAPI document and a generated NyxAPI client used by every page and the admin",
+        status: "shipped",
         area: "docs",
       },
-      { text: "Invite emails sent automatically", status: "planned", area: "docs" },
+      {
+        text: "Signed Cloudinary uploads and deletes done by the server, and invite emails sent automatically",
+        status: "shipped",
+        area: "docs",
+      },
     ],
   },
 ];
@@ -329,6 +334,14 @@ export interface Limitation {
 
 /** Things that do not work today, stated plainly. Each is true of the current release. */
 export const LIMITATIONS: Limitation[] = [
+  {
+    title: "No C# or .NET package",
+    detail:
+      "NyxAPI is TypeScript and JavaScript. It cannot be called from C# code such as .NET MAUI, WinForms or ASP.NET controllers.",
+    workaround:
+      "Use it in the JavaScript front end of an ASP.NET site, or generate a C# client with NSwag, Kiota or Refit from the same OpenAPI document.",
+    area: "codegen",
+  },
   {
     title: "React only",
     detail: "The core runs anywhere, but the only UI adapter is React.",

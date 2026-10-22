@@ -13,9 +13,6 @@ website/public/downloads/
 website/public/install.sh
 website/next-env.d.ts
 website/*.tsbuildinfo
-website/test/seed.test.ts
-
-supabase
 
 # derived by website/scripts/prepare-downloads.mjs
 website/src/generated/

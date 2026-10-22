@@ -10,6 +10,7 @@ export default tseslint.config(
       "benchmarks/results/**",
       "website/.next/**",
       "website/out/**",
+      "website/src/api/**",
       "website/public/**",
       "website/src/generated/**",
       "website/src/demo/api/**",

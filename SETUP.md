@@ -38,12 +38,18 @@ The first start takes about a minute. It first runs `website/scripts/prepare-dow
 Then Next.js starts at **http://localhost:3000**. These generated files are not committed; they are
 recreated by every `dev` and `build`, so you never run a separate setup step.
 
-## 3. Build the static site
+## 3. Build and run the site
+
+The site is a Next.js app with server route handlers under `/api`, so it needs a Node runtime (Vercel
+provides one). It is no longer a static export.
 
 ```bash
-pnpm website:build      # output in website/out
-npx serve website/out   # preview it
+pnpm website:build                       # production build
+pnpm --filter @nyxapi/website start      # serve it on http://localhost:3000
 ```
+
+Without backend variables the site shows its built-in content. The backend variables (Supabase and
+Cloudinary) are listed in `website/.env.example` and explained in `docs/BACKEND.md`.
 
 Set these before building for production:
 

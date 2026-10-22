@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Callout } from "@/components/Callout";
+import Link from "next/link";
 import { Code } from "@/components/Code";
 import { Doc, H2, H3 } from "@/components/Doc";
 
@@ -96,6 +97,31 @@ npx nyx generate --input openapi.json --output src/api --config nyx.config.json`
         <li>
           A request body is optional in the generated signature when the document omits{" "}
           <code>required: true</code>.
+        </li>
+      </ul>
+
+      <H2>Using NyxAPI from C# projects</H2>
+      <p>
+        NyxAPI is a TypeScript and JavaScript library. It cannot be called from C# code, so it does
+        not work inside .NET MAUI pages, WinForms handlers or ASP.NET controllers. There is no C# or
+        NuGet package yet; one is listed as <em>exploring</em> on the{" "}
+        <Link href="/roadmap/">roadmap</Link>.
+      </p>
+      <ul>
+        <li>
+          <strong>ASP.NET with a JavaScript front end.</strong> Use NyxAPI in the TypeScript or
+          React code, generated from your API&apos;s OpenAPI document as shown above. This is the
+          supported setup.
+        </li>
+        <li>
+          <strong>Hybrid and desktop apps that host web content</strong> (MAUI Blazor Hybrid, a
+          WinForms or WPF WebView2 window). A JavaScript front end inside them can use NyxAPI like
+          any web app. This follows from how those hosts work; it has not been tested here.
+        </li>
+        <li>
+          <strong>Native C# calling your API.</strong> Generate a C# client with NSwag, Kiota or
+          Refit from the same OpenAPI document. You get typed calls, but not NyxAPI&apos;s query
+          cache, request deduplication or invalidation.
         </li>
       </ul>
 

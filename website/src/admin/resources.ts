@@ -585,7 +585,7 @@ export const RESOURCES: Resource[] = [
     ],
     titleKey: "title",
     orderBy: [{ column: "sort" }],
-    search: ["title", "detail", "claimed_by"],
+    search: ["title", "detail"],
     defaults: { area: "docs", size: "small", status: "open", sort: 100, published: true },
     publicPath: () => "/roadmap/",
     fields: [
@@ -614,7 +614,13 @@ export const RESOURCES: Resource[] = [
           { value: "closed", label: "Closed" },
         ],
       },
-      { name: "claimed_by", label: "Claimed by", type: "text", nullable: true },
+      {
+        name: "claimed_by",
+        label: "Claimed by",
+        type: "relation",
+        nullable: true,
+        relation: { table: "people", label: "name", none: "Unclaimed" },
+      },
       { name: "github_url", label: "GitHub issue", type: "url", nullable: true },
       { name: "sort", label: "Order", type: "number", min: 0 },
       PUBLISHED,

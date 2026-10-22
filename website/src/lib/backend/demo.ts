@@ -5,6 +5,7 @@
  * without any account; it is not a place to keep real content. It mimics the main database rules
  * (unique values, https links, a published tutorial needs a video), not row level security.
  */
+import { byTable } from "../../server/spec";
 import { checkImage } from "./cloudinary";
 import { demoSeed } from "./seed-data";
 import {
@@ -85,6 +86,9 @@ function compare(a: unknown, b: unknown): number {
   return text(a).localeCompare(text(b));
 }
 
+/** The demo "token" is just the role and email; there is no server to check it. */
+export const demoToken = (role: StaffRole, email: string): string => `demo:${role}:${email}`;
+
 function readAuth(): { signedIn: boolean; role: StaffRole; email: string } {
   try {
     const raw = localStorage.getItem(AUTH);
@@ -92,7 +96,7 @@ function readAuth(): { signedIn: boolean; role: StaffRole; email: string } {
   } catch {
     /* default */
   }
-  return { signedIn: true, role: "admin", email: "admin@demo.test" };
+  return { signedIn: false, role: "admin", email: "admin@demo.test" };
 }
 
 export function createDemoBackend(): Backend {
@@ -195,6 +199,21 @@ export function createDemoBackend(): Backend {
       if (table !== "staff" && table !== "staff_invites" && table !== "audit_log")
         rec["updated_at"] = now;
       validate(table, rec);
+      // A database returns every column; fill the ones the caller left out the way the schema would.
+      for (const c of byTable(table).columns) {
+        if (c.name in rec) continue;
+        rec[c.name] = c.nullable
+          ? null
+          : c.type === "int"
+            ? 0
+            : c.type === "bool"
+              ? false
+              : c.type === "textarray" || c.type === "jsonarray"
+                ? []
+                : c.type === "jsonobject"
+                  ? {}
+                  : "";
+      }
       if (rows(table).some((r) => r[pk] === rec[pk]))
         throw new BackendError("Something with that name or number already exists.", "23505");
       rows(table).push(rec);
@@ -251,6 +270,10 @@ export function createDemoBackend(): Backend {
       async me(): Promise<Me | null> {
         const a = readAuth();
         return a.signedIn ? { session: { userId: "demo", email: a.email }, role: a.role } : null;
+      },
+      async accessToken() {
+        const a = readAuth();
+        return a.signedIn ? demoToken(a.role, a.email) : null;
       },
       onChange(listener) {
         listeners.add(listener);

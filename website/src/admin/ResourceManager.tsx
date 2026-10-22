@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { errorMessage, fieldErrors, useResourceMutations } from "../lib/api/resources";
+import { useRows } from "../lib/content";
 import { imageUrl } from "../lib/backend/cloudinary";
 import { PRIMARY_KEY } from "../lib/backend/types";
 import { useAdmin } from "./AdminContext";
@@ -59,9 +61,7 @@ function cell(row: Row, col: Column): React.ReactNode {
 }
 
 export function ResourceManager({ resource }: { resource: Resource }) {
-  const { backend, role, userId, toast } = useAdmin();
-  const [rows, setRows] = useState<Row[] | null>(null);
-  const [error, setError] = useState("");
+  const { role, userId, toast } = useAdmin();
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<{ mode: "create" | "edit"; row: Row } | null>(null);
   const pk = PRIMARY_KEY[resource.table];
@@ -69,24 +69,24 @@ export function ResourceManager({ resource }: { resource: Resource }) {
   const canCreate = !own && atLeast(role, resource.canCreate ?? "editor");
   const canDelete = !own && atLeast(role, resource.canDelete ?? "editor");
 
-  const load = useCallback(async () => {
-    try {
-      const all = (await backend.list(resource.table, {
-        orderBy: resource.orderBy,
-      })) as unknown as Row[];
-      setRows(own ? all.filter((r) => r["user_id"] === userId) : all);
-      setError("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load.");
-    }
-  }, [backend, resource, own, userId]);
+  // One cached list per table. Saving, publishing or deleting invalidates it, so this list, the
+  // dropdowns that use the same table and the public pages all refresh without extra code.
+  const list = useRows(resource.table, {
+    orderBy: resource.orderBy,
+    publishedOnly: false,
+    fresh: true,
+  });
+  const { update, remove } = useResourceMutations(resource.table);
+  const error = list.error ?? "";
+  const rows = useMemo<Row[] | null>(() => {
+    const all = list.rows as Row[] | null;
+    return all && own ? all.filter((r) => r["user_id"] === userId) : all;
+  }, [list.rows, own, userId]);
 
   useEffect(() => {
-    setRows(null);
     setEditing(null);
     setQuery("");
-    void load();
-  }, [load]);
+  }, [resource.id]);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -94,27 +94,23 @@ export function ResourceManager({ resource }: { resource: Resource }) {
     return rows.filter((r) => resource.search.some((k) => text(r[k]).toLowerCase().includes(q)));
   }, [rows, query, resource.search]);
 
-  async function remove(row: Row): Promise<void> {
+  async function removeRow(row: Row): Promise<void> {
     const name = text(row[resource.titleKey]) || "this item";
     if (!window.confirm(`Delete “${name}”? This cannot be undone.`)) return;
     try {
-      await backend.remove(resource.table, String(row[pk]));
+      await remove.mutateAsync(String(row[pk]));
       toast(`Deleted “${name}”.`);
-      await load();
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Could not delete.", "error");
+      toast(errorMessage(e), "error");
     }
   }
 
   async function togglePublished(row: Row): Promise<void> {
     const flag = resource.table === "announcements" ? "active" : "published";
     try {
-      await backend.update(resource.table, String(row[pk]), {
-        [flag]: row[flag] !== true,
-      });
-      await load();
+      await update.mutateAsync({ id: String(row[pk]), patch: { [flag]: row[flag] !== true } });
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Could not update.", "error");
+      toast(errorMessage(e), "error");
     }
   }
 
@@ -126,10 +122,9 @@ export function ResourceManager({ resource }: { resource: Resource }) {
         initial={editing.row}
         own={own}
         onClose={() => setEditing(null)}
-        onSaved={async (msg) => {
+        onSaved={(msg) => {
           toast(msg);
           setEditing(null);
-          await load();
         }}
       />
     );
@@ -236,7 +231,7 @@ export function ResourceManager({ resource }: { resource: Resource }) {
                       </button>
                     )}
                     {canDelete && (
-                      <button className="btn small danger" onClick={() => void remove(row)}>
+                      <button className="btn small danger" onClick={() => void removeRow(row)}>
                         Delete
                       </button>
                     )}
@@ -264,12 +259,13 @@ function Editor({
   initial: Row;
   own: boolean;
   onClose: () => void;
-  onSaved: (message: string) => Promise<void>;
+  onSaved: (message: string) => void;
 }) {
-  const { backend, toast } = useAdmin();
+  const { toast } = useAdmin();
+  const { create, update } = useResourceMutations(resource.table);
   const [values, setValues] = useState<Values>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState(false);
+  const saving = create.isPending || update.isPending;
   const pk = PRIMARY_KEY[resource.table];
 
   const fields: Field[] = useMemo(
@@ -323,26 +319,27 @@ function Editor({
         ?.scrollIntoView({ block: "center", behavior: "smooth" });
       return;
     }
-    setSaving(true);
     try {
       const payload = toPayload(fields, values, mode);
       if (mode === "create") {
-        await backend.insert(resource.table, payload);
-        await onSaved(`Created ${resource.singular}.`);
+        await create.mutateAsync(payload);
+        onSaved(`Created ${resource.singular}.`);
       } else {
         const changed = Object.fromEntries(
           Object.entries(payload).filter(([k, v]) => !same(v, initial[k])),
         );
         if (Object.keys(changed).length === 0) {
-          await onSaved("No changes to save.");
+          onSaved("No changes to save.");
           return;
         }
-        await backend.update(resource.table, String(initial[pk]), changed);
-        await onSaved(`Saved ${resource.singular}.`);
+        await update.mutateAsync({ id: String(initial[pk]), patch: changed });
+        onSaved(`Saved ${resource.singular}.`);
       }
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Could not save.", "error");
-      setSaving(false);
+      // The server checks everything again; show its answer next to the fields it names.
+      const fields = fieldErrors(err);
+      if (fields) setErrors(fields);
+      toast(errorMessage(err), "error");
     }
   }
 

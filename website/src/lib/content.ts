@@ -6,8 +6,10 @@
  */
 import { EXAMPLES } from "./examples";
 import { GUIDE_EXAMPLES } from "./guide-examples";
-import { useCallback, useEffect, useState } from "react";
-import { backendMode, loadBackend } from "./backend";
+import { useQuery } from "@nyxapi/react";
+import { useCallback } from "react";
+import { backendMode } from "./backend";
+import { errorMessage, tree, toQuery } from "./api/resources";
 import type {
   IssueRow,
   LimitationRow,
@@ -48,40 +50,39 @@ export interface Rows<T> {
   reload: () => void;
 }
 
-/** Load a table. `rows` stays null until the first response (or forever when no backend is set). */
-export function useRows<T extends TableName>(table: T, options?: ListOptions): Rows<Tables[T]> {
-  const [rows, setRows] = useState<Tables[T][] | null>(null);
-  const [loading, setLoading] = useState(backendMode !== "none");
-  const [error, setError] = useState<string | null>(null);
-  const [tick, setTick] = useState(0);
-  const key = JSON.stringify(options ?? {});
-  useEffect(() => {
-    let live = true;
-    void (async () => {
-      const be = await loadBackend();
-      if (!be) {
-        if (live) setLoading(false);
-        return;
-      }
-      try {
-        const opts: ListOptions = { publishedOnly: true, ...(JSON.parse(key) as ListOptions) };
-        const r = await be.list(table, opts);
-        if (live) {
-          setRows(r);
-          setError(null);
-        }
-      } catch (e) {
-        if (live) setError(e instanceof Error ? e.message : "Could not load content.");
-      } finally {
-        if (live) setLoading(false);
-      }
-    })();
-    return () => {
-      live = false;
-    };
-  }, [table, key, tick]);
-  const reload = useCallback(() => setTick((n) => n + 1), []);
-  return { rows, loading, error, reload };
+export interface RowsOptions extends ListOptions {
+  /**
+   * Staff screens: ask for fresher data (10 s instead of 5 min) and refetch when the tab regains
+   * focus. Combine with `publishedOnly: false` to include unpublished rows.
+   */
+  fresh?: boolean;
+}
+
+/**
+ * Load a table through the generated NyxAPI client. Every component that asks for the same table
+ * with the same filters shares one request and one cache entry. `rows` stays null until the
+ * first response (or forever when no backend is set), so pages can fall back to built-in content.
+ */
+export function useRows<T extends TableName>(table: T, options: RowsOptions = {}): Rows<Tables[T]> {
+  const { fresh, ...list } = options;
+  const query = useQuery(
+    tree(table).get.options(
+      { query: toQuery({ publishedOnly: true, ...list }) },
+      {
+        enabled: backendMode !== "none",
+        ...(fresh ? { staleTime: 10_000, refetchOnWindowFocus: true } : {}),
+      },
+    ),
+  );
+  const { refetch } = query;
+  const reload = useCallback(() => void refetch(), [refetch]);
+  return {
+    // The rows were validated against the generated shapes; this only picks the typed view.
+    rows: (query.data ?? null) as Tables[T][] | null,
+    loading: backendMode !== "none" && query.isPending,
+    error: query.error ? errorMessage(query.error) : null,
+    reload,
+  };
 }
 
 // ---------- defensive readers for hand-edited JSON ----------

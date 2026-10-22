@@ -1,12 +1,38 @@
-# Website backend: Supabase and Cloudinary
+# Website backend: route API, Supabase and Cloudinary
 
-The website is a static export. There is no server of ours: the browser talks straight to Supabase
-(data and sign-in) and Cloudinary (images). Security therefore lives in the database, as row-level
-security (RLS) policies in `supabase/migrations/0001_init.sql`. They are tested against a real
-Postgres by `supabase/tests/run.sh`.
+The website is a Next.js app deployed on Vercel. Its backend is a small REST API served by route
+handlers (`website/src/app/api/[...path]/route.ts`) on top of Supabase (data and sign-in) and
+Cloudinary (images). The front end, public pages and admin panel alike, calls that API through a
+NyxAPI client that is **generated from the API's own OpenAPI document**. The site is therefore a
+real-world use of NyxAPI: generated types, queries, mutations, caching, invalidation and optimistic
+updates.
+
+```
+browser ── NyxAPI client (generated, cached) ──► /api/*  (Next.js route handlers, Vercel)
+                                                    │  one router: src/server/api.ts
+                                                    ├──► Supabase (as the signed-in user, RLS still applies)
+                                                    └──► Cloudinary (signed uploads, deletes)
+```
+
+How it fits together:
+
+- **One router.** `handleApi` in `src/server/api.ts` is framework-agnostic. The Vercel route handler
+  and the in-browser demo transport both call it, and the unit tests call it directly.
+- **One table spec.** `src/server/spec.ts` drives request validation, the OpenAPI document
+  (`website/openapi/site-api.json`) and a test that compares it with the SQL migration column by column.
+- **Generated client.** `nyx generate` (config in `website/nyx.config.json`) writes `website/src/api`.
+  After changing the spec run `pnpm --filter @nyxapi/website generate:api`; `generate:api:check` (part of
+  `pnpm check`) fails if the committed files are stale.
+- **No service-role key.** The server builds a Supabase client per request with the caller's access
+  token, so row-level security (RLS) still decides what each person can do. Policies live in
+  `supabase/migrations/0001_init.sql` and are tested against a real Postgres by `supabase/tests/run.sh`.
+  The API adds validation, clear errors and caching headers on top; it is not the only line of defence.
+- **Sign-in** still happens in the browser with Supabase magic links. The client sends the access token
+  with each API call; `GET /api/me` resolves the role (accepting a pending invite on first sign-in).
 
 Without these settings the site still builds and shows its built-in content (docs, 30 tutorial
-episodes, releases, roadmap). The admin panel then explains that it is not connected.
+episodes, releases, roadmap). The API answers `503 not_configured` and the admin panel explains that it is
+not connected. Browse the API description at `/api/openapi.json` and its health at `/api/status`.
 
 ## What is managed
 
@@ -40,31 +66,34 @@ built-in content is shown, so a fresh project never produces a blank site.
 Supabase's built-in email sender is rate limited. For real use, add your own SMTP provider under
 Authentication, SMTP settings.
 
-## 2. Create the Cloudinary upload preset
+## 2. Get your Cloudinary credentials
 
-1. Settings, Upload, Upload presets: add a preset with **Signing mode: Unsigned**.
-2. Set a folder (for example `nyxapi`), allowed formats `png, jpg, webp, gif, avif`, and a maximum
-   file size (5 MB matches the site's own check).
-3. Copy the cloud name and the preset name.
+Uploads are **signed by the server**, so no unsigned preset is needed. From the Cloudinary dashboard copy
+the cloud name, API key and API secret. The server signs each upload for a fixed folder and image
+formats (`png, jpg, webp, gif, avif`); the browser then uploads straight to Cloudinary. Removing an item
+from the media library also deletes the file in Cloudinary. If that deletion fails the entry is still
+removed and the admin panel tells you the file is still there.
 
-Honest limits of this setup: an unsigned preset can be used by anyone who reads the page source, so
-keep its formats, size and folder tight and watch your usage. Signed uploads and deleting the
-Cloudinary file when a library entry is removed need a server-side function and are not built yet
-(see Milestone 9 in `ROADMAP.md`). Removing an item from the media library does not delete the file in
-Cloudinary.
+## 3. Configure Vercel
 
-## 3. Configure the site
+The site is no longer a static export, so it needs a Node runtime: Vercel provides this for Next.js
+with no extra settings (framework preset **Next.js**, root directory `website`). Add these environment
+variables in Vercel, Project Settings, Environment Variables, then redeploy:
 
-Copy `website/.env.example` to `website/.env.local` and fill it in. On a host, set the same four
-variables in the build settings. They are inlined at build time, so redeploy after changing them.
+| Variable                        | Where used      | Secret  |
+| ------------------------------- | --------------- | ------- |
+| `SUPABASE_URL`                  | server          | no      |
+| `SUPABASE_ANON_KEY`             | server          | no      |
+| `NEXT_PUBLIC_SUPABASE_URL`      | browser sign-in | no      |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | browser sign-in | no      |
+| `CLOUDINARY_CLOUD_NAME`         | server          | no      |
+| `CLOUDINARY_API_KEY`            | server          | no      |
+| `CLOUDINARY_API_SECRET`         | server          | **yes** |
 
-```bash
-cd website
-pnpm build   # writes the static site to website/out
-```
-
-Never put the `service_role` key in the site. The `anon` key is meant to be public; RLS is what
-protects the data.
+The server variables fall back to their `NEXT_PUBLIC_` twins, so you may set only those if you prefer.
+Keep `CLOUDINARY_API_SECRET` without the `NEXT_PUBLIC_` prefix, or it would be shipped to browsers. Never
+put the Supabase `service_role` key anywhere in this site. Copy `website/.env.example` to
+`website/.env.local` for development (`pnpm --filter @nyxapi/website dev`).
 
 ## 4. Make yourself the first admin
 
@@ -90,8 +119,9 @@ To recognise a contributor on the Community page, first create their profile und
 invite them as a contributor and pick that profile. When they sign in with the invited address, the
 profile is linked to their account.
 
-An invite is a record, not an email: tell the person to open `/admin/` and sign in with the invited
-address. Automatic invite emails are on the roadmap.
+Creating an invite also emails the person a sign-in link (Supabase Auth sends it; add your own SMTP
+provider for real use). The admin panel says whether the email went out. If it did not, the invite is
+still saved: tell them to open `/admin/` and sign in with the invited address.
 
 ## Roles at a glance
 
@@ -104,8 +134,8 @@ address. Automatic invite emails are on the roadmap.
 
 ## Trying it without accounts
 
-Build with `NEXT_PUBLIC_BACKEND=demo`. The admin panel signs you in as an admin at once, with sample
-data kept in this browser's local storage. An address containing `editor` or `contributor` gives that
+Build with `NEXT_PUBLIC_BACKEND=demo`. The admin panel shows its sign-in form, but no email is sent and any address
+works. Sample data is kept in this browser's local storage. An address containing `editor` or `contributor` gives that
 role, which is how the role views are checked. Never deploy this.
 
 ## Tests
@@ -113,7 +143,18 @@ role, which is how the role views are checked. Never deploy this.
 - `supabase/tests/run.sh` applies the migration and seed to a local Postgres and checks the RLS
   policies for anonymous visitors and every role, invite claiming, last-admin protection, the
   activity log and the input constraints.
-- `pnpm check` runs the website's unit tests for the form logic, the demo backend, the content
-  mappers and the Cloudinary helpers.
-- What has not been tested here: a live Supabase project (hosted Auth, email delivery) and live
-  Cloudinary uploads. Check those once with your own accounts before launch.
+- `pnpm check` runs the website's unit tests: the API router (roles, validation, caching headers,
+  invites, media), the generated client with cache invalidation, the spec-versus-migration comparison,
+  Cloudinary signing, the form logic and the demo backend. It also checks that the OpenAPI document and
+  the generated client are up to date.
+- What has not been tested here: a live Supabase project (token verification, `claim_invite` through a
+  real JWT, invite email delivery), live Cloudinary upload and delete, and a deployed Vercel run. Check
+  those once with your own accounts before launch.
+
+## Known limits
+
+- No rate limiting on `/api`. Use Vercel's firewall rules or Supabase's own limits if the site gets abuse.
+- Each server instance caches a token's role for 10 seconds, so a removed member may keep access for up
+  to that long on an instance that has already seen their token. RLS still applies to every query.
+- The demo mode runs the same router in the browser with sample data in local storage. It is for previews,
+  not security.

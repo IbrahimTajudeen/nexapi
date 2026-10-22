@@ -678,6 +678,12 @@
   "text": ""
  },
  {
+  "title": "Using NyxAPI from C# projects",
+  "page": "NestJS and ASP.NET Core",
+  "href": "/docs/adapters/#using-nyxapi-from-c-projects",
+  "text": ""
+ },
+ {
   "title": "Any other backend",
   "page": "NestJS and ASP.NET Core",
   "href": "/docs/adapters/#any-other-backend",

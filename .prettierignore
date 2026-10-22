@@ -9,3 +9,5 @@ website/public
 website/src/generated
 website/src/demo/api
 website/next-env.d.ts
+website/src/api
+website/openapi

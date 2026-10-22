@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { imageUrl } from "../lib/backend/cloudinary";
-import type { TableName } from "../lib/backend/types";
+import { errorMessage } from "../lib/api/resources";
+import { useUploadImage } from "../lib/api/upload";
+import { useRows } from "../lib/content";
 import { useAdmin } from "./AdminContext";
 import {
   SOCIAL_NETWORKS,
@@ -362,26 +364,25 @@ function ImageField({
   onChange: (v: string) => void;
   onPublicId: (p: string) => void;
 }) {
-  const { backend, toast } = useAdmin();
+  const { toast } = useAdmin();
+  const upload = useUploadImage();
+  const busy = upload.isPending;
   const input = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
 
   async function pick(file: File | undefined): Promise<void> {
     if (!file) return;
-    setBusy(true);
     try {
-      const media = await backend.uploadImage(
+      const media = await upload.mutateAsync({
         file,
-        field.folder ?? "nyxapi",
-        file.name.replace(/\.[^.]+$/, ""),
-      );
+        folder: field.folder ?? "nyxapi",
+        alt: file.name.replace(/\.[^.]+$/, ""),
+      });
       onChange(media.url);
       onPublicId(media.public_id);
       toast("Image uploaded.");
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Upload failed.", "error");
+      toast(errorMessage(e), "error");
     } finally {
-      setBusy(false);
       if (input.current) input.current.value = "";
     }
   }
@@ -457,27 +458,19 @@ function RelationField({
   value: string;
   onChange: (v: string) => void;
 }) {
-  const { backend } = useAdmin();
-  const [rows, setRows] = useState<{ value: string; label: string }[]>([]);
   const rel = field.relation;
-  useEffect(() => {
-    if (!rel) return;
-    let live = true;
-    const table: TableName = rel.table;
-    void backend.list(table).then((r) => {
-      if (!live) return;
-      const key = "id";
-      setRows(
-        (r as unknown as Record<string, unknown>[]).map((x) => ({
-          value: String(x[key]),
-          label: String(x[rel.label] ?? x[key]),
-        })),
-      );
-    });
-    return () => {
-      live = false;
-    };
-  }, [backend, rel]);
+  // The same cached list the admin screen for that table uses: no second request.
+  const list = useRows(rel?.table ?? "people", {
+    publishedOnly: false,
+    fresh: true,
+    ...(rel ? {} : { limit: 1 }),
+  });
+  const rows = rel
+    ? ((list.rows ?? []) as unknown as Record<string, unknown>[]).map((x) => ({
+        value: scalar(x["id"]),
+        label: scalar(x[rel.label]) || scalar(x["id"]),
+      }))
+    : [];
   return (
     <Shell field={field} error={error} id={id}>
       <select id={id} value={value} onChange={(e) => onChange(e.target.value)}>

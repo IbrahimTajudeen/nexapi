@@ -21,7 +21,7 @@
     "bench": "pnpm --filter @nyxapi/benchmarks bench",
     "website:dev": "pnpm --filter @nyxapi/website dev",
     "website:build": "pnpm --filter @nyxapi/website build",
-    "check": "pnpm --filter @nyxapi/website prepare:site && pnpm lint && pnpm typecheck && pnpm test && pnpm generate:check",
+    "check": "pnpm --filter @nyxapi/website prepare:site && pnpm lint && pnpm typecheck && pnpm test && pnpm generate:check && pnpm --filter @nyxapi/website generate:api:check",
     "smoke:pack": "pnpm build && node scripts/smoke-pack.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version && pnpm install --lockfile-only",

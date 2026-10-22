@@ -10,7 +10,7 @@ import { RESOURCES } from "./resources";
 const GROUPS = ["People", "Learning", "Product", "Site"] as const;
 
 function Sidebar() {
-  const { role, email, signOut, backend } = useAdmin();
+  const { role, email, signOut, mode } = useAdmin();
   const path = usePathname();
   const active = (href: string): boolean => path === href || path === href.replace(/\/$/, "");
   const item = (href: string, label: string) => (
@@ -61,7 +61,7 @@ function Sidebar() {
           {email}
         </span>
         <span className="adm-badge">{role}</span>
-        {backend.mode === "demo" && <span className="adm-badge b-warning">demo data</span>}
+        {mode === "demo" && <span className="adm-badge b-warning">demo data</span>}
         <button className="btn small" onClick={() => void signOut()}>
           Sign out
         </button>
@@ -78,7 +78,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="adm-layout">
             <Sidebar />
             <div className="adm-main">
-              {ctx.backend.mode === "demo" && (
+              {ctx.mode === "demo" && (
                 <p className="adm-note" role="note">
                   Demo mode: everything you change is stored in this browser only and is not shared.
                   Configure Supabase to use real data.

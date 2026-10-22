@@ -77,3 +77,16 @@ Things to know:
 - Enums serialize as integers unless you add `JsonStringEnumConverter`; the generated type follows the
   schema (`0 | 1 | 2`).
 - A request body is optional in the generated signature when Swashbuckle omits `required: true`.
+
+## Using NyxAPI from C# projects
+
+NyxAPI is TypeScript and JavaScript, so it cannot be called from C# code (.NET MAUI pages, WinForms
+handlers, ASP.NET controllers). There is no C# or NuGet package; one is listed as exploring in
+`ROADMAP.md`.
+
+- ASP.NET with a JavaScript front end: use NyxAPI in the front end, generated from the OpenAPI
+  document as above. Supported.
+- Hybrid and desktop apps that host web content (MAUI Blazor Hybrid, WebView2 in WinForms or WPF): a
+  JavaScript front end inside them can use NyxAPI like any web app. Not tested here.
+- Native C# calling your API: generate a C# client with NSwag, Kiota or Refit from the same OpenAPI
+  document. You get typed calls but not NyxAPI's cache, deduplication or invalidation.

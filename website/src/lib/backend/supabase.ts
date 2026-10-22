@@ -1,12 +1,10 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { uploadToCloudinary } from "./cloudinary";
 import {
   BackendError,
   PRIMARY_KEY,
   type Backend,
   type ListOptions,
   type Me,
-  type MediaRow,
   type StaffRole,
   type StaffRow,
   type TableName,
@@ -127,6 +125,10 @@ export function createSupabaseBackend(
           .maybeSingle<Pick<StaffRow, "role">>();
         return { session, role: own.data && isRole(own.data.role) ? own.data.role : null };
       },
+      async accessToken() {
+        const { data } = await sb.auth.getSession();
+        return data.session?.access_token ?? null;
+      },
       onChange(listener) {
         const { data } = sb.auth.onAuthStateChange(() => listener());
         return () => data.subscription.unsubscribe();
@@ -143,18 +145,6 @@ export function createSupabaseBackend(
       async signOut() {
         await sb.auth.signOut();
       },
-    },
-
-    async uploadImage(file, folder, alt): Promise<MediaRow> {
-      const up = await uploadToCloudinary(file, folder);
-      const { data } = await sb.auth.getUser();
-      return (await run(
-        sb
-          .from("media")
-          .insert({ ...up, folder, alt, created_by: data.user?.id ?? null })
-          .select()
-          .single(),
-      )) as unknown as MediaRow;
     },
   };
 }
