@@ -19,7 +19,7 @@ run "$PGBIN/pg_ctl" -D "$dir/data" -o "-p $port -k $dir -c listen_addresses=''" 
 psql_() { run psql -h "$dir" -p "$port" -U postgres -v ON_ERROR_STOP=1 -q "$@"; }
 psql_ -d postgres -c "create database site" >/dev/null
 psql_ -d site -f "$here/setup.sql" >/dev/null
-psql_ -d site -f "$here/../migrations/0001_init.sql" >/dev/null
-echo "migration applied"
+for m in "$here"/../migrations/*.sql; do psql_ -d site -f "$m" >/dev/null; done
+echo "migrations applied"
 if [ -f "$here/../seed.sql" ]; then psql_ -d site -f "$here/../seed.sql" >/dev/null; echo "seed applied"; fi
 psql_ -d site -f "$here/rls.sql" 2>&1 | grep -E "ok |FAILED|PASSED|ERROR" || true

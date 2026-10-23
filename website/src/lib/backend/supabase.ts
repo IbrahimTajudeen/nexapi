@@ -27,7 +27,8 @@ export function explain(error: { message: string; code?: string }): BackendError
   if (code === "23502") return new BackendError("A required field is empty.", code);
   if (code === "PGRST116")
     return new BackendError("That item was not found, or you may not change it.", code);
-  return new BackendError(error.message, code);
+  // Unknown database errors can name tables and columns; keep those out of what people see.
+  return new BackendError("The database could not complete that request.", code);
 }
 
 const isRole = (v: unknown): v is StaffRole =>

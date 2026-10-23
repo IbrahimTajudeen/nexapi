@@ -25,7 +25,7 @@ function checkValue(col: Col, v: unknown, dataImages: boolean): string | null {
         col.https &&
         v !== "" &&
         !HTTPS.test(v) &&
-        !(col.path && /^\/[^/\s]\S*$/.test(v)) &&
+        !(col.path && /^\/[^/\\\s][^\\\s]*$/.test(v)) &&
         !(dataImages && DATA_IMAGE.test(v))
       )
         return `${col.name} must be a link starting with https://${col.path ? " or a path starting with /" : ""}.`;

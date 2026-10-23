@@ -46,6 +46,8 @@ export interface ApiDeps {
   media?: {
     sign(folder: string): SignedUpload;
     destroy(publicId: string): Promise<boolean>;
+    /** Whether an image link and public id really are an upload made under this site's account. */
+    owns(url: string, publicId: string): boolean;
   };
   /** Email a sign-in link to an invited person; absent when not available. */
   sendSignInLink?(email: string, origin: string): Promise<void>;
@@ -114,8 +116,24 @@ function fromError(e: unknown): ApiResponse {
   return fail(500, "server_error", "Something went wrong on the server.");
 }
 
-const PUBLIC_CACHE = { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" };
-const PRIVATE_CACHE = { "Cache-Control": "private, no-store" };
+// A shared cache must never serve a visitor's (published only) answer to a signed-in editor, so
+// every cached answer varies on the Authorization header.
+const PUBLIC_CACHE = {
+  "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+  Vary: "Authorization",
+};
+const PRIVATE_CACHE = { "Cache-Control": "private, no-store", Vary: "Authorization" };
+
+/** Uploads always go under the nyxapi folder; anything else (or a sneaky path) falls back to it. */
+export const UPLOAD_ROOT = "nyxapi";
+export function safeFolder(raw: unknown): string {
+  if (typeof raw !== "string") return UPLOAD_ROOT;
+  const ok =
+    raw.length <= 80 &&
+    /^[a-z0-9_-]+(\/[a-z0-9_-]+)*$/i.test(raw) &&
+    (raw === UPLOAD_ROOT || raw.startsWith(`${UPLOAD_ROOT}/`));
+  return ok ? raw : UPLOAD_ROOT;
+}
 
 function parseOrder(spec: TableSpec, raw: string | null): ListOptions["orderBy"] | string {
   if (!raw) return undefined;
@@ -137,8 +155,8 @@ async function list(
 ): Promise<ApiResponse> {
   if (spec.read !== "public") {
     if (!who) return fail(401, "unauthorized", "Sign in first.");
-    if (!atLeast(who, spec.read === "admin" ? "admin" : "editor"))
-      return fail(403, "forbidden", "Your role cannot read this.");
+    const need = spec.read === "admin" ? "admin" : spec.read === "staff" ? "editor" : "contributor";
+    if (!atLeast(who, need)) return fail(403, "forbidden", "Your role cannot read this.");
   }
   const order = parseOrder(spec, req.query.get("order"));
   if (typeof order === "string") return fail(400, "bad_request", order);
@@ -167,7 +185,20 @@ async function findRow(store: Backend, spec: TableSpec, id: string): Promise<Row
 
 function canWrite(spec: TableSpec, who: Principal | null): boolean {
   if (spec.write === "admin") return atLeast(who, "admin");
+  if (spec.write === "member-own") return atLeast(who, "contributor");
   return atLeast(who, "editor");
+}
+
+/** Contributors may only change media entries they added themselves; editors and admins any. */
+async function mayChangeMedia(
+  store: Backend,
+  spec: TableSpec,
+  id: string,
+  who: Principal,
+): Promise<boolean> {
+  if (atLeast(who, "editor")) return true;
+  const row = await findRow(store, spec, id);
+  return !!row && row["created_by"] === who.userId;
 }
 
 async function create(
@@ -185,10 +216,25 @@ async function create(
   });
   if (!checked.ok) return fail(422, "invalid", "Some fields are not valid.", checked.errors);
   const row: Row = { ...checked.value };
-  if (spec.table === "media") row["created_by"] = who.userId;
+  if (spec.table === "media") {
+    row["created_by"] = who.userId;
+    // In real mode only images uploaded to our own Cloudinary folder may be registered. Otherwise
+    // an editor could register any link, or any public id, and later make the server delete it.
+    if (deps.mode !== "demo") {
+      if (!deps.media)
+        return fail(503, "not_configured", "Image uploads are not configured on the server.");
+      if (!deps.media.owns(String(row["url"]), String(row["public_id"])))
+        return fail(422, "invalid", "Some fields are not valid.", {
+          url: "This is not an image uploaded through this site.",
+        });
+    }
+  }
   if (spec.table === "staff_invites") {
     row["email"] = String(row["email"]).trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(row["email"])))
+    if (
+      String(row["email"]).length > 254 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(row["email"]))
+    )
       return fail(422, "invalid", "Some fields are not valid.", {
         email: "email must be an email address.",
       });
@@ -226,6 +272,8 @@ async function update(
   const store = deps.store(req.token);
   const own = spec.write === "contributor-own" && who.role === "contributor";
   if (!canWrite(spec, who) && !own) return fail(403, "forbidden", "Your role cannot do that.");
+  if (spec.table === "media" && !(await mayChangeMedia(store, spec, id, who)))
+    return fail(403, "forbidden", "You can only change images you added.");
   if (own) {
     const row = await findRow(store, spec, id);
     if (!row || row["user_id"] !== who.userId)
@@ -258,6 +306,8 @@ async function remove(
   if (!canWrite(spec, who)) return fail(403, "forbidden", "Your role cannot do that.");
   const store = deps.store(req.token);
   if (spec.table === "media") {
+    if (!(await mayChangeMedia(store, spec, id, who)))
+      return fail(403, "forbidden", "You can only remove images you added.");
     const row = (await findRow(store, spec, id)) as MediaRow | undefined;
     if (!row) return fail(404, "not_found", "That image was not found.");
     await store.remove("media", id);
@@ -304,10 +354,7 @@ export async function handleApi(req: ApiRequest, deps: ApiDeps): Promise<ApiResp
       if (!deps.media)
         return fail(503, "not_configured", "Image uploads are not configured on the server.");
       const body = req.body as { folder?: unknown } | null;
-      const folder =
-        typeof body?.folder === "string" && /^[a-z0-9/_-]{1,80}$/i.test(body.folder)
-          ? body.folder
-          : "nyxapi";
+      const folder = safeFolder(body?.folder);
       return ok(deps.media.sign(folder), 200, PRIVATE_CACHE);
     }
 
@@ -323,6 +370,10 @@ export async function handleApi(req: ApiRequest, deps: ApiDeps): Promise<ApiResp
 
     if (spec.table === "site_settings") {
       if (method !== "PUT") return fail(405, "method_not_allowed", "Use PUT to change a setting.");
+      if (!/^[a-z0-9][a-z0-9._-]{0,79}$/i.test(second))
+        return fail(422, "invalid", "Some fields are not valid.", {
+          key: "key may use letters, numbers, dots, dashes and underscores.",
+        });
       if (!who) return fail(401, "unauthorized", "Sign in first.");
       if (!canWrite(spec, who)) return fail(403, "forbidden", "Your role cannot do that.");
       const checked = checkBody(

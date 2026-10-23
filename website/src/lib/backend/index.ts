@@ -3,15 +3,17 @@ import type { Backend } from "./types";
 /**
  * Which backend this build talks to. Values are inlined at build time:
  *   NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY  -> "supabase"
- *   NEXT_PUBLIC_BACKEND=demo                                  -> "demo" (data stays in this browser)
+ *   NEXT_PUBLIC_BACKEND=demo (and no Supabase settings)       -> "demo" (data stays in this browser)
  *   neither                                                   -> "none": the site shows its built-in content
  */
 const url = process.env["NEXT_PUBLIC_SUPABASE_URL"] ?? "";
 const anon = process.env["NEXT_PUBLIC_SUPABASE_ANON_KEY"] ?? "";
 const flag = process.env["NEXT_PUBLIC_BACKEND"] ?? "";
 
+// A real Supabase configuration always wins over the demo flag, so a leftover
+// NEXT_PUBLIC_BACKEND=demo can never swap a live site for the fake in-browser admin.
 export const backendMode: "supabase" | "demo" | "none" =
-  flag === "demo" ? "demo" : url !== "" && anon !== "" ? "supabase" : "none";
+  url !== "" && anon !== "" ? "supabase" : flag === "demo" ? "demo" : "none";
 
 let cached: Promise<Backend | null> | undefined;
 

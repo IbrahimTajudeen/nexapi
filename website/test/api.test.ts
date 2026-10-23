@@ -296,6 +296,7 @@ describe("media", () => {
         uploadUrl: "u",
       }),
       destroy: async () => true,
+      owns: () => true,
     };
     expect(
       (await call("POST", "media/sign", { token: editor, body: { folder: "nyxapi/people" } })).body,
@@ -321,6 +322,7 @@ describe("media", () => {
         throw new Error("unused");
       },
       destroy: async (id) => (destroyed.push(id), true),
+      owns: () => true,
     };
     expect((await call("DELETE", `media/${made.id}`, { token: editor })).body).toEqual({
       deleted: true,
@@ -340,6 +342,7 @@ describe("media", () => {
       destroy: async () => {
         throw new Error("down");
       },
+      owns: () => true,
     };
     expect((await call("DELETE", `media/${again.id}`, { token: editor })).body).toEqual({
       deleted: true,

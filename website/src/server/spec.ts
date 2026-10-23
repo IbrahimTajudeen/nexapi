@@ -52,10 +52,10 @@ export interface TableSpec {
   pkType: "uuid" | "text" | "int";
   /** Column that filters public reads (published / active), if any. */
   publicFlag?: "published" | "active";
-  /** Who may read the table: everyone (published rows only for visitors), or admins only. */
-  read: "public" | "staff" | "admin";
-  /** Lowest role that may write. */
-  write: "editor" | "admin" | "contributor-own";
+  /** Who may read the table: everyone (published rows only for visitors), any team member (including contributors), editors and admins, or admins only. */
+  read: "public" | "member" | "staff" | "admin";
+  /** Lowest role that may write. "member-own": any team member may add; contributors change only what they added. */
+  write: "editor" | "admin" | "contributor-own" | "member-own";
   /** Whether POST /<segment> exists. */
   create: boolean;
   columns: readonly Col[];
@@ -406,8 +406,8 @@ export const TABLES: readonly TableSpec[] = [
     singular: "Media",
     pk: "id",
     pkType: "uuid",
-    read: "public",
-    write: "editor",
+    read: "member",
+    write: "member-own",
     create: true,
     columns: [
       id,

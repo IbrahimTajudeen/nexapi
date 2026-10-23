@@ -25,7 +25,7 @@ How it fits together:
   `pnpm check`) fails if the committed files are stale.
 - **No service-role key.** The server builds a Supabase client per request with the caller's access
   token, so row-level security (RLS) still decides what each person can do. Policies live in
-  `supabase/migrations/0001_init.sql` and are tested against a real Postgres by `supabase/tests/run.sh`.
+  `supabase/migrations/` and are tested against a real Postgres by `supabase/tests/run.sh`.
   The API adds validation, clear errors and caching headers on top; it is not the only line of defence.
 - **Sign-in** still happens in the browser with Supabase magic links. The client sends the access token
   with each API call; `GET /api/me` resolves the role (accepting a pending invite on first sign-in).
@@ -53,7 +53,7 @@ built-in content is shown, so a fresh project never produces a blank site.
 ## 1. Create the Supabase project
 
 1. Create a project at supabase.com.
-2. SQL editor: run `supabase/migrations/0001_init.sql`, then `supabase/seed.sql`
+2. SQL editor: run `supabase/migrations/0001_init.sql`, then `0002_media_hardening.sql`, then `supabase/seed.sql`
    (episodes, modules, releases and roadmap, so the admin panel starts with today's content;
    safe to run twice).
 3. Authentication, Providers: keep **Email** on and **Confirm email** on. The invite system relies
@@ -150,6 +150,16 @@ role, which is how the role views are checked. Never deploy this.
 - What has not been tested here: a live Supabase project (token verification, `claim_invite` through a
   real JWT, invite email delivery), live Cloudinary upload and delete, and a deployed Vercel run. Check
   those once with your own accounts before launch.
+
+## Security
+
+See [SECURITY.md](../SECURITY.md) for the full model. In short: every query runs as the signed-in user so
+row-level security is the real gate (the anon key is public by design, so anyone can call Supabase
+directly; the policies must hold on their own, and `supabase/tests/run.sh` proves they do). The API adds
+validation, upload ownership checks, an Origin check on writes, body and token size limits, rate limiting,
+and security headers. **Already deployed? Run `supabase/migrations/0002_media_hardening.sql` in the SQL
+editor once**: it makes the media registry staff-only and stops contributors changing other people's
+entries.
 
 ## Known limits
 

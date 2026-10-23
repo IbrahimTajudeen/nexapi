@@ -3423,7 +3423,12 @@
       "get": {
         "operationId": "listMedia",
         "summary": "List media",
-        "description": "Anyone can read published rows. Signed-in staff also see unpublished ones unless `published=true`.",
+        "description": "Staff only.",
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "order",

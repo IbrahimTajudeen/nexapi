@@ -197,4 +197,32 @@ begin;
   select pg_temp.back();
 rollback;
 
+begin;
+  -- the media registry: staff only to read; contributors only touch what they uploaded
+  insert into public.media (id, public_id, url, created_by) values
+    ('20000000-0000-0000-0000-000000000001', 'nyxapi/a', 'https://res.cloudinary.com/x/image/upload/a.png', '00000000-0000-0000-0000-0000000000c1'),
+    ('20000000-0000-0000-0000-000000000002', 'nyxapi/b', 'https://res.cloudinary.com/x/image/upload/b.png', '00000000-0000-0000-0000-0000000000b1');
+  select pg_temp.act_anon();
+  select pg_temp.check('anon cannot read the media registry', pg_temp.refused($$select count(*) from public.media$$));
+  select pg_temp.back();
+  select pg_temp.act_as('00000000-0000-0000-0000-0000000000c1', 'contrib@example.test');
+  select public.claim_invite();
+  select pg_temp.check('contributor reads media', (select count(*) from public.media) = 2);
+  select pg_temp.check('contributor registers their own upload',
+    not pg_temp.refused($$insert into public.media (public_id, url, created_by) values ('nyxapi/c', 'https://res.cloudinary.com/x/image/upload/c.png', '00000000-0000-0000-0000-0000000000c1')$$));
+  select pg_temp.check('contributor cannot register an upload as someone else',
+    pg_temp.refused($$insert into public.media (public_id, url, created_by) values ('nyxapi/d', 'https://res.cloudinary.com/x/image/upload/d.png', '00000000-0000-0000-0000-0000000000b1')$$));
+  select pg_temp.check('contributor cannot change others media',
+    pg_temp.affected($$update public.media set alt = 'x' where id = '20000000-0000-0000-0000-000000000002'$$) = 0);
+  select pg_temp.check('contributor cannot delete others media',
+    pg_temp.affected($$delete from public.media where id = '20000000-0000-0000-0000-000000000002'$$) = 0);
+  select pg_temp.check('contributor can delete their own media',
+    pg_temp.affected($$delete from public.media where id = '20000000-0000-0000-0000-000000000001'$$) = 1);
+  select pg_temp.back();
+  select pg_temp.act_as('00000000-0000-0000-0000-0000000000b1', 'editor@example.test');
+  select pg_temp.check('editor manages any media',
+    pg_temp.affected($$delete from public.media where id = '20000000-0000-0000-0000-000000000002'$$) = 1);
+  select pg_temp.back();
+rollback;
+
 \echo ALL SECURITY CHECKS PASSED

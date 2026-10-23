@@ -46,6 +46,22 @@ function clientFor(url: string, anon: string, token: string | null): SupabaseCli
   return client;
 }
 
+const PUBLIC_ID = /^nyxapi\/[A-Za-z0-9_/-]+$/;
+
+/**
+ * Is this an image that was uploaded to this site's Cloudinary account and folder? Used before a
+ * media entry is registered, so the library (and the delete that follows) cannot be pointed at
+ * other people's images or at other files in the same account.
+ */
+export function ownsUpload(url: string, publicId: string, cloud: string): boolean {
+  if (!PUBLIC_ID.test(publicId)) return false;
+  const base = `https://res.cloudinary.com/${cloud}/image/upload/`;
+  if (!url.startsWith(base) || /[?#\s]/.test(url)) return false;
+  const rest = url.slice(base.length);
+  // [transformations/]v123/public_id.ext
+  return rest.includes(`${publicId}.`) || rest.endsWith(`/${publicId}`);
+}
+
 /** Reads the environment; null when Supabase is not configured. */
 export function createSupabaseDeps(env: ServerEnv, fetcher: typeof fetch = fetch): ApiDeps | null {
   const url = env.SUPABASE_URL ?? "";
@@ -105,7 +121,12 @@ export function createSupabaseDeps(env: ServerEnv, fetcher: typeof fetch = fetch
           uploadUrl: `https://api.cloudinary.com/v1_1/${cloud}/image/upload`,
         };
       },
+      owns(url, publicId) {
+        return ownsUpload(url, publicId, cloud);
+      },
       async destroy(publicId) {
+        // Never destroy anything outside the folder this site uploads to.
+        if (!PUBLIC_ID.test(publicId)) return false;
         const timestamp = Math.floor(Date.now() / 1000);
         const body = new URLSearchParams({
           public_id: publicId,

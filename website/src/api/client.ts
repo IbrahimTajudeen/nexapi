@@ -278,7 +278,7 @@ export function createApi(client: NyxClient) {
     media: {
       /**
        * List media
-       * Anyone can read published rows. Signed-in staff also see unpublished ones unless `published=true`.
+       * Staff only.
        * `GET /media`
        */
       get: client.query<ListMediaRequest, ListMediaData, ListMediaErrorBody>({ operationId: "listMedia", method: "get", path: "/media", validate: { shape: ListMediaResponse, shapes } }),
